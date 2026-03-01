@@ -11,8 +11,8 @@ const config: Config = {
     v4: true,
   },
 
-  url: 'https://docs.frankmax.digital',
-  baseUrl: '/',
+  url: 'https://andrew-leo-2024.github.io',
+  baseUrl: '/frankmax-docs/',
 
   organizationName: 'andrew-leo-2024',
   projectName: 'frankmax-docs',
