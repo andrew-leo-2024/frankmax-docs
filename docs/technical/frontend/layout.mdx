@@ -1,0 +1,120 @@
+---
+title: Locale Layout
+sidebar_position: 5
+---
+
+# Locale Layout
+
+The locale layout is the root layout for all frontend pages, responsible for resolving the jurisdiction, applying the sovereign theme, and rendering the shared Header and Footer components.
+
+**Source:** `src/app/(frontend)/[locale]/layout.tsx`
+
+## Component
+
+```typescript
+interface LocaleLayoutProps {
+  children: React.ReactNode;
+  params: {
+    locale: string;
+  };
+}
+
+export default async function LocaleLayout({ children, params }: LocaleLayoutProps)
+```
+
+### Props
+
+| Prop | Type | Description |
+|------|------|-------------|
+| `children` | ReactNode | Page content rendered by the matched route |
+| `params.locale` | string | Locale string from the URL (e.g., `en-gb`) |
+
+## Process
+
+The layout performs the following steps on each request:
+
+### 1. Extract Country Code
+
+Extracts the country code from the locale parameter using string parsing (e.g., `en-gb` yields `gb`).
+
+### 2. Fetch Jurisdiction
+
+Queries the `jurisdictions` collection to find the jurisdiction matching the extracted country code:
+
+```typescript
+const jurisdiction = await resolveJurisdiction(locale);
+```
+
+See [Resolve Jurisdiction](../libraries/resolve-jurisdiction) for details.
+
+### 3. Build CSS Variables
+
+Converts the jurisdiction's theme configuration into CSS custom properties using `buildCSSVariables()`:
+
+```typescript
+const cssVars = buildCSSVariables(jurisdiction?.theme);
+```
+
+If the jurisdiction has no theme or is not found, `DEFAULT_PALETTE` values are used.
+
+See [Sovereign Theme Library](../libraries/sovereign-theme) for details.
+
+### 4. Render Layout
+
+Wraps the page content in a `div` with the CSS variables applied as inline styles:
+
+```tsx
+return (
+  <div style={cssVars}>
+    <Header locale={locale} countryName={jurisdiction?.name} />
+    <main>{children}</main>
+    <Footer locale={locale} />
+  </div>
+);
+```
+
+## Rendered Structure
+
+```html
+<div style="--primary: #1e40af; --secondary: #7c3aed; ...">
+  <header>
+    <!-- Header with nav links and country badge -->
+  </header>
+  <main>
+    <!-- Page content (children) -->
+  </main>
+  <footer>
+    <!-- Footer with four-column grid -->
+  </footer>
+</div>
+```
+
+## Theme Cascading
+
+Because the CSS variables are set on the wrapping `div`, all child components can reference them using `var()`:
+
+```css
+/* Any child component */
+.button {
+  background-color: var(--primary);
+}
+
+.card {
+  background-color: var(--surface);
+  border-color: var(--accent);
+}
+
+.text {
+  color: var(--foreground);
+}
+```
+
+This enables jurisdiction-specific theming without any component-level theme awareness. Components simply reference CSS variables and the correct colors are provided by the layout.
+
+## Fallback Behavior
+
+If `resolveJurisdiction()` returns `null` (no matching jurisdiction found):
+
+- `buildCSSVariables(undefined)` is called, which returns the `DEFAULT_PALETTE` values
+- The `countryName` prop on `Header` will be `undefined`, so no country badge is displayed
+- The page still renders normally with default styling

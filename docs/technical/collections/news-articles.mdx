@@ -1,0 +1,71 @@
+---
+title: News Articles
+sidebar_position: 8
+---
+
+# News Articles Collection
+
+The News Articles collection stores curated news content sourced from external feeds and editorial input, connected to jurisdictions and services for targeted distribution.
+
+## Configuration
+
+| Property | Value |
+|----------|-------|
+| **Slug** | `news-articles` |
+| **Admin Group** | News |
+
+## Fields
+
+| Field | Type | Required | Default | Admin | Description |
+|-------|------|----------|---------|-------|-------------|
+| `title` | text | Yes | — | — | Article headline |
+| `slug` | text | Yes | — | Indexed | URL-friendly identifier |
+| `source` | text | No | — | — | Source publication name |
+| `sourceUrl` | text | No | — | — | Original article URL |
+| `summary` | textarea | No | — | — | Brief article summary |
+| `content` | richText | No | — | — | Full article content (Lexical editor) |
+| `jurisdiction` | relationship | No | — | — | Source jurisdiction (single, to `jurisdictions`) |
+| `services` | relationship | No | — | hasMany | Related services |
+| `industry` | text | No | — | — | Industry sector tag |
+| `publishedAt` | date | No | — | — | Original publication date |
+| `minifluxId` | number | No | — | — | Miniflux feed reader entry ID |
+| `targetJurisdictions` | relationship | No | — | Sidebar | Target jurisdictions for display |
+| `targetLanguages` | select (hasMany) | No | — | Sidebar | Target languages |
+| `scheduledPublishAt` | date | No | — | Sidebar, Indexed | Scheduled publication date |
+| `expiresAt` | date | No | — | Sidebar, Indexed | Content expiration date |
+
+## Dual Jurisdiction Fields
+
+News articles have two jurisdiction-related fields serving different purposes:
+
+1. **`jurisdiction`** (single relationship) — The source jurisdiction where the news originated. This is a single relationship to the `jurisdictions` collection.
+
+2. **`targetJurisdictions`** (hasMany relationship) — The jurisdictions where this article should be displayed. This is the standard reusable field used for content filtering.
+
+## Relationships
+
+| Collection | Field | Direction |
+|-----------|-------|-----------|
+| Jurisdictions | `jurisdiction` | Article → Jurisdiction (source) |
+| Jurisdictions | `targetJurisdictions` | Article → Jurisdictions (display targets) |
+| Services | `services` | Article → Services (hasMany) |
+| OpportunityBriefs | `newsArticle` | Brief → Article |
+| Campaigns | `relatedContent` | Campaign → Article (polymorphic) |
+
+## Search Integration
+
+News articles are indexed in MeiliSearch under the `news` index. See [Search Library](../libraries/search) for configuration.
+
+## Frontend Route
+
+- **Listing:** `/[locale]/news` — Displays news articles filtered by the current jurisdiction
+
+## API Endpoints
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET | `/api/news-articles` | List news articles with optional filtering |
+| POST | `/api/news-articles` | Create a new article |
+| GET | `/api/news-articles/:id` | Get a specific article |
+| PATCH | `/api/news-articles/:id` | Update an article |
+| DELETE | `/api/news-articles/:id` | Delete an article |

@@ -1,0 +1,79 @@
+---
+title: Publish Tokens
+sidebar_position: 12
+---
+
+# Publish Tokens Collection
+
+The Publish Tokens collection stores cryptographic proof records generated when content is published through the governance workflow. These tokens provide a verifiable chain of custody for published content.
+
+## Configuration
+
+| Property | Value |
+|----------|-------|
+| **Slug** | `publish-tokens` |
+| **Admin Group** | Governance |
+
+### Access Control
+
+Publish tokens are write-once records:
+
+| Operation | Access |
+|-----------|--------|
+| `create` | `true` (system creates tokens via hooks) |
+| `read` | `true` (all authenticated users can read) |
+| `update` | `false` (tokens cannot be modified) |
+| `delete` | `false` (tokens cannot be deleted) |
+
+## Fields
+
+| Field | Type | Required | Default | Description |
+|-------|------|----------|---------|-------------|
+| `collection` | text | Yes | — | Slug of the published collection |
+| `documentId` | text | Yes | — | ID of the published document |
+| `contentHash` | text | Yes | — | SHA-256 hash of the document content at publish time |
+| `publishedBy` | relationship | Yes | — | User who published the document (to `users`) |
+| `ratifiedBy` | relationship | No | — | User who ratified the document (to `users`) |
+| `jurisdiction` | relationship | No | — | Associated jurisdiction (to `jurisdictions`) |
+| `versionId` | text | No | — | Payload version ID at publish time |
+
+## Token Generation
+
+Publish tokens are generated automatically by the governance hook when a document transitions to the `published` status:
+
+1. The governance hook detects a status change to `published`
+2. The `hashContent()` function generates a SHA-256 hash of the document content (excluding `status`, `createdAt`, `updatedAt`, and `id` fields)
+3. A new publish token is created with the content hash, publishing user, and document reference
+4. If the document was previously ratified, the `ratifiedBy` user is also recorded
+
+## Verification
+
+Publish tokens enable content verification by comparing:
+
+- The `contentHash` stored in the token against a fresh hash of the current document
+- If the hashes match, the document has not been modified since publication
+- If they differ, the document has been altered after publication
+
+## Querying Tokens
+
+To find all publish tokens for a specific document:
+
+```
+GET /api/publish-tokens?where[collection][equals]=pages&where[documentId][equals]=abc123
+```
+
+To find all tokens created by a specific user:
+
+```
+GET /api/publish-tokens?where[publishedBy][equals]=user123
+```
+
+## API Endpoints
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET | `/api/publish-tokens` | List publish tokens |
+| POST | `/api/publish-tokens` | Create a publish token (system use) |
+| GET | `/api/publish-tokens/:id` | Get a specific publish token |
+
+Update and delete operations are not available due to access control restrictions.

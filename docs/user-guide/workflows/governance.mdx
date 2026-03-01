@@ -1,0 +1,122 @@
+---
+title: Governance
+sidebar_position: 3
+---
+
+# Governance
+
+The Frankmax CMS incorporates a multi-layered governance framework that ensures content integrity, accountability, and compliance across the global network of 250+ jurisdiction websites. This page covers the governance mechanisms built into the CMS.
+
+## Audit Logs
+
+The CMS maintains an **immutable audit log** that records significant actions performed in the system. Immutability means that once an audit log entry is created, it cannot be modified or deleted -- even by administrators.
+
+### What Is Logged
+
+Audit log entries capture:
+
+| Field | Description |
+|-------|-------------|
+| **Action** | The type of action performed (create, update, publish, status change, etc.) |
+| **Collection** | Which collection the action was performed on |
+| **Document** | The specific document that was affected |
+| **User** | The admin user who performed the action |
+| **Timestamp** | When the action occurred |
+| **Details** | Relevant details about the change (e.g., status changed from Draft to Review) |
+
+### Immutability
+
+The audit log collection is configured with:
+
+- **No update access:** Existing log entries cannot be modified.
+- **No delete access:** Log entries cannot be removed.
+
+This ensures the audit trail is tamper-proof. Even if a content item is deleted, its audit log entries remain permanently in the system.
+
+### Viewing Audit Logs
+
+Navigate to the **Audit Logs** collection in the sidebar to browse the log. You can filter by:
+
+- Date range
+- User
+- Collection
+- Action type
+
+## Content Hashing
+
+Every time content is published, the system computes a **SHA-256 hash** of the content. This hash serves as a cryptographic fingerprint that can be used to verify the content has not been tampered with.
+
+- The hash is stored in the **PublishTokens** collection alongside the publishing metadata.
+- At any point, you can recompute the hash of the current content and compare it to the stored hash to verify integrity.
+- If the hashes differ, the content has been modified since it was last published through the normal workflow.
+
+See [Publishing](/docs/user-guide/workflows/publishing) for details on how content hashing works during the publish process.
+
+## Doctrine Governance Layers
+
+The Frankmax governance framework is structured into four hierarchical layers, each with increasing flexibility. Content and rules at higher levels constrain what is permissible at lower levels.
+
+### Layer 1: Immutable Law
+
+The highest governance layer. Content and rules classified as Immutable Law **cannot be modified after ratification**. This is enforced programmatically -- the CMS prevents any edits to documents with this governance classification once they have been ratified.
+
+Immutable Law is used for:
+
+- Foundational principles that must never change.
+- Core brand values and identity rules.
+- Regulatory commitments that are permanent.
+
+:::warning
+Once a document is ratified under Immutable Law, it is permanently locked. Ensure the content is thoroughly reviewed before ratification, as there is no mechanism to edit it afterwards.
+:::
+
+### Layer 2: Constitutional Law
+
+Constitutional-level governance provides high stability with a controlled amendment process. Changes to constitutional content require elevated approval and follow a stricter review process than standard content.
+
+Constitutional Law is used for:
+
+- Brand guidelines and identity standards.
+- Core service definitions.
+- Pricing frameworks and policies.
+
+### Layer 3: PEACE Protocol
+
+The PEACE Protocol governance layer covers operational policies and procedures that need regular updates but still require formal approval before changes take effect.
+
+PEACE Protocol content follows the standard content lifecycle (Draft, Review, Ratified, Published) with additional review requirements.
+
+### Layer 4: Operational
+
+The most flexible governance layer. Operational content follows the standard content lifecycle without additional governance constraints beyond the normal status workflow.
+
+Operational governance is used for:
+
+- Day-to-day content (news articles, blog posts).
+- Campaign materials.
+- Temporary promotions and announcements.
+
+## Governance Layer Summary
+
+| Layer | Modifiable After Ratification? | Typical Content | Review Requirements |
+|-------|-------------------------------|-----------------|---------------------|
+| **Immutable Law** | No -- permanently locked | Foundational principles | Thorough pre-ratification review |
+| **Constitutional Law** | Yes -- with elevated approval | Brand guidelines, policies | Enhanced review process |
+| **PEACE Protocol** | Yes -- with standard approval | Operational policies | Standard lifecycle |
+| **Operational** | Yes -- standard workflow | Day-to-day content | Standard lifecycle |
+
+## How Governance Is Enforced
+
+Governance rules are enforced through **hooks** that run on every save operation:
+
+1. **Before Change hooks** validate status transitions and governance constraints before the save is committed.
+2. **After Change hooks** create audit log entries and publish tokens after a successful save.
+
+These hooks run server-side and cannot be bypassed through the admin UI. They ensure consistent enforcement regardless of which user is making the change.
+
+## Tips
+
+- Use the audit log proactively to monitor content changes across the platform.
+- Before ratifying content under Immutable Law, have multiple stakeholders review and approve it, since it cannot be changed afterwards.
+- The combination of audit logs, content hashing, and governance layers provides defence in depth against unauthorised or accidental content modifications.
+- Regular audit log reviews help identify unusual patterns or potential issues early.

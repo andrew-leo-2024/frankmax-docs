@@ -1,0 +1,74 @@
+---
+title: Campaigns Dashboard
+sidebar_position: 3
+---
+
+# Campaigns Dashboard
+
+The Campaigns Dashboard is a custom admin view that provides a visual timeline of all marketing campaigns. It is accessible at `/admin/campaigns-dashboard` and can be reached from the **Command Center** section in the sidebar navigation.
+
+## Accessing the Dashboard
+
+1. Log in to the admin panel.
+2. In the sidebar, click **Campaigns Dashboard** under the Command Center section.
+3. The dashboard loads at `/admin/campaigns-dashboard`.
+
+## Timeline / Gantt View
+
+The main feature of the dashboard is a horizontal timeline (Gantt-style) that displays campaigns as bars spanning their start and end dates.
+
+### Reading the Timeline
+
+- The **horizontal axis** represents time (dates).
+- Each **campaign** is displayed as a horizontal bar.
+- The **bar length** represents the campaign duration (from start date to end date).
+- Bars are **colour-coded by status**:
+
+| Status | Colour |
+|--------|--------|
+| **draft** | Grey |
+| **scheduled** | Blue |
+| **active** | Green |
+| **paused** | Amber/Yellow |
+| **completed** | Purple |
+
+### The "Now" Marker
+
+A vertical **red line** marks the current date and time on the timeline. This makes it easy to see:
+
+- Which campaigns are currently active (bars crossing the red line).
+- Which campaigns are upcoming (bars to the right of the red line).
+- Which campaigns have concluded (bars to the left of the red line).
+
+## Filtering Campaigns
+
+Above the timeline, you will find **status filter buttons** that allow you to show or hide campaigns by status:
+
+- Click a status button to **toggle** that status on or off.
+- Active filters are visually highlighted.
+- You can enable multiple filters simultaneously (e.g., show only "active" and "scheduled" campaigns).
+
+## Campaign Cards
+
+Below or alongside the timeline, each campaign is represented as a **campaign card** showing:
+
+| Information | Description |
+|-------------|-------------|
+| **Name** | The campaign name |
+| **Status** | The current status with a colour-coded badge |
+| **Dates** | Start and end dates |
+| **Budget** | The campaign budget (if set) |
+| **Content Count** | The number of content items linked to the campaign |
+
+Click a campaign card to navigate to the full campaign editor where you can modify its details.
+
+## Creating a New Campaign
+
+The dashboard includes a **"+ New Campaign"** button in the top-right area. Clicking it takes you directly to the campaign creation form, pre-populated with default values.
+
+## Tips
+
+- Use the Campaigns Dashboard during planning meetings to get a visual overview of overlapping campaigns.
+- Filter by "active" status to focus on campaigns currently running.
+- The "Now" marker helps identify campaigns that should be transitioned to "active" or "completed" based on their dates.
+- Hover over a campaign bar on the timeline to see a quick summary tooltip.

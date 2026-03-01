@@ -1,0 +1,96 @@
+---
+title: Campaigns
+sidebar_position: 6
+---
+
+# Campaigns Collection
+
+The Campaigns collection manages marketing campaigns that aggregate content across multiple collections and target specific jurisdictions.
+
+## Configuration
+
+| Property | Value |
+|----------|-------|
+| **Slug** | `campaigns` |
+| **Admin Group** | Content |
+| **Versions/Drafts** | `true` |
+
+## Fields
+
+| Field | Type | Required | Default | Admin | Description |
+|-------|------|----------|---------|-------|-------------|
+| `name` | text | Yes | — | — | Campaign name |
+| `slug` | text | Yes | — | Indexed | URL-friendly identifier |
+| `status` | select | No | `draft` | — | Campaign lifecycle status |
+| `startDate` | date | No | — | Indexed, `dayAndTime` | Campaign start date and time |
+| `endDate` | date | No | — | Indexed, `dayAndTime` | Campaign end date and time |
+| `targetJurisdictions` | relationship | No | — | hasMany | Target jurisdictions for the campaign |
+| `relatedContent` | array | No | — | — | Polymorphic content references |
+| `notes` | richText | No | — | — | Internal campaign notes (Lexical editor) |
+| `budget` | number | No | — | — | Campaign budget in USD |
+| `kpiTargets` | array | No | — | — | Key performance indicator targets |
+
+### Status Options
+
+| Value | Label | Description |
+|-------|-------|-------------|
+| `draft` | Draft | Campaign is being planned |
+| `scheduled` | Scheduled | Campaign is scheduled for future activation |
+| `active` | Active | Campaign is currently running |
+| `paused` | Paused | Campaign is temporarily suspended |
+| `completed` | Completed | Campaign has ended |
+
+### Related Content (Polymorphic)
+
+The `relatedContent` field is an array where each entry contains a polymorphic relationship that can reference any of the following collections:
+
+- `pages`
+- `services`
+- `news-articles`
+- `products`
+
+This allows a single campaign to aggregate different types of content.
+
+```typescript
+{
+  name: 'relatedContent',
+  type: 'array',
+  fields: [
+    {
+      name: 'content',
+      type: 'relationship',
+      relationTo: ['pages', 'services', 'news-articles', 'products'],
+    },
+  ],
+}
+```
+
+### KPI Targets
+
+The `kpiTargets` field is an array of metric tracking entries:
+
+| Sub-field | Type | Description |
+|-----------|------|-------------|
+| `metric` | text | Name of the KPI (e.g., "Page Views", "Conversions") |
+| `target` | number | Target value for the metric |
+| `actual` | number | Actual achieved value |
+
+## Admin Views
+
+Campaigns have a dedicated admin dashboard at `/admin/campaigns-dashboard` that provides:
+
+- Timeline visualization with positioned bars based on start/end dates
+- Status color coding
+- Budget and content count display
+
+See [Campaigns Dashboard](../admin-views/campaigns-dashboard) for details.
+
+## API Endpoints
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET | `/api/campaigns` | List campaigns with optional filtering |
+| POST | `/api/campaigns` | Create a new campaign |
+| GET | `/api/campaigns/:id` | Get a specific campaign |
+| PATCH | `/api/campaigns/:id` | Update a campaign |
+| DELETE | `/api/campaigns/:id` | Delete a campaign |

@@ -1,0 +1,273 @@
+---
+title: Production Deployment
+sidebar_position: 3
+---
+
+# Production Deployment
+
+This guide covers building and deploying the Frankmax CMS to a production environment, including build steps, environment configuration, reverse proxy setup, and process management.
+
+## Build the Application
+
+Create an optimised production build:
+
+```bash
+pnpm build
+```
+
+This compiles the Next.js application and Payload CMS admin panel into the `.next/` directory. The build process also regenerates TypeScript types to `src/payload-types.ts`.
+
+## Start the Production Server
+
+After building, start the production server:
+
+```bash
+pnpm start
+```
+
+By default, the server listens on port 3000. Override this with the `PORT` environment variable:
+
+```bash
+PORT=8080 pnpm start
+```
+
+## Production Environment Configuration
+
+Create a production `.env` file or configure environment variables through your hosting platform. Every production deployment must set the following:
+
+```bash title=".env.production"
+# REQUIRED — Use a strong, unique secret (min 32 characters)
+PAYLOAD_SECRET=your-production-secret-min-32-chars-here
+
+# REQUIRED — PostgreSQL connection string
+DATABASE_URI=postgresql://user:password@db-host:5432/frankmax_cms
+
+# REQUIRED — Public-facing URL (no trailing slash)
+NEXT_PUBLIC_SITE_URL=https://www.frankmax.digital
+
+# MeiliSearch
+MEILISEARCH_HOST=http://meilisearch-host:7700
+MEILISEARCH_KEY=your-production-meilisearch-key
+
+# Node environment
+NODE_ENV=production
+```
+
+:::danger
+**Never use the default `PAYLOAD_SECRET` in production.** The default value `default-secret-change-me` is for development only. Generate a secure random string of at least 32 characters:
+
+```bash
+openssl rand -base64 48
+```
+:::
+
+## Reverse Proxy (Nginx)
+
+In production, place the Node.js server behind a reverse proxy such as Nginx. This handles TLS termination, static file caching, and request buffering.
+
+### Example Nginx Configuration
+
+```nginx title="/etc/nginx/sites-available/frankmax-cms"
+server {
+    listen 80;
+    server_name www.frankmax.digital frankmax.digital;
+    return 301 https://$server_name$request_uri;
+}
+
+server {
+    listen 443 ssl http2;
+    server_name www.frankmax.digital frankmax.digital;
+
+    ssl_certificate     /etc/letsencrypt/live/frankmax.digital/fullchain.pem;
+    ssl_certificate_key /etc/letsencrypt/live/frankmax.digital/privkey.pem;
+
+    # Security headers
+    add_header X-Frame-Options "SAMEORIGIN" always;
+    add_header X-Content-Type-Options "nosniff" always;
+    add_header X-XSS-Protection "1; mode=block" always;
+    add_header Referrer-Policy "strict-origin-when-cross-origin" always;
+    add_header Strict-Transport-Security "max-age=31536000; includeSubDomains" always;
+
+    # Proxy to Next.js
+    location / {
+        proxy_pass http://127.0.0.1:3000;
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection 'upgrade';
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+        proxy_cache_bypass $http_upgrade;
+    }
+
+    # Cache static assets
+    location /_next/static {
+        proxy_pass http://127.0.0.1:3000;
+        add_header Cache-Control "public, max-age=31536000, immutable";
+    }
+
+    # Media uploads
+    location /media {
+        proxy_pass http://127.0.0.1:3000;
+        add_header Cache-Control "public, max-age=86400";
+    }
+
+    client_max_body_size 50M;
+}
+```
+
+Enable the site and reload Nginx:
+
+```bash
+sudo ln -s /etc/nginx/sites-available/frankmax-cms /etc/nginx/sites-enabled/
+sudo nginx -t
+sudo systemctl reload nginx
+```
+
+## Process Management
+
+Use a process manager to keep the Node.js server running, handle restarts on failure, and manage log output.
+
+### Option A: PM2
+
+PM2 is a production process manager for Node.js applications:
+
+```bash
+# Install PM2 globally
+npm install -g pm2
+
+# Start the application
+pm2 start pnpm --name "frankmax-cms" -- start
+
+# Enable startup on boot
+pm2 startup
+pm2 save
+
+# View logs
+pm2 logs frankmax-cms
+
+# Monitor
+pm2 monit
+```
+
+#### PM2 Ecosystem File
+
+For more control, create an `ecosystem.config.cjs` file:
+
+```javascript title="ecosystem.config.cjs"
+module.exports = {
+  apps: [
+    {
+      name: 'frankmax-cms',
+      script: 'node_modules/.bin/next',
+      args: 'start',
+      instances: 'max',
+      exec_mode: 'cluster',
+      env: {
+        NODE_ENV: 'production',
+        PORT: 3000,
+      },
+      max_memory_restart: '1G',
+      log_date_format: 'YYYY-MM-DD HH:mm:ss Z',
+    },
+  ],
+};
+```
+
+Start with the ecosystem file:
+
+```bash
+pm2 start ecosystem.config.cjs
+```
+
+### Option B: systemd
+
+Create a systemd service unit for Linux servers:
+
+```ini title="/etc/systemd/system/frankmax-cms.service"
+[Unit]
+Description=Frankmax CMS
+After=network.target postgresql.service
+
+[Service]
+Type=simple
+User=www-data
+WorkingDirectory=/var/www/frankmax-cms
+ExecStart=/usr/bin/pnpm start
+Restart=on-failure
+RestartSec=10
+EnvironmentFile=/var/www/frankmax-cms/.env.production
+
+# Resource limits
+LimitNOFILE=65535
+MemoryMax=2G
+
+[Install]
+WantedBy=multi-user.target
+```
+
+Enable and start the service:
+
+```bash
+sudo systemctl daemon-reload
+sudo systemctl enable frankmax-cms
+sudo systemctl start frankmax-cms
+
+# Check status
+sudo systemctl status frankmax-cms
+
+# View logs
+sudo journalctl -u frankmax-cms -f
+```
+
+## Production Checklist
+
+Before going live, verify every item on this checklist:
+
+### Security
+
+- [ ] `PAYLOAD_SECRET` is set to a unique, cryptographically random string (minimum 32 characters)
+- [ ] Default credentials have been changed
+- [ ] TLS/SSL is configured and enforced (HTTPS only)
+- [ ] Security headers are set (X-Frame-Options, HSTS, CSP)
+- [ ] `.env` file is not accessible from the web
+- [ ] MeiliSearch API key is changed from the default
+
+### Database
+
+- [ ] PostgreSQL connection uses a dedicated production user (not `postgres`)
+- [ ] Database backups are configured and tested (see [Database](/docs/operations/deployment/database))
+- [ ] All migrations have been applied (`pnpm payload migrate`)
+- [ ] Connection pooling is appropriately sized
+
+### Application
+
+- [ ] `NODE_ENV` is set to `production`
+- [ ] `NEXT_PUBLIC_SITE_URL` matches the production domain
+- [ ] The application builds without errors (`pnpm build`)
+- [ ] Initial admin user has been created
+- [ ] Seed data has been loaded if needed
+
+### Infrastructure
+
+- [ ] Process manager (PM2 or systemd) is configured
+- [ ] Automatic restart on failure is enabled
+- [ ] Log rotation is configured
+- [ ] Monitoring and alerting are in place
+- [ ] MeiliSearch is running and search indexes are initialized
+- [ ] Reverse proxy is configured with proper timeouts
+- [ ] `client_max_body_size` is set for media uploads
+
+### Performance
+
+- [ ] Static assets are cached with long TTLs
+- [ ] Gzip or Brotli compression is enabled at the proxy level
+- [ ] Image optimization via Sharp is working
+- [ ] Database indexes are in place (handled by migrations)
+
+## Next Steps
+
+- [Database](/docs/operations/deployment/database) — PostgreSQL setup and backup strategies
+- [Environment Variables](/docs/operations/configuration/environment-variables) — Complete variable reference
+- [Search Indexing](/docs/operations/maintenance/search-indexing) — Initialize and manage MeiliSearch indexes

@@ -1,0 +1,169 @@
+---
+title: Hooks & Webhooks
+sidebar_position: 3
+---
+
+# Hooks & Webhooks
+
+Payload CMS provides a hook-based event system that runs custom logic at specific points in the document lifecycle. The Frankmax CMS uses hooks for governance workflows and can be extended for webhook-style external notifications.
+
+## Hook Types
+
+Payload supports hooks at both the collection and field level. The Frankmax CMS primarily uses collection-level hooks.
+
+### Collection Hooks
+
+| Hook | Timing | Use Case |
+|------|--------|----------|
+| `beforeValidate` | Before field validation | Transform data before validation |
+| `beforeChange` | Before database write | Governance validation, audit logging |
+| `afterChange` | After database write | External notifications, cache invalidation |
+| `beforeRead` | Before returning data | Data transformation, access filtering |
+| `afterRead` | After returning data | Data enrichment, computed fields |
+| `beforeDelete` | Before document deletion | Deletion guards, cleanup |
+| `afterDelete` | After document deletion | External cleanup, notifications |
+
+### Hook Signature
+
+```typescript
+// beforeChange hook
+const hook: CollectionBeforeChangeHook = async ({
+  data,           // The incoming document data
+  req,            // The Payload request object (includes user)
+  operation,      // 'create' or 'update'
+  originalDoc,    // The existing document (update only)
+}) => {
+  // Modify and return data
+  return data;
+};
+```
+
+## Built-in Hooks
+
+### Governance Hook
+
+The primary hook in the Frankmax CMS is the governance hook, implemented as a `beforeChange` hook via the `createGovernanceHook()` factory.
+
+```typescript
+// Applied to pages, services, and doctrine
+hooks: {
+  beforeChange: [createGovernanceHook('pages')],
+}
+```
+
+This hook handles:
+
+- **Status transition validation** — Enforces the state machine
+- **Audit log creation** — Records all governance actions
+- **Publish token generation** — Creates cryptographic proof on publish
+- **Immutable doctrine enforcement** — Prevents modification of ratified immutable documents
+
+See [Governance Hooks](../hooks/governance-hooks) for complete documentation.
+
+## Adding Webhook-Style Notifications
+
+To send external notifications when documents are created, updated, or published, add `afterChange` hooks to the relevant collections.
+
+### Example: External Webhook on Publish
+
+```typescript
+// src/collections/hooks/webhookNotifier.ts
+import { CollectionAfterChangeHook } from 'payload';
+
+export const createWebhookNotifier = (
+  collectionSlug: string
+): CollectionAfterChangeHook => {
+  return async ({ doc, previousDoc, operation, req }) => {
+    // Only trigger on status change to 'published'
+    if (
+      operation === 'update' &&
+      doc.status === 'published' &&
+      previousDoc?.status !== 'published'
+    ) {
+      try {
+        await fetch(process.env.WEBHOOK_URL, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            event: 'content.published',
+            collection: collectionSlug,
+            documentId: doc.id,
+            slug: doc.slug,
+            publishedAt: new Date().toISOString(),
+          }),
+        });
+      } catch (error) {
+        req.payload.logger.error(
+          `Webhook notification failed for ${collectionSlug}/${doc.id}: ${error}`
+        );
+      }
+    }
+
+    return doc;
+  };
+};
+```
+
+### Registering the Webhook Hook
+
+```typescript
+// In a collection config
+import { createWebhookNotifier } from '../hooks/webhookNotifier';
+
+{
+  slug: 'pages',
+  hooks: {
+    beforeChange: [createGovernanceHook('pages')],
+    afterChange: [createWebhookNotifier('pages')],
+  },
+}
+```
+
+### Example: Notify on Any Change
+
+```typescript
+const notifyOnChange: CollectionAfterChangeHook = async ({
+  doc,
+  operation,
+  collection,
+}) => {
+  await fetch(process.env.WEBHOOK_URL, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      event: `content.${operation}`,
+      collection: collection.slug,
+      documentId: doc.id,
+      timestamp: new Date().toISOString(),
+    }),
+  });
+  return doc;
+};
+```
+
+## Hook Execution Order
+
+When multiple hooks are registered, they execute in array order:
+
+```typescript
+hooks: {
+  beforeChange: [
+    createGovernanceHook('pages'),  // Runs first
+    anotherHook,                    // Runs second
+  ],
+  afterChange: [
+    createWebhookNotifier('pages'), // Runs after database write
+  ],
+}
+```
+
+## Best Practices
+
+| Practice | Reason |
+|----------|--------|
+| Use `afterChange` for external calls | Ensures the database write succeeded before notifying |
+| Catch errors in webhook hooks | Prevent external service failures from blocking CMS operations |
+| Use `beforeChange` for validation | Reject invalid data before it reaches the database |
+| Keep hooks focused | Each hook should handle a single concern |
+| Log failures | Use `req.payload.logger` for consistent logging |
+| Use factory functions | Like `createGovernanceHook()`, factories enable reuse across collections |

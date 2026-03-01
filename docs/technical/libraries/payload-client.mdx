@@ -1,0 +1,130 @@
+---
+title: Payload Client
+sidebar_position: 5
+---
+
+# Payload Client
+
+The Payload client library provides a singleton factory for obtaining the Payload CMS instance, used throughout server-side code to interact with collections and globals.
+
+**Source:** `src/lib/payload.ts`
+
+## getPayloadClient()
+
+Returns a singleton Payload client instance. On the first call, it initializes the client using the Payload configuration. Subsequent calls return the cached instance.
+
+```typescript
+import { getPayload } from 'payload';
+import config from '@payload-config';
+
+export async function getPayloadClient() {
+  return await getPayload({ config });
+}
+```
+
+**Returns:** `Promise<Payload>` — The initialized Payload client instance.
+
+## Usage
+
+The Payload client is used in server components, route handlers, and server-side functions to perform CRUD operations on collections.
+
+### In Server Components
+
+```typescript
+import { getPayloadClient } from '@/lib/payload';
+
+export default async function ServicesPage() {
+  const payload = await getPayloadClient();
+
+  const services = await payload.find({
+    collection: 'services',
+    where: {
+      status: { equals: 'published' },
+    },
+    limit: 50,
+  });
+
+  return <ServicesList services={services.docs} />;
+}
+```
+
+### In Route Handlers
+
+```typescript
+import { getPayloadClient } from '@/lib/payload';
+
+export async function GET(request: Request) {
+  const payload = await getPayloadClient();
+
+  const pages = await payload.find({
+    collection: 'pages',
+    depth: 2,
+  });
+
+  return Response.json(pages);
+}
+```
+
+## Common Operations
+
+### Find Documents
+
+```typescript
+const payload = await getPayloadClient();
+
+// Find with filtering
+const results = await payload.find({
+  collection: 'services',
+  where: { status: { equals: 'published' } },
+  sort: 'name',
+  limit: 20,
+  page: 1,
+  depth: 1,
+});
+```
+
+### Find by ID
+
+```typescript
+const doc = await payload.findByID({
+  collection: 'jurisdictions',
+  id: '123',
+});
+```
+
+### Create Document
+
+```typescript
+const newDoc = await payload.create({
+  collection: 'pages',
+  data: {
+    name: 'New Page',
+    slug: 'new-page',
+    status: 'draft',
+  },
+});
+```
+
+### Update Document
+
+```typescript
+const updated = await payload.update({
+  collection: 'pages',
+  id: '123',
+  data: {
+    status: 'review',
+  },
+});
+```
+
+### Find Global
+
+```typescript
+const siteSettings = await payload.findGlobal({
+  slug: 'site-settings',
+});
+```
+
+## Configuration Import
+
+The `@payload-config` import alias resolves to the `payload.config.ts` file at the project root. This alias is configured in the project's TypeScript path mappings.

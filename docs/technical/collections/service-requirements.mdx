@@ -1,0 +1,52 @@
+---
+title: Service Requirements
+sidebar_position: 15
+---
+
+# Service Requirements Collection
+
+The Service Requirements collection stores detailed requirement specifications for services, organized by type, category, and priority. These provide granular breakdowns of what each service entails.
+
+## Configuration
+
+| Property | Value |
+|----------|-------|
+| **Slug** | `service-requirements` |
+| **Admin Group** | Content |
+
+## Fields
+
+| Field | Type | Required | Default | Description |
+|-------|------|----------|---------|-------------|
+| `externalId` | number | No | — | External reference ID for data import tracking |
+| `serviceType` | text | No | — | Type of service (e.g., professional, managed) |
+| `parentCategory` | text | No | — | Parent category grouping |
+| `classification` | text | No | — | Classification within the parent category |
+| `title` | text | Yes | — | Requirement title |
+| `description` | textarea | No | — | Brief requirement description |
+| `detailedDescription` | textarea | No | — | Comprehensive requirement details |
+| `priority` | number | No | — | Priority ranking (lower numbers = higher priority) |
+| `tags` | text | No | — | Comma-separated tags for categorization |
+
+## Data Volume
+
+The Frankmax platform includes 891 detailed service requirements across all service offerings.
+
+## Usage
+
+Service requirements provide the detailed specification layer beneath services and service classifications. They are used to:
+
+- Define specific deliverables within a service engagement
+- Categorize requirements by type and priority
+- Track requirement coverage across service offerings
+- Support RFP/proposal generation with detailed scope items
+
+## API Endpoints
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET | `/api/service-requirements` | List requirements with optional filtering |
+| POST | `/api/service-requirements` | Create a new requirement |
+| GET | `/api/service-requirements/:id` | Get a specific requirement |
+| PATCH | `/api/service-requirements/:id` | Update a requirement |
+| DELETE | `/api/service-requirements/:id` | Delete a requirement |

@@ -1,0 +1,225 @@
+---
+title: Migrations
+sidebar_position: 1
+---
+
+# Migrations
+
+Database migrations manage schema changes for the Frankmax CMS. Payload CMS uses Drizzle ORM under the hood to generate and execute migrations against the PostgreSQL database.
+
+## Overview
+
+Migration files are stored in `src/migrations/` and tracked by an index file at `src/migrations/index.ts`. Each migration contains `up` and `down` functions that apply or revert schema changes.
+
+```
+src/
+  migrations/
+    20260301_051334_initial.ts    # Initial schema migration
+    index.ts                      # Migration registry
+```
+
+## Running Migrations
+
+Apply all pending migrations to the database:
+
+```bash
+pnpm payload migrate
+```
+
+This executes any migration files that have not yet been applied, in chronological order. Payload tracks which migrations have been applied in a `payload_migrations` table in the database.
+
+## Creating Migrations
+
+When you modify collection schemas, add new fields, or change globals, generate a new migration:
+
+```bash
+pnpm payload migrate:create
+```
+
+This compares the current Payload schema (defined in your collection and global configs) against the existing database schema and generates a migration file with the necessary `ALTER TABLE`, `CREATE TABLE`, or other DDL statements.
+
+The generated file follows the naming convention:
+
+```
+YYYYMMDD_HHMMSS_migration_name.ts
+```
+
+### Example Workflow
+
+1. Modify a collection schema (e.g., add a new field to Pages)
+2. Generate the migration:
+   ```bash
+   pnpm payload migrate:create
+   ```
+3. Review the generated migration file in `src/migrations/`
+4. Apply the migration:
+   ```bash
+   pnpm payload migrate
+   ```
+
+## Migration File Format
+
+Migration files export `up` and `down` functions along with a hash for integrity verification:
+
+```typescript title="src/migrations/20260301_051334_initial.ts"
+import { MigrateUpArgs, MigrateDownArgs } from '@payloadcms/db-postgres'
+
+export async function up({ db, payload, req }: MigrateUpArgs): Promise<void> {
+  // Drizzle ORM schema operations
+  await db.execute(sql`
+    CREATE TABLE IF NOT EXISTS "pages" (
+      "id" serial PRIMARY KEY NOT NULL,
+      "title" varchar NOT NULL,
+      "slug" varchar NOT NULL,
+      -- ... additional columns
+      "created_at" timestamp(3) with time zone DEFAULT now() NOT NULL,
+      "updated_at" timestamp(3) with time zone DEFAULT now() NOT NULL
+    );
+  `)
+}
+
+export async function down({ db, payload, req }: MigrateDownArgs): Promise<void> {
+  await db.execute(sql`DROP TABLE IF EXISTS "pages";`)
+}
+```
+
+### Arguments
+
+| Argument | Description |
+|----------|-------------|
+| `db` | Drizzle ORM database instance for executing raw SQL |
+| `payload` | Payload instance for using the Local API during data migrations |
+| `req` | Request object for context |
+
+## Migration Index
+
+The `src/migrations/index.ts` file registers all migration files:
+
+```typescript title="src/migrations/index.ts"
+import * as migration_20260301_051334_initial from './20260301_051334_initial'
+
+export const migrations = [
+  {
+    up: migration_20260301_051334_initial.up,
+    down: migration_20260301_051334_initial.down,
+    name: '20260301_051334_initial',
+  },
+]
+```
+
+New migrations are automatically appended to this file when you run `pnpm payload migrate:create`.
+
+## Initial Migration
+
+The initial migration (`20260301_051334_initial.ts`) creates the complete database schema including:
+
+- Tables for all 15 collections (Users, Pages, Services, Jurisdictions, Media, Campaigns, Initiatives, Governance States, Software Categories, Software Apps, Software Features, Service Classifications, Service Requirements, News, Tags)
+- Block tables for the 20 content block types
+- Relationship join tables (e.g., `pages_rels`, `services_rels`)
+- The SiteSettings global table
+- The `payload_migrations` tracking table
+- Indexes for frequently queried columns
+
+## Rolling Back Migrations
+
+To roll back the most recently applied migration:
+
+```bash
+pnpm payload migrate:down
+```
+
+This executes the `down` function of the last applied migration, reverting its schema changes.
+
+:::caution
+Rolling back migrations in production is risky and may cause data loss. Always back up your database before rolling back. See [Database Backups](/docs/operations/deployment/database#backup-strategies).
+:::
+
+### Rolling Back Multiple Migrations
+
+Payload rolls back one migration at a time. To roll back multiple migrations, run `migrate:down` repeatedly:
+
+```bash
+pnpm payload migrate:down
+pnpm payload migrate:down
+```
+
+## Resetting the Database
+
+To completely reset the database and re-apply all migrations from scratch:
+
+```bash
+# Drop and recreate the database
+dropdb frankmax_cms
+createdb frankmax_cms
+
+# Apply all migrations
+pnpm payload migrate
+```
+
+:::danger
+This destroys all data. Only use this approach in development environments.
+:::
+
+## Data Migrations
+
+For migrations that need to transform existing data (not just schema changes), use the `payload` argument to access the Local API:
+
+```typescript
+export async function up({ db, payload, req }: MigrateUpArgs): Promise<void> {
+  // Schema change
+  await db.execute(sql`
+    ALTER TABLE "pages" ADD COLUMN "featured" boolean DEFAULT false;
+  `)
+
+  // Data migration — set existing published pages as featured
+  const pages = await payload.find({
+    collection: 'pages',
+    where: { status: { equals: 'published' } },
+    limit: 0,
+  })
+
+  for (const page of pages.docs) {
+    await payload.update({
+      collection: 'pages',
+      id: page.id,
+      data: { featured: true },
+    })
+  }
+}
+```
+
+## Best Practices
+
+- **Always review generated migrations** before applying them. Auto-generated migrations may include unintended changes.
+- **Test migrations against a copy** of production data before deploying.
+- **Never edit a migration** that has already been applied to a shared environment. Create a new migration instead.
+- **Keep migrations small and focused.** One migration per logical change makes rollbacks predictable.
+- **Back up the database** before running migrations in staging or production.
+- **Include both `up` and `down` functions** so migrations can be reversed if needed.
+
+## Troubleshooting
+
+### Migration already applied
+
+If a migration is marked as applied but the schema change is missing, you may need to manually update the `payload_migrations` table:
+
+```sql
+DELETE FROM payload_migrations WHERE name = '20260301_051334_initial';
+```
+
+Then re-run `pnpm payload migrate`.
+
+### Schema drift
+
+If the database schema has drifted from the migration history (e.g., manual schema changes), generate a fresh migration to reconcile:
+
+```bash
+pnpm payload migrate:create
+```
+
+Review the generated migration carefully to ensure it captures only the intended changes.
+
+## Next Steps
+
+- [Database](/docs/operations/deployment/database) — PostgreSQL setup and backup strategies
+- [Seeding](/docs/operations/maintenance/seeding) — Populating the database with initial data

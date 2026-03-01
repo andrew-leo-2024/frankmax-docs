@@ -1,0 +1,83 @@
+---
+title: Scheduling
+sidebar_position: 3
+---
+
+# Scheduling
+
+Scheduling allows you to control when content becomes visible and when it expires. This is essential for time-sensitive campaigns, seasonal content, event promotions, and regulatory announcements that must go live or be removed at specific times.
+
+## Scheduling Fields
+
+Two fields control content scheduling. Both are available on pages, services, news articles, and products in the sidebar panel of the content editor.
+
+| Field | Type | Purpose |
+|-------|------|---------|
+| **scheduledPublishAt** | Day and Time picker | Content becomes visible **after** this date and time |
+| **expiresAt** | Day and Time picker | Content is **hidden after** this date and time |
+
+### scheduledPublishAt
+
+When set, the content will not appear on the frontend until the specified date and time, even if the content has `published` status. This enables you to prepare and publish content in advance, with it automatically becoming visible at the scheduled time.
+
+- **Not set:** Content is visible immediately upon publishing (subject to other filters).
+- **Set to a future date:** Content is hidden until that date and time arrives.
+- **Set to a past date:** Content is visible (the scheduled date has already passed).
+
+### expiresAt
+
+When set, the content will automatically stop appearing on the frontend after the specified date and time. The content is not deleted -- it remains in the CMS and can be reactivated by clearing or extending the expiry date.
+
+- **Not set:** Content never expires and remains visible indefinitely.
+- **Set to a future date:** Content will be hidden when that date and time arrives.
+- **Set to a past date:** Content is already expired and hidden from the frontend.
+
+## Using Both Fields Together
+
+You can use `scheduledPublishAt` and `expiresAt` together to create a precise visibility window:
+
+| scheduledPublishAt | expiresAt | Result |
+|--------------------|-----------|--------|
+| Not set | Not set | Always visible (when published) |
+| 1 March 2026 09:00 | Not set | Visible from 1 March 2026 onwards |
+| Not set | 31 March 2026 23:59 | Visible until 31 March 2026 |
+| 1 March 2026 09:00 | 31 March 2026 23:59 | Visible only during March 2026 |
+
+## How Scheduling Combines with Content Filters
+
+Scheduling is one of three content targeting mechanisms. All three are combined with AND logic when filtering content on the frontend:
+
+1. **Jurisdiction targeting** -- Is this content available for the visitor's jurisdiction?
+2. **Language targeting** -- Is this content available in the visitor's language?
+3. **Scheduling** -- Is the current date/time within the content's visibility window?
+
+Content must pass all three filters to appear. For example, a page targeted to the United Kingdom, in English only, with `scheduledPublishAt` of 1 March 2026 will only appear on the UK English site after 1 March 2026.
+
+## Performance
+
+Both `scheduledPublishAt` and `expiresAt` fields are **indexed** in the database for performance. This means scheduling filters do not add significant query overhead, even across the full content set of 250+ jurisdictions.
+
+## Common Use Cases
+
+### Campaign Landing Pages
+
+Set `scheduledPublishAt` to the campaign start date and `expiresAt` to the campaign end date. The page automatically appears and disappears without manual intervention.
+
+### Seasonal Content
+
+Create holiday or seasonal content well in advance, then schedule it to appear during the appropriate period (e.g., a year-end promotion visible only in December).
+
+### Regulatory Announcements
+
+Set `scheduledPublishAt` to the exact date and time a regulation takes effect. The content will not appear prematurely.
+
+### Event Promotions
+
+Schedule event-related content to expire after the event has concluded, keeping the site current without manual cleanup.
+
+## Tips
+
+- Always verify the timezone used by the date/time picker. Scheduled times are evaluated against the server's timezone.
+- Scheduling does not override status. Content must have `published` status **and** be within the scheduling window to appear on the frontend.
+- Use the [Analytics Overview](/docs/user-guide/analytics) dashboard to see a list of upcoming scheduled content.
+- To remove scheduling constraints, simply clear the date/time fields and save.

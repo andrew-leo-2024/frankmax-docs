@@ -1,0 +1,84 @@
+---
+title: Architecture Overview
+sidebar_position: 1
+---
+
+# Architecture Overview
+
+The Frankmax CMS is built on a modern, layered architecture that combines Payload CMS v3 with Next.js to deliver a headless content management system with full-stack rendering capabilities.
+
+## Tech Stack
+
+| Layer | Technology | Purpose |
+|-------|-----------|---------|
+| **CMS** | Payload CMS 3 | Content modeling, admin UI, access control, hooks |
+| **Framework** | Next.js (App Router) | Server-side rendering, API routes, routing |
+| **Database** | PostgreSQL | Primary data store via `@payloadcms/db-postgres` |
+| **ORM** | Drizzle ORM | Type-safe database queries, migrations |
+| **Rich Text** | Lexical | Rich text editor integrated with Payload |
+| **Image Processing** | Sharp | Image resizing, optimization, format conversion |
+| **Search** | MeiliSearch | Full-text search across services, software, and news |
+
+## Architecture Layers
+
+The system follows a four-layer architecture:
+
+```
+┌─────────────────────────────────────────────┐
+│              Frontend (React)               │
+│   Next.js App Router + Server Components    │
+├─────────────────────────────────────────────┤
+│           Next.js API Routes                │
+│   Payload REST API + Custom Endpoints       │
+├─────────────────────────────────────────────┤
+│             Payload CMS v3                  │
+│  Collections, Globals, Hooks, Access Control│
+├─────────────────────────────────────────────┤
+│       PostgreSQL + Drizzle ORM              │
+│      Data persistence & migrations          │
+└─────────────────────────────────────────────┘
+```
+
+### Database Layer
+
+PostgreSQL serves as the primary data store. Drizzle ORM provides type-safe schema definitions and query building. Migrations are managed through Payload's built-in migration system stored in `src/migrations/`.
+
+### Payload CMS Layer
+
+Payload CMS v3 manages:
+
+- **15 collections** organized into five admin groups: System, Content, Governance, Directory, and News
+- **1 global** (`SiteSettings`) for site-wide configuration
+- **20 blocks** for composable page layouts
+- **Hooks** for governance workflows, content hashing, and audit logging
+- **Access control** with role-based permissions (admin, editor, viewer)
+
+### API Layer
+
+Next.js API routes expose the Payload REST API at `/api/{collection}`. All standard CRUD operations are available, along with authentication, querying, and depth-based relationship resolution.
+
+### Frontend Layer
+
+The frontend uses Next.js App Router with a `(frontend)` route group. Locale-based routing (`/[locale]/`) powers the multi-jurisdiction site network. Server Components fetch data directly from Payload, while Client Components handle interactive features like search and live preview.
+
+## Key Capabilities
+
+| Capability | Implementation |
+|-----------|---------------|
+| Multi-jurisdiction content | `targetJurisdictions` field + content filters |
+| Sovereign theming | Per-jurisdiction CSS variable palettes |
+| Content governance | State machine hooks with audit logging |
+| Live preview | Payload Live Preview with draft mode |
+| Full-text search | MeiliSearch with configurable indexes |
+| Block-based layouts | 20 composable content blocks |
+| 5 custom admin views | Sites Dashboard, Campaigns, Orchestrator, Analytics, Site Detail |
+
+## Environment Variables
+
+| Variable | Purpose |
+|----------|---------|
+| `DATABASE_URI` | PostgreSQL connection string |
+| `PAYLOAD_SECRET` | Payload encryption secret |
+| `MEILISEARCH_HOST` | MeiliSearch server URL |
+| `MEILISEARCH_KEY` | MeiliSearch API key |
+| `NEXT_PUBLIC_SERVER_URL` | Public server URL for previews |

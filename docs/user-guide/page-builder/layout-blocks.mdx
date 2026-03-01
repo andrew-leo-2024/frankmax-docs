@@ -1,0 +1,167 @@
+---
+title: Layout Blocks
+sidebar_position: 2
+---
+
+# Layout Blocks
+
+Layout blocks define the structural grid of a page section. They control how content is arranged in columns, grids, and hero areas. There are five layout blocks available.
+
+## HeroBanner
+
+The HeroBanner block creates a full-width hero section at the top of a page (or anywhere in the layout). It supports background colours, images, and videos with overlaid text and call-to-action buttons.
+
+### Fields
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| **title** | Text | Yes | The main heading displayed prominently in the hero area |
+| **subtitle** | Text | No | A secondary line of text below the title |
+| **backgroundType** | Select | Yes | Determines the background style. Options: `color`, `image`, `video` |
+| **backgroundColor** | Color | Conditional | Shown when backgroundType is `color`. Sets a solid background colour |
+| **backgroundImage** | Upload | Conditional | Shown when backgroundType is `image`. An image from the Media library |
+| **backgroundVideo** | Upload | Conditional | Shown when backgroundType is `video`. A video file from the Media library |
+| **height** | Select | Yes | Controls the vertical height of the hero. Options: `sm` (small), `md` (medium), `lg` (large), `full` (full viewport height) |
+| **textAlign** | Select | No | Horizontal alignment of the text content. Options: `left`, `center`, `right`. Default: `center` |
+| **ctaButtons** | Array | No | Up to 3 call-to-action buttons |
+
+### CTA Button Fields
+
+Each CTA button in the `ctaButtons` array has:
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| **label** | Text | Yes | The button text |
+| **href** | Text | Yes | The URL the button links to (internal path or external URL) |
+| **variant** | Select | No | The visual style of the button. Options: `primary`, `secondary`, `outline`, `ghost` |
+
+### Usage Tips
+
+- Use `full` height for landing pages where the hero should fill the entire viewport.
+- Limit CTA buttons to 2 for most cases; 3 buttons can look cluttered on mobile.
+- When using a background image, ensure the image has sufficient contrast for text readability. The system applies a dark overlay automatically, but high-contrast images work best.
+
+---
+
+## TwoColumn
+
+The TwoColumn block divides a section into two side-by-side columns with configurable width ratios. Each column can contain rich text content and an optional image.
+
+### Fields
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| **ratio** | Select | Yes | The width split between left and right columns. Options: `50-50`, `33-67`, `67-33`, `25-75`, `75-25` |
+| **verticalAlign** | Select | No | Vertical alignment of column content. Options: `top`, `center`, `bottom`. Default: `top` |
+| **colorVariant** | Select | No | Background colour scheme applied to the entire block. Options: `default`, `primary`, `secondary`, `accent`, `surface` |
+
+### Left Column Fields
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| **left.content** | Rich Text | No | Rich text content for the left column |
+| **left.image** | Upload | No | An image displayed in the left column |
+
+### Right Column Fields
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| **right.content** | Rich Text | No | Rich text content for the right column |
+| **right.image** | Upload | No | An image displayed in the right column |
+
+### Usage Tips
+
+- Use `67-33` or `33-67` for content-heavy sections paired with a supporting image.
+- Use `50-50` for balanced comparisons or side-by-side features.
+- The `verticalAlign: center` option is useful when one column has more content than the other, keeping the shorter column centred relative to the taller one.
+
+---
+
+## ThreeColumn
+
+The ThreeColumn block creates three equal-width columns, each containing rich text content and an optional image.
+
+### Fields
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| **colorVariant** | Select | No | Background colour scheme. Options: `default`, `primary`, `secondary`, `accent`, `surface` |
+
+### Column Fields (repeated for columns 1, 2, and 3)
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| **column[n].content** | Rich Text | No | Rich text content for the column |
+| **column[n].image** | Upload | No | An image displayed in the column |
+
+### Usage Tips
+
+- Three columns work well for feature highlights, service categories, or team member spotlights.
+- On mobile viewports, columns stack vertically in order (column 1, then 2, then 3).
+- Keep content roughly equal in length across all three columns for the best visual balance.
+
+---
+
+## FourColumn
+
+The FourColumn block creates four equal-width columns, each with a heading, content area, and optional image.
+
+### Fields
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| **colorVariant** | Select | No | Background colour scheme. Options: `default`, `primary`, `secondary`, `accent`, `surface` |
+
+### Column Fields (repeated for columns 1, 2, 3, and 4)
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| **column[n].heading** | Text | No | A heading for the column |
+| **column[n].content** | Rich Text | No | Rich text content for the column |
+| **column[n].image** | Upload | No | An image displayed in the column |
+
+### Usage Tips
+
+- Four columns are best suited for desktop layouts. On tablets they typically reflow to a 2x2 grid, and on mobile they stack vertically.
+- Use the heading field for short labels (e.g., feature names, step numbers).
+- Keep individual column content concise -- four columns leave limited horizontal space per column.
+
+---
+
+## BentoGrid
+
+The BentoGrid block creates an asymmetric card grid with one featured (larger) card and several supporting cards. The featured card spans two columns, making it visually prominent.
+
+### Fields
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| **heading** | Text | No | An optional heading displayed above the grid |
+
+### Featured Card Fields
+
+The featured card is displayed at double width (spanning 2 columns):
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| **featured.title** | Text | Yes | The title of the featured card |
+| **featured.description** | Textarea | No | A description displayed on the featured card |
+| **featured.image** | Upload | No | A hero image for the featured card |
+| **featured.href** | Text | No | A link URL -- clicking the card navigates to this destination |
+
+### Cards Array
+
+The supporting cards are displayed in a grid alongside (and below) the featured card. You can add between 2 and 6 cards.
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| **cards[n].title** | Text | Yes | The card title |
+| **cards[n].description** | Textarea | No | A short description |
+| **cards[n].image** | Upload | No | A card image |
+| **cards[n].href** | Text | No | A link URL for the card |
+
+### Usage Tips
+
+- The BentoGrid is ideal for showcasing a primary offering alongside related items (e.g., a flagship service with supporting services).
+- Use 4 supporting cards for a balanced 2-column layout below the featured card.
+- All cards are clickable if an `href` is provided, making this block suitable for navigation hubs.

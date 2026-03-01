@@ -1,0 +1,85 @@
+---
+title: Site Detail
+sidebar_position: 3
+---
+
+# Site Detail
+
+The Site Detail view displays comprehensive information about a single jurisdiction, including its theme configuration, associated pages, campaigns, and news articles.
+
+**Source:** `src/admin/views/SiteDetail.tsx`
+
+**URL:** `/admin/sites/:id`
+
+## Component Type
+
+Client component (`'use client'`). Uses `useParams()` to extract the jurisdiction `id` from the URL.
+
+## Data Fetching
+
+Performs parallel API fetches on mount:
+
+| Request | Endpoint | Purpose |
+|---------|----------|---------|
+| Jurisdiction | `GET /api/jurisdictions/{id}` | Jurisdiction details and theme |
+| Pages | `GET /api/pages?where[targetJurisdictions][equals]={id}` | Pages targeting this jurisdiction |
+| Campaigns | `GET /api/campaigns?where[targetJurisdictions][equals]={id}` | Campaigns for this jurisdiction |
+| News | `GET /api/news-articles?where[jurisdiction][equals]={id}` | News from this jurisdiction |
+
+## Sections
+
+### Jurisdiction Information
+
+Displays the core jurisdiction fields:
+
+| Field | Description |
+|-------|-------------|
+| Name | Jurisdiction name |
+| Country Code | ISO country code |
+| Locale | Region description |
+| Language | Primary language |
+| Website URL | Country-specific website URL |
+| Status | Current status with color badge |
+
+### Theme Preview
+
+Displays the jurisdiction's sovereign theme palette as color swatches. Each swatch shows the hex value and the palette field name:
+
+| Swatch | Field |
+|--------|-------|
+| Primary | `theme.primary` |
+| Secondary | `theme.secondary` |
+| Accent | `theme.accent` |
+| Background | `theme.background` |
+| Foreground | `theme.foreground` |
+| Sidebar Bg | `theme.sidebarBg` |
+| Sidebar Fg | `theme.sidebarFg` |
+| Surface | `theme.surface` |
+
+### Pages List
+
+Lists all pages that target this jurisdiction, showing:
+
+- Page name
+- Slug
+- Status
+
+### Campaigns List
+
+Lists all campaigns targeting this jurisdiction, showing:
+
+- Campaign name
+- Status
+- Start and end dates
+
+### News List
+
+Lists all news articles sourced from this jurisdiction, showing:
+
+- Article title
+- Source
+- Published date
+
+## Navigation
+
+A back link at the top of the page navigates to `/admin/sites` (the Sites Dashboard).

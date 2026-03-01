@@ -1,0 +1,192 @@
+---
+title: Content Blocks
+sidebar_position: 3
+---
+
+# Content Blocks
+
+Content blocks present text, data, and structured information. There are seven content block types available.
+
+## RichText
+
+The RichText block provides a free-form rich text editor for long-form content such as paragraphs, headings, lists, links, and inline formatting.
+
+### Fields
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| **content** | Rich Text | Yes | The rich text content. Supports headings (H2-H6), bold, italic, underline, strikethrough, links, ordered lists, unordered lists, blockquotes, code blocks, and inline images |
+| **maxWidth** | Select | No | Controls the maximum width of the content area. Options: `prose` (65ch, optimal for reading), `medium` (80ch), `full` (100% width). Default: `prose` |
+
+### Usage Tips
+
+- Use `prose` width for blog-style articles and long-form text to maintain comfortable reading line lengths.
+- Use `full` width when the rich text contains tables or wide content that benefits from extra horizontal space.
+- The rich text editor supports pasting content from external sources; formatting is normalised automatically.
+
+---
+
+## Accordion
+
+The Accordion block creates expandable/collapsible content sections, commonly used for FAQs, feature breakdowns, and structured documentation.
+
+### Fields
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| **heading** | Text | No | An optional heading displayed above the accordion |
+| **allowMultipleOpen** | Checkbox | No | When enabled, multiple accordion items can be expanded simultaneously. When disabled (default), opening one item closes any other open item |
+| **items** | Array | Yes | The accordion items (minimum 1) |
+
+### Item Fields
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| **items[n].title** | Text | Yes | The clickable header text for the accordion item |
+| **items[n].content** | Rich Text | Yes | The content revealed when the item is expanded |
+
+### Usage Tips
+
+- For FAQ sections, set `allowMultipleOpen` to `false` so users focus on one answer at a time.
+- For reference documentation where users might compare multiple sections, enable `allowMultipleOpen`.
+- Keep titles concise and descriptive -- they serve as the primary navigation within the accordion.
+
+---
+
+## Tabs
+
+The Tabs block presents content in tabbed panels. Only one tab's content is visible at a time; clicking a tab label switches the visible panel.
+
+### Fields
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| **heading** | Text | No | An optional heading displayed above the tabs |
+| **items** | Array | Yes | The tab items (minimum 2) |
+
+### Item Fields
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| **items[n].label** | Text | Yes | The text displayed on the tab button |
+| **items[n].content** | Rich Text | Yes | The content displayed when this tab is active |
+
+### Usage Tips
+
+- Tabs work well for presenting related information that users want to compare or switch between (e.g., pricing tiers, service types, platform comparisons).
+- Keep tab labels short (1-3 words) so they fit comfortably in the tab bar, especially on mobile.
+- At least 2 tabs are required. For more than 5 tabs, consider whether an Accordion might be more appropriate.
+
+---
+
+## Carousel
+
+The Carousel block displays a horizontal set of cards that users can swipe or navigate through using arrows. Optional autoplay rotates cards automatically.
+
+### Fields
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| **heading** | Text | No | An optional heading displayed above the carousel |
+| **autoplay** | Checkbox | No | When enabled, the carousel automatically advances through cards at a set interval |
+| **cards** | Array | Yes | The carousel cards (minimum 2) |
+
+### Card Fields
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| **cards[n].title** | Text | Yes | The card title |
+| **cards[n].description** | Textarea | No | A short description displayed on the card |
+| **cards[n].image** | Upload | No | An image displayed on the card |
+| **cards[n].href** | Text | No | A link URL -- clicking the card navigates to this destination |
+
+### Usage Tips
+
+- Use carousels for testimonials, case studies, partner logos, or featured content.
+- Enable autoplay for passive browsing scenarios (e.g., a homepage showcase). Disable it when users need to read longer card content.
+- Provide at least 3-4 cards for a meaningful carousel experience.
+
+---
+
+## PeopleGrid
+
+The PeopleGrid block displays a grid of team members, consultants, or personnel with their photos, roles, bios, and LinkedIn profiles.
+
+### Fields
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| **heading** | Text | No | An optional heading displayed above the grid (e.g., "Our Team", "Leadership") |
+| **people** | Array | Yes | The people to display |
+
+### Person Fields
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| **people[n].name** | Text | Yes | The person's full name |
+| **people[n].role** | Text | No | Their job title or role |
+| **people[n].bio** | Textarea | No | A short biography |
+| **people[n].photo** | Upload | No | A profile photo from the Media library |
+| **people[n].linkedin** | URL | No | A link to their LinkedIn profile |
+
+### Usage Tips
+
+- Use consistent photo dimensions and styles across all people for a professional appearance.
+- The grid automatically adjusts columns based on screen size: 4 columns on desktop, 2 on tablet, 1 on mobile.
+- Keep bios to 2-3 sentences for a clean grid layout.
+
+---
+
+## AZList
+
+The AZList block creates an alphabetical directory listing, suitable for glossaries, partner directories, or service catalogues.
+
+### Fields
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| **heading** | Text | No | An optional heading displayed above the list |
+| **items** | Array | Yes | The directory items |
+
+### Item Fields
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| **items[n].title** | Text | Yes | The item's display name |
+| **items[n].description** | Textarea | No | A short description of the item |
+| **items[n].href** | Text | No | A link URL for the item |
+
+### Usage Tips
+
+- Items are automatically sorted alphabetically by title on the frontend.
+- Alphabetical jump links (A, B, C, ...) are generated for quick navigation.
+- This block is ideal for directories with 20+ items where users need to find specific entries quickly.
+
+---
+
+## Stats
+
+The Stats block displays numerical statistics in a visually prominent format, suitable for key metrics, achievements, or impact numbers.
+
+### Fields
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| **heading** | Text | No | An optional heading displayed above the stats |
+| **stats** | Array | Yes | The statistics to display (minimum 1, maximum 8) |
+
+### Stat Fields
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| **stats[n].value** | Text | Yes | The numerical value (e.g., "250", "99.9", "1M") |
+| **stats[n].label** | Text | Yes | A descriptive label for the stat (e.g., "Countries Served") |
+| **stats[n].prefix** | Text | No | Text displayed before the value (e.g., "$", ">" ) |
+| **stats[n].suffix** | Text | No | Text displayed after the value (e.g., "%", "+", "K") |
+
+### Usage Tips
+
+- Use 3-4 stats for a single row on desktop. More than 4 will wrap to a second row.
+- The prefix and suffix fields let you format values naturally: prefix `$` + value `1,750` + suffix `/day` renders as "$1,750/day".
+- Keep labels short (2-4 words) for visual impact.
+- Stats animate (count up) when they scroll into view on the frontend.

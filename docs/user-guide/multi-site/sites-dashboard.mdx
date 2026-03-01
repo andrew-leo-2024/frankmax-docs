@@ -1,0 +1,89 @@
+---
+title: Sites Dashboard
+sidebar_position: 1
+---
+
+# Sites Dashboard
+
+The Sites Dashboard provides a visual overview of all 250+ jurisdictions in the Frankmax global network. It is a custom admin view accessible at `/admin/sites` from the **Command Center** section of the sidebar navigation.
+
+## Accessing the Dashboard
+
+1. Log in to the admin panel.
+2. In the sidebar, click **Sites Dashboard** under the Command Center section.
+3. The dashboard loads at `/admin/sites`.
+
+## Dashboard Layout
+
+The dashboard displays jurisdictions as a **grid of cards**. Each card represents one jurisdiction and shows key information at a glance.
+
+### Jurisdiction Card
+
+Each card displays:
+
+| Information | Description |
+|-------------|-------------|
+| **Country/Territory Name** | The full name of the jurisdiction (e.g., "United Kingdom", "United Arab Emirates") |
+| **Locale Code** | The locale identifier used in URLs (e.g., `en-gb`, `ar-ae`) |
+| **Status Badge** | A colour-coded badge indicating the jurisdiction's status |
+| **Theme Colour Swatches** | Small colour samples showing the jurisdiction's sovereign theme palette (derived from the national flag) |
+| **Region** | The geographic region the jurisdiction belongs to (e.g., "Europe", "Asia Pacific", "Middle East") |
+
+### Status Badges
+
+Each jurisdiction has one of three statuses:
+
+| Status | Badge Colour | Meaning |
+|--------|-------------|---------|
+| **Active** | Green | The jurisdiction site is live and serving content |
+| **Draft** | Grey | The jurisdiction is being configured and is not yet live |
+| **Suspended** | Red | The jurisdiction site has been temporarily disabled |
+
+## Searching and Filtering
+
+### Search
+
+A **search bar** at the top of the dashboard allows you to find jurisdictions quickly. You can search by:
+
+- **Country name** (e.g., "United Kingdom", "Brazil")
+- **Locale code** (e.g., "en-gb", "pt-br")
+
+The grid updates in real time as you type.
+
+### Filters
+
+Filter controls allow you to narrow the grid by:
+
+| Filter | Options | Description |
+|--------|---------|-------------|
+| **Region** | Africa, Americas, Asia Pacific, Europe, Middle East, Oceania | Show only jurisdictions in a specific geographic region |
+| **Status** | Active, Draft, Suspended | Show only jurisdictions with a specific status |
+
+Filters can be combined (e.g., show only "Active" jurisdictions in "Europe").
+
+## Drilling Down
+
+Click any jurisdiction card to navigate to the **Site Detail** view for that jurisdiction. The detail view shows:
+
+- Full jurisdiction information (name, region, language, locale code).
+- A preview of the sovereign theme (colour swatches for all theme tokens).
+- Lists of pages, campaigns, and news articles targeted to that jurisdiction.
+
+See [Site Detail](/docs/user-guide/multi-site/site-detail) for full documentation.
+
+## Sovereign Theming
+
+Each jurisdiction in the Frankmax network has a unique **sovereign theme** derived from its national flag colours. The theme colour swatches on each card give you a quick preview of:
+
+- **Primary colour** -- the dominant flag colour.
+- **Secondary colour** -- a complementary flag colour.
+- **Accent colour** -- a contrasting flag colour used for highlights.
+
+These colours are applied automatically to all content rendered on that jurisdiction's site, ensuring a localised visual identity without per-jurisdiction CSS.
+
+## Tips
+
+- Use the search bar to quickly locate a specific jurisdiction rather than scrolling through 250+ cards.
+- Filter by "Draft" status to see which jurisdictions are still being set up.
+- Filter by region to focus on a geographic area when planning regional content or campaigns.
+- The theme colour swatches help you anticipate how content will look on a specific jurisdiction site before visiting it.

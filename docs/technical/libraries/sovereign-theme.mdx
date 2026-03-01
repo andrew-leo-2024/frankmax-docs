@@ -1,0 +1,159 @@
+---
+title: Sovereign Theme Library
+sidebar_position: 3
+---
+
+# Sovereign Theme Library
+
+The sovereign theme library provides functions for converting jurisdiction theme data into CSS custom properties for runtime theming.
+
+**Source:** `src/lib/sovereign-theme.ts`
+
+## SovereignPalette
+
+TypeScript interface defining the shape of a jurisdiction's theme configuration.
+
+```typescript
+interface SovereignPalette {
+  primary: string;
+  secondary: string;
+  accent: string;
+  background: string;
+  foreground: string;
+  sidebarBg: string;
+  sidebarFg: string;
+  surface: string;
+}
+```
+
+## DEFAULT_PALETTE
+
+Constant providing fallback values for all palette fields.
+
+```typescript
+const DEFAULT_PALETTE: SovereignPalette = {
+  primary: '#1e40af',
+  secondary: '#7c3aed',
+  accent: '#f59e0b',
+  background: '#ffffff',
+  foreground: '#0f172a',
+  sidebarBg: '#1e293b',
+  sidebarFg: '#f8fafc',
+  surface: '#f8fafc',
+};
+```
+
+| Field | Default Value | Visual |
+|-------|--------------|--------|
+| `primary` | `#1e40af` | Blue 800 |
+| `secondary` | `#7c3aed` | Violet 600 |
+| `accent` | `#f59e0b` | Amber 500 |
+| `background` | `#ffffff` | White |
+| `foreground` | `#0f172a` | Slate 900 |
+| `sidebarBg` | `#1e293b` | Slate 800 |
+| `sidebarFg` | `#f8fafc` | Slate 50 |
+| `surface` | `#f8fafc` | Slate 50 |
+
+## buildCSSVariables(theme?)
+
+Merges a partial theme object with `DEFAULT_PALETTE` and returns a `Record<string, string>` of CSS custom properties.
+
+```typescript
+function buildCSSVariables(theme?: Partial<SovereignPalette>): Record<string, string>
+```
+
+**Parameters:**
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `theme` | `Partial<SovereignPalette>` | No | Jurisdiction theme overrides |
+
+**Returns:** `Record<string, string>` mapping CSS variable names to color values.
+
+**Mapping:**
+
+| Palette Field | CSS Variable |
+|--------------|-------------|
+| `primary` | `--primary` |
+| `secondary` | `--secondary` |
+| `accent` | `--accent` |
+| `background` | `--background` |
+| `foreground` | `--foreground` |
+| `sidebarBg` | `--sidebar-bg` |
+| `sidebarFg` | `--sidebar-fg` |
+| `surface` | `--surface` |
+
+**Example:**
+
+```typescript
+// With no theme (uses all defaults)
+const vars = buildCSSVariables();
+// { '--primary': '#1e40af', '--secondary': '#7c3aed', ... }
+
+// With partial theme
+const vars = buildCSSVariables({ primary: '#dc2626', accent: '#10b981' });
+// { '--primary': '#dc2626', '--accent': '#10b981', '--secondary': '#7c3aed', ... }
+```
+
+## cssVariablesToStyle()
+
+Converts a CSS variables record into an inline style string.
+
+```typescript
+function cssVariablesToStyle(vars: Record<string, string>): string
+```
+
+**Parameters:**
+
+| Parameter | Type | Description |
+|-----------|------|-------------|
+| `vars` | `Record<string, string>` | Output from `buildCSSVariables()` |
+
+**Returns:** A semicolon-separated CSS declaration string.
+
+**Example:**
+
+```typescript
+const vars = buildCSSVariables({ primary: '#dc2626' });
+const style = cssVariablesToStyle(vars);
+// "--primary: #dc2626; --secondary: #7c3aed; --accent: #f59e0b; ..."
+```
+
+## Usage
+
+The primary usage is in the locale layout to apply per-jurisdiction theming:
+
+```tsx
+import { buildCSSVariables } from '@/lib/sovereign-theme';
+import { resolveJurisdiction } from '@/lib/resolve-jurisdiction';
+
+export default async function LocaleLayout({ params, children }) {
+  const jurisdiction = await resolveJurisdiction(params.locale);
+  const cssVars = buildCSSVariables(jurisdiction?.theme);
+
+  return (
+    <div style={cssVars}>
+      {children}
+    </div>
+  );
+}
+```
+
+Components anywhere in the tree can then reference these variables:
+
+```css
+.header {
+  background-color: var(--primary);
+  color: var(--foreground);
+}
+
+.sidebar {
+  background-color: var(--sidebar-bg);
+  color: var(--sidebar-fg);
+}
+
+.card {
+  background-color: var(--surface);
+  border-color: var(--accent);
+}
+```

@@ -1,0 +1,78 @@
+---
+title: Nav Links
+sidebar_position: 7
+---
+
+# Nav Links
+
+The NavLinks component extends the Payload admin panel sidebar with navigation links to the custom admin views under a "Command Center" heading.
+
+**Source:** `src/admin/views/NavLinks.tsx`
+
+## Registration
+
+Registered as `afterNavLinks` in the Payload configuration:
+
+```typescript
+admin: {
+  components: {
+    afterNavLinks: 'src/admin/views/NavLinks',
+  },
+}
+```
+
+The `afterNavLinks` position renders the component below the default Payload collection navigation links in the sidebar.
+
+## Component Type
+
+Client component (`'use client'`).
+
+## Rendered Output
+
+The component renders:
+
+### Command Center Heading
+
+A section heading labeled "Command Center" that visually separates the custom views from the default Payload navigation.
+
+### Navigation Links
+
+| Label | Path | View |
+|-------|------|------|
+| Sites Dashboard | `/admin/sites` | [Sites Dashboard](./sites-dashboard) |
+| Campaigns | `/admin/campaigns-dashboard` | [Campaigns Dashboard](./campaigns-dashboard) |
+| Content Orchestrator | `/admin/orchestrator` | [Content Orchestrator](./content-orchestrator) |
+| Analytics Overview | `/admin/analytics` | [Analytics Overview](./analytics-overview) |
+
+### Visual Structure
+
+```
+──── Default Payload Nav ────
+  System
+    Users
+    Media
+  Content
+    Services
+    Pages
+    ...
+  Governance
+    Doctrine
+    Jurisdictions
+    ...
+  Directory
+    Software Directory
+    Software Features
+  News
+    News Articles
+    Opportunity Briefs
+
+──── Command Center ────
+  Sites Dashboard
+  Campaigns
+  Content Orchestrator
+  Analytics Overview
+```
+
+## Styling
+
+The component uses inline styles to match the Payload admin panel's existing sidebar design. Links highlight on hover and show the active state when the current URL matches the link path.

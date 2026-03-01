@@ -1,0 +1,146 @@
+---
+title: Feed Blocks
+sidebar_position: 5
+---
+
+# Feed Blocks
+
+Feed blocks pull in dynamic content from other collections, provide interactive elements like forms, or create hybrid layouts with sidebars. There are five feed block types available.
+
+## NewsFeed
+
+The NewsFeed block dynamically displays a list of published news articles on the page. It queries the NewsArticles collection and renders matching results.
+
+### Fields
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| **heading** | Text | No | The section heading. Default: `"Latest News"` |
+| **count** | Number | No | The number of articles to display. Minimum: `1`, Maximum: `24`. Default: `6` |
+| **filterByService** | Relationship | No | Select a service to show only articles related to that service. Leave empty to show all articles |
+| **layout** | Select | No | The display layout. Options: `grid` (card grid), `list` (vertical list). Default: `grid` |
+
+### Usage Tips
+
+- Use `filterByService` on service-specific pages to show only relevant news.
+- The `list` layout is more compact and works well in narrow containers or sidebars.
+- The `grid` layout displays cards with images, titles, and summaries -- ideal for homepage or landing page sections.
+- Articles are sorted by `publishedAt` date, most recent first.
+- Only articles with `published` status are shown.
+
+---
+
+## ServiceShowcase
+
+The ServiceShowcase block displays a curated selection of services from the Services collection. Services can be filtered by sub-brand and displayed in grid or carousel format.
+
+### Fields
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| **heading** | Text | No | The section heading. Default: `"Our Services"` |
+| **filterByBrand** | Multi-select | No | Filter services by one or more sub-brands. Options: `FDS001` (Digital Marketing Maven), `FDS002` (Design Studio), `FDS003` (IT Synergy), `FDS004` (DevOps Excellence), `FDS005` (AI Labs). Leave empty to show services from all brands |
+| **count** | Number | No | The number of services to display. Minimum: `1`, Maximum: `48`. Default: `6` |
+| **layout** | Select | No | The display layout. Options: `grid` (card grid), `carousel` (horizontal scrolling carousel). Default: `grid` |
+
+### Usage Tips
+
+- Use `filterByBrand` to create brand-specific showcase sections (e.g., only AI Labs services on the AI landing page).
+- Select multiple brands to create cross-brand showcases.
+- The `carousel` layout is effective for compact sections where horizontal scrolling is preferred over a tall grid.
+- Service cards display the service name, description, service type (Professional/Managed), and consultant fee range.
+
+---
+
+## CallToAction
+
+The CallToAction block creates a prominent promotional banner with a heading, description, and up to two action buttons. Use it to drive conversions, highlight offers, or guide users to key pages.
+
+### Fields
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| **heading** | Text | Yes | The main CTA heading |
+| **description** | Textarea | No | Supporting text below the heading |
+| **colorVariant** | Select | No | The background colour scheme. Options: `primary`, `secondary`, `accent`, `surface`. Default: `primary` |
+| **buttons** | Array | No | Action buttons (maximum 2) |
+
+### Button Fields
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| **buttons[n].label** | Text | Yes | The button text |
+| **buttons[n].href** | Text | Yes | The URL the button links to |
+| **buttons[n].variant** | Select | No | The button style. Options: `primary`, `secondary`, `outline`, `ghost` |
+
+### Usage Tips
+
+- Place CallToAction blocks strategically after content sections where users are most likely to convert.
+- Use `primary` colour variant for the most important CTAs, `secondary` or `accent` for supporting ones.
+- A common pattern is one `primary` button (e.g., "Get Started") and one `outline` button (e.g., "Learn More").
+- Keep the heading action-oriented (e.g., "Ready to Transform Your Business?" rather than "Our Services").
+
+---
+
+## FormBlock
+
+The FormBlock renders an interactive form on the page. It supports preset form types for common use cases and a fully customisable form builder for unique requirements.
+
+### Fields
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| **heading** | Text | No | The form section heading |
+| **description** | Textarea | No | Introductory text displayed above the form |
+| **formType** | Select | Yes | The form template. Options: `contact` (name, email, phone, message), `newsletter` (email only), `quote` (name, email, company, service, message), `custom` (define your own fields) |
+| **fields** | Array | Conditional | Shown when formType is `custom`. An array of custom form fields |
+| **submitLabel** | Text | No | The text on the submit button. Default: `"Submit"` |
+
+### Custom Field Configuration
+
+When `formType` is set to `custom`, you define the form structure using the `fields` array:
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| **fields[n].label** | Text | Yes | The field label displayed to the user |
+| **fields[n].name** | Text | Yes | The field's technical name (used in form data submission). Must be unique, no spaces |
+| **fields[n].type** | Select | Yes | The input type. Options: `text`, `email`, `tel`, `textarea`, `select`, `checkbox`, `number`, `date` |
+| **fields[n].required** | Checkbox | No | Whether the field must be filled in before submission |
+
+### Preset Form Fields
+
+| Form Type | Included Fields |
+|-----------|----------------|
+| **contact** | Name (text, required), Email (email, required), Phone (tel), Message (textarea, required) |
+| **newsletter** | Email (email, required) |
+| **quote** | Name (text, required), Email (email, required), Company (text), Service (select), Message (textarea) |
+| **custom** | User-defined fields |
+
+### Usage Tips
+
+- Use `contact` for general enquiry pages.
+- Use `newsletter` for simple email capture (e.g., in a footer or sidebar).
+- Use `quote` on service pages where potential clients can request pricing.
+- Use `custom` when none of the presets match your needs.
+- The `submitLabel` field lets you customise the button text (e.g., "Request a Quote", "Subscribe", "Send Message").
+
+---
+
+## Sidebar
+
+The Sidebar block creates a two-panel layout with a main content area and a sidebar. The sidebar can be positioned on the left or right.
+
+### Fields
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| **sidebarPosition** | Select | Yes | Where the sidebar appears relative to the main content. Options: `left`, `right`. Default: `right` |
+| **mainContent** | Rich Text | Yes | The primary content area (occupies approximately 2/3 of the width) |
+| **sidebarContent** | Rich Text | Yes | The sidebar content area (occupies approximately 1/3 of the width) |
+
+### Usage Tips
+
+- Use `right` sidebar for supplementary navigation, related links, or contact information alongside main content.
+- Use `left` sidebar for table-of-contents navigation or category filters on directory pages.
+- On mobile, the sidebar stacks below the main content regardless of the `sidebarPosition` setting.
+- Both content areas support full rich text formatting, so you can include headings, lists, links, and images in either panel.

@@ -1,0 +1,103 @@
+---
+title: Content Orchestrator
+sidebar_position: 5
+---
+
+# Content Orchestrator
+
+The Content Orchestrator provides a bulk content management interface for performing batch operations across multiple collections.
+
+**Source:** `src/admin/views/ContentOrchestrator.tsx`
+
+**URL:** `/admin/orchestrator`
+
+## Component Type
+
+Client component (`'use client'`).
+
+## COLLECTIONS Constant
+
+Defines the collections available for orchestration:
+
+```typescript
+const COLLECTIONS = [
+  { slug: 'pages', titleField: 'name' },
+  { slug: 'services', titleField: 'name' },
+  { slug: 'news-articles', titleField: 'title' },
+  { slug: 'products', titleField: 'name' },
+];
+```
+
+| Collection | Title Field | Description |
+|-----------|------------|-------------|
+| `pages` | `name` | Page documents |
+| `services` | `name` | Service offerings |
+| `news-articles` | `title` | News articles |
+| `products` | `name` | Product listings |
+
+## Data Fetching
+
+On mount, the component fetches data in parallel:
+
+| Request | Purpose |
+|---------|---------|
+| Items from each collection in `COLLECTIONS` | Content items for the grid |
+| `GET /api/jurisdictions` | Jurisdiction options for bulk assignment |
+| `GET /api/campaigns` | Campaign data for reference |
+
+## Features
+
+### Collection Selection
+
+A tab or dropdown interface allows switching between the four collections. Each collection displays its items in the content grid.
+
+### Checkbox Selection
+
+Each row in the content grid includes a checkbox for multi-select. A "Select All" checkbox toggles all visible items.
+
+### Bulk Actions
+
+Two bulk operations are available for selected items:
+
+#### Assign Jurisdiction
+
+Assigns selected items to one or more target jurisdictions:
+
+```
+PATCH /api/{collection}/{id}
+Body: { targetJurisdictions: [jurisdictionId, ...] }
+```
+
+This sends individual PATCH requests for each selected item, updating the `targetJurisdictions` field.
+
+#### Change Status
+
+Changes the status of selected items:
+
+```
+PATCH /api/{collection}/{id}
+Body: { status: newStatus }
+```
+
+Available status options depend on the collection but typically include: `draft`, `review`, `ratified`, `published`.
+
+### Content Grid
+
+The grid displays items with the following columns:
+
+| Column | Description |
+|--------|-------------|
+| Checkbox | Multi-select checkbox |
+| Title | Item title (field name varies by collection) |
+| Slug | URL-friendly identifier |
+| Status | Current status with color coding |
+
+## Workflow
+
+1. Select a collection from the tabs
+2. Review the content items in the grid
+3. Check the boxes next to items to include in the bulk operation
+4. Choose a bulk action (Assign Jurisdiction or Change Status)
+5. Configure the action parameters (jurisdiction selection or status value)
+6. Execute the action
+7. The grid refreshes to show updated values

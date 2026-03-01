@@ -1,0 +1,99 @@
+---
+title: Block Reference
+sidebar_position: 6
+---
+
+# Block Reference
+
+This page provides a quick-reference table of all 20 blocks available in the Frankmax CMS page builder. Use this as a lookup when choosing which block to add to your page layout.
+
+## All Blocks at a Glance
+
+| Block Name | Slug | Category | Key Fields |
+|------------|------|----------|------------|
+| **HeroBanner** | `heroBanner` | Layout | title, subtitle, backgroundType (color/image/video), height (sm/md/lg/full), textAlign, ctaButtons (max 3) |
+| **TwoColumn** | `twoColumn` | Layout | ratio (50-50/33-67/67-33/25-75/75-25), verticalAlign, colorVariant, left (content + image), right (content + image) |
+| **ThreeColumn** | `threeColumn` | Layout | colorVariant, 3 columns each with content + image |
+| **FourColumn** | `fourColumn` | Layout | colorVariant, 4 columns each with heading + content + image |
+| **BentoGrid** | `bentoGrid` | Layout | heading, featured card (title/description/image/href spanning 2 cols), cards array (2-6) |
+| **RichText** | `richText` | Content | content (rich text), maxWidth (prose/medium/full) |
+| **Accordion** | `accordion` | Content | heading, allowMultipleOpen, items (title + content) |
+| **Tabs** | `tabs` | Content | heading, items (label + content, min 2) |
+| **Carousel** | `carousel` | Content | heading, autoplay, cards (title/description/image/href, min 2) |
+| **PeopleGrid** | `peopleGrid` | Content | heading, people (name/role/bio/photo/linkedin) |
+| **AZList** | `azList` | Content | heading, items (title/description/href) |
+| **Stats** | `stats` | Content | heading, stats (value/label/prefix/suffix, 1-8) |
+| **ImageGallery** | `imageGallery` | Media | heading, layout (grid/masonry/slider), columns (2/3/4), images (image + caption) |
+| **Video** | `video` | Media | heading, source (url/upload), url (YouTube/Vimeo), file (upload), caption |
+| **Embed** | `embed` | Media | heading, html (code), maxWidth (sm/md/lg/full) |
+| **NewsFeed** | `newsFeed` | Feed | heading (default "Latest News"), count (1-24, default 6), filterByService, layout (grid/list) |
+| **ServiceShowcase** | `serviceShowcase` | Feed | heading (default "Our Services"), filterByBrand (FDS001-FDS005), count (1-48, default 6), layout (grid/carousel) |
+| **CallToAction** | `callToAction` | Feed | heading, description, colorVariant (primary/secondary/accent/surface), buttons (max 2 with label/href/variant) |
+| **FormBlock** | `formBlock` | Feed | heading, description, formType (contact/newsletter/quote/custom), fields (label/name/type/required), submitLabel |
+| **Sidebar** | `sidebar` | Feed | sidebarPosition (left/right), mainContent (rich text), sidebarContent (rich text) |
+
+## Blocks by Category
+
+### Layout (5 blocks)
+
+These blocks define the structural grid of page sections. Use them to control how content is arranged in columns and grids.
+
+1. **HeroBanner** -- Full-width hero area with background and CTA buttons
+2. **TwoColumn** -- Two columns with configurable width ratios
+3. **ThreeColumn** -- Three equal columns
+4. **FourColumn** -- Four equal columns with headings
+5. **BentoGrid** -- Asymmetric grid with a featured card
+
+### Content (7 blocks)
+
+These blocks present text, data, and structured information.
+
+1. **RichText** -- Free-form rich text editor
+2. **Accordion** -- Expandable/collapsible sections
+3. **Tabs** -- Tabbed content panels
+4. **Carousel** -- Horizontal card slider
+5. **PeopleGrid** -- Team member grid
+6. **AZList** -- Alphabetical directory
+7. **Stats** -- Numerical statistics display
+
+### Media (3 blocks)
+
+These blocks handle images, video, and embedded content.
+
+1. **ImageGallery** -- Multi-image gallery with multiple layouts
+2. **Video** -- Video player (URL or upload)
+3. **Embed** -- Raw HTML embed
+
+### Feed (5 blocks)
+
+These blocks pull in dynamic content or provide interactive elements.
+
+1. **NewsFeed** -- Dynamic news article list
+2. **ServiceShowcase** -- Dynamic service display
+3. **CallToAction** -- Promotional banner with buttons
+4. **FormBlock** -- Interactive forms
+5. **Sidebar** -- Two-panel layout with sidebar
+
+## Choosing the Right Block
+
+| You want to... | Use this block |
+|----------------|---------------|
+| Create a page header with a background image and buttons | HeroBanner |
+| Place text next to an image | TwoColumn |
+| Show 3 or 4 feature highlights side by side | ThreeColumn or FourColumn |
+| Highlight a primary item with related items | BentoGrid |
+| Write a long-form article or description | RichText |
+| Present FAQ-style questions and answers | Accordion |
+| Show related content in switchable panels | Tabs |
+| Display testimonials or featured items in a slider | Carousel |
+| Show team members with photos and bios | PeopleGrid |
+| Create a searchable A-Z directory | AZList |
+| Display key metrics or achievements | Stats |
+| Show a collection of photos | ImageGallery |
+| Embed a YouTube or Vimeo video | Video |
+| Add a Google Map or social media widget | Embed |
+| Show the latest news articles | NewsFeed |
+| Showcase services by brand | ServiceShowcase |
+| Add a conversion-focused banner | CallToAction |
+| Add a contact or enquiry form | FormBlock |
+| Create a page with a sidebar | Sidebar |

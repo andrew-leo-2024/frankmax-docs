@@ -1,0 +1,94 @@
+---
+title: Creating Campaigns
+sidebar_position: 1
+---
+
+# Creating Campaigns
+
+Campaigns in the Frankmax CMS are used to plan, track, and manage marketing initiatives across jurisdictions. A campaign groups related content, defines timeframes, sets budgets, and tracks key performance indicators (KPIs).
+
+## Creating a New Campaign
+
+1. Navigate to **Campaigns** in the sidebar.
+2. Click **Create New** in the top-right corner.
+3. Fill in the campaign fields described below.
+4. Click **Save** or **Save Draft**.
+
+## Campaign Fields
+
+### Core Fields
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| **name** | Text | Yes | The campaign name (e.g., "Q1 2026 AI Services Launch") |
+| **slug** | Text | Yes | A URL-friendly identifier, auto-generated from the name |
+| **status** | Select | Yes | The campaign status. Options: `draft`, `scheduled`, `active`, `paused`, `completed`. Default: `draft` |
+| **startDate** | Date | No | The planned start date of the campaign |
+| **endDate** | Date | No | The planned end date of the campaign |
+
+### Targeting
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| **targetJurisdictions** | Relationship (hasMany) | No | The jurisdictions this campaign targets. Leave empty for a global campaign |
+
+### Related Content
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| **relatedContent** | Polymorphic Relationship (hasMany) | No | Content items associated with this campaign. Can reference items from multiple collections: Pages, Services, News Articles, and Products |
+
+The `relatedContent` field is polymorphic, meaning each entry specifies both the collection and the specific item:
+
+- Select the **collection** (pages, services, news-articles, or products).
+- Then select the **specific item** from that collection.
+- Repeat to add more related content from any collection.
+
+This allows a single campaign to span multiple content types -- for example, linking a campaign to a landing page, two service descriptions, a news article announcement, and a product listing.
+
+### Notes
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| **notes** | Rich Text | No | Free-form notes for campaign planning, strategy documentation, or internal communication |
+
+### Budget
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| **budget** | Number | No | The campaign budget in USD |
+
+### KPI Targets
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| **kpiTargets** | Array | No | Key performance indicators for the campaign |
+
+Each KPI entry has the following fields:
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| **kpiTargets[n].metric** | Text | Yes | The name of the metric being tracked (e.g., "Page Views", "Form Submissions", "Conversion Rate") |
+| **kpiTargets[n].target** | Number | Yes | The target value for this metric |
+| **kpiTargets[n].actual** | Number | No | The actual achieved value (updated as the campaign runs) |
+
+## Example Campaign Setup
+
+Here is an example of a fully configured campaign:
+
+| Field | Value |
+|-------|-------|
+| **name** | Q1 2026 Cloud Services Push |
+| **slug** | q1-2026-cloud-services-push |
+| **status** | scheduled |
+| **startDate** | 2026-01-15 |
+| **endDate** | 2026-03-31 |
+| **targetJurisdictions** | United Kingdom, United States, Germany, France |
+| **relatedContent** | Cloud Services page, Cloud Migration service, "New Cloud Partnership" news article |
+| **budget** | 50000 |
+| **kpiTargets** | Page Views: target 10,000; Form Submissions: target 250; Conversion Rate: target 2.5% |
+
+## Next Steps
+
+- Learn about [managing campaign statuses and KPIs](/docs/user-guide/campaigns/managing-campaigns).
+- Explore the [Campaigns Dashboard](/docs/user-guide/campaigns/campaigns-dashboard) for a visual timeline view of all campaigns.

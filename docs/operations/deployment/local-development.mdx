@@ -1,0 +1,196 @@
+---
+title: Local Development
+sidebar_position: 2
+---
+
+# Local Development
+
+This guide walks through setting up the Frankmax CMS for local development, from cloning the repository to accessing the admin panel.
+
+## Step 1: Clone the Repository
+
+```bash
+git clone <repository-url> frankmax-cms
+cd frankmax-cms
+```
+
+## Step 2: Install Dependencies
+
+The project uses pnpm as its package manager. Install all dependencies:
+
+```bash
+pnpm install
+```
+
+This installs all required packages including Payload CMS, Next.js, `@payloadcms/db-postgres`, Sharp for image processing, and the MeiliSearch client.
+
+## Step 3: Configure Environment Variables
+
+Create a `.env` file in the project root. Copy the example below and adjust values for your local setup:
+
+```bash title=".env"
+# Database — PostgreSQL connection string
+DATABASE_URI=postgresql://postgres:password@localhost:5432/frankmax_cms
+
+# Payload CMS secret — used for encryption (change in production)
+PAYLOAD_SECRET=default-secret-change-me
+
+# Public site URL
+NEXT_PUBLIC_SITE_URL=http://localhost:3000
+
+# MeiliSearch configuration
+MEILISEARCH_HOST=http://localhost:7700
+MEILISEARCH_KEY=frankmax_search_key_2026
+```
+
+:::caution
+Never commit your `.env` file to version control. Ensure `.env` is listed in your `.gitignore`.
+:::
+
+See the [Environment Variables](/docs/operations/configuration/environment-variables) reference for a complete list of all variables.
+
+## Step 4: Create the PostgreSQL Database
+
+If you have not already created the database:
+
+```bash
+createdb frankmax_cms
+```
+
+Or connect to PostgreSQL and create it manually:
+
+```bash
+psql -U postgres
+```
+
+```sql
+CREATE DATABASE frankmax_cms;
+\q
+```
+
+Verify the connection string in your `.env` matches the database name, user, password, host, and port.
+
+## Step 5: Run Migrations
+
+Apply the database schema using the Payload migration system. This executes the Drizzle ORM migrations located in `src/migrations/`:
+
+```bash
+pnpm payload migrate
+```
+
+The initial migration (`20260301_051334_initial.ts`) creates all tables for the 15 collections, inline block tables, and the SiteSettings global.
+
+:::tip
+If you need to reset the database and re-run migrations from scratch:
+```bash
+dropdb frankmax_cms
+createdb frankmax_cms
+pnpm payload migrate
+```
+:::
+
+## Step 6: Seed Data (Optional)
+
+Populate the database with initial data such as jurisdictions, services, and service classifications:
+
+```bash
+pnpm seed
+```
+
+This uses the Payload Local API to insert:
+- 250+ jurisdictions (countries) with locale codes
+- 48 service offerings across the 5 sub-brands
+- 91 service classifications and 891 service requirements
+- 3,259 software directory categories
+
+See [Seeding](/docs/operations/maintenance/seeding) for more details on the seeding process.
+
+## Step 7: Start the Development Server
+
+Launch the Next.js development server with hot reloading:
+
+```bash
+pnpm dev
+```
+
+The server starts on port 3000 by default.
+
+## Step 8: Access the Application
+
+Once the server is running, open your browser:
+
+| URL | Description |
+|-----|-------------|
+| `http://localhost:3000/admin` | Payload CMS admin panel |
+| `http://localhost:3000/en-gb` | Frontend — default locale (United Kingdom) |
+| `http://localhost:3000/en-us` | Frontend — United States locale |
+| `http://localhost:3000/api/pages` | REST API — Pages collection |
+
+### First-Time Admin Setup
+
+On first access to `/admin`, Payload will prompt you to create the initial admin user. This user belongs to the `users` collection and has full administrative access.
+
+1. Navigate to `http://localhost:3000/admin`
+2. Enter an email address and password
+3. Click **Create Account**
+4. You will be redirected to the admin dashboard
+
+## Live Preview
+
+The CMS supports live preview for the `pages` and `services` collections. When editing a page or service in the admin panel, the live preview pane shows real-time changes across three breakpoints:
+
+| Breakpoint | Width | Label |
+|-----------|-------|-------|
+| Mobile | 375px | mobile |
+| Tablet | 768px | tablet |
+| Desktop | 1440px | desktop |
+
+The preview URL is constructed using the `NEXT_PUBLIC_SITE_URL` environment variable combined with the document's slug and locale.
+
+## TypeScript Types
+
+Payload generates TypeScript types from your collection and global configurations. The generated file is output to:
+
+```
+src/payload-types.ts
+```
+
+Types are regenerated automatically during `pnpm dev`. To manually regenerate:
+
+```bash
+pnpm payload generate:types
+```
+
+## Common Issues
+
+### Port already in use
+
+If port 3000 is occupied, Next.js will suggest an alternative port. You can also specify one explicitly:
+
+```bash
+PORT=3001 pnpm dev
+```
+
+### Database connection refused
+
+Ensure PostgreSQL is running and the `DATABASE_URI` in your `.env` is correct:
+
+```bash
+# Check PostgreSQL status
+pg_isready
+```
+
+### MeiliSearch not reachable
+
+Search features require MeiliSearch to be running. Verify it is accessible:
+
+```bash
+curl http://localhost:7700/health
+# Expected: {"status":"available"}
+```
+
+## Next Steps
+
+- [Production Deployment](/docs/operations/deployment/production) — Build and deploy to production
+- [Environment Variables](/docs/operations/configuration/environment-variables) — Full variable reference
+- [Payload Config](/docs/operations/configuration/payload-config) — Configuration deep dive

@@ -1,0 +1,174 @@
+---
+title: Governance Hooks
+sidebar_position: 1
+---
+
+# Governance Hooks
+
+The governance hook system enforces content workflow state machines, generates audit trails, and creates cryptographic publish tokens for the Frankmax CMS.
+
+**Source:** `src/collections/hooks/governanceHooks.ts`
+
+## createGovernanceHook(collectionSlug)
+
+A factory function that returns a Payload `CollectionBeforeChangeHook` configured for a specific collection.
+
+```typescript
+function createGovernanceHook(collectionSlug: string): CollectionBeforeChangeHook
+```
+
+**Parameters:**
+
+| Parameter | Type | Description |
+|-----------|------|-------------|
+| `collectionSlug` | string | The slug of the collection this hook is attached to |
+
+**Returns:** A `CollectionBeforeChangeHook` function.
+
+**Usage:**
+
+```typescript
+// In a collection config
+{
+  hooks: {
+    beforeChange: [createGovernanceHook('pages')],
+  },
+}
+```
+
+### Collections Using This Hook
+
+| Collection | Slug |
+|-----------|------|
+| Pages | `pages` |
+| Services | `services` |
+| Doctrine | `doctrine` |
+
+## State Machine
+
+### VALID_TRANSITIONS
+
+The hook enforces a strict state machine for content status transitions:
+
+```typescript
+const VALID_TRANSITIONS: Record<string, string[]> = {
+  draft: ['review'],
+  review: ['draft', 'ratified'],
+  ratified: ['published', 'review'],
+  published: ['draft'],
+};
+```
+
+#### Transition Diagram
+
+```
+         ┌──────────────────────────────────┐
+         │                                  ▼
+      ┌──────┐     ┌────────┐     ┌───────────┐     ┌───────────┐
+      │ draft│────►│ review │────►│ ratified  │────►│ published │
+      └──────┘     └────────┘     └───────────┘     └───────────┘
+         ▲            │  ▲            │                   │
+         │            │  │            │                   │
+         │            │  └────────────┘                   │
+         │            ▼                                   │
+         │         (draft)                                │
+         │                                                │
+         └────────────────────────────────────────────────┘
+```
+
+**Valid transitions:**
+
+| From | To |
+|------|----|
+| `draft` | `review` |
+| `review` | `draft`, `ratified` |
+| `ratified` | `published`, `review` |
+| `published` | `draft` |
+
+Any transition not listed above will be rejected with an error.
+
+## hashContent()
+
+Generates a SHA-256 hash of document content for integrity verification.
+
+```typescript
+function hashContent(data: Record<string, any>): string
+```
+
+**Process:**
+
+1. Creates a copy of the document data
+2. Strips the following fields: `status`, `createdAt`, `updatedAt`, `id`
+3. Serializes the remaining data to a JSON string
+4. Computes a SHA-256 hash of the JSON string
+5. Returns the hex-encoded hash string
+
+## Hook Behavior
+
+When the governance hook runs (on `beforeChange`), it performs the following checks and actions:
+
+### 1. Status Change Validation
+
+If the `status` field is changing:
+
+- Looks up the current status in `VALID_TRANSITIONS`
+- Checks if the new status is in the allowed transitions array
+- **Rejects** the change if the transition is not valid
+
+### 2. Audit Log Entry
+
+On any valid status change, the hook creates an `audit-log` entry:
+
+```typescript
+{
+  action: 'status_change',
+  collection: collectionSlug,
+  documentId: id,
+  user: req.user.id,
+  previousStatus: originalDoc.status,
+  newStatus: data.status,
+}
+```
+
+### 3. Publish Action
+
+When the status changes to `published`:
+
+- Calls `hashContent()` to generate a SHA-256 content hash
+- Sets `data.contentHash` on the document
+- Creates a `publish-tokens` entry:
+
+```typescript
+{
+  collection: collectionSlug,
+  documentId: id,
+  contentHash: hash,
+  publishedBy: req.user.id,
+}
+```
+
+### 4. Ratify Action (Doctrine Only)
+
+When a doctrine document's status changes to `ratified`:
+
+- Records `ratifiedBy` with the current user
+- Sets `ratifiedAt` to the current timestamp
+- Generates and stores the `contentHash`
+- Creates an audit log entry with the `ratify` action
+
+### 5. Immutable Doctrine Check
+
+For the `doctrine` collection, if a document has `immutable: true` and `status === 'ratified'`:
+
+- The hook **prevents** any modifications to the document content
+- Only status transitions (e.g., to `published`) may be permitted
+- This ensures foundational governance documents cannot be tampered with after ratification
+
+## Error Handling
+
+The hook throws errors in the following cases:
+
+| Condition | Error |
+|-----------|-------|
+| Invalid status transition | `"Invalid status transition from {current} to {new}"` |
+| Immutable doctrine modification | `"Cannot modify immutable ratified doctrine"` |

@@ -1,0 +1,291 @@
+---
+title: Payload Config
+sidebar_position: 2
+---
+
+# Payload Config
+
+The `payload.config.ts` file is the central configuration file for the Frankmax CMS. It defines all collections, globals, editor settings, database connection, admin panel behavior, and live preview configuration.
+
+## File Location
+
+```
+src/payload.config.ts
+```
+
+## Configuration Structure
+
+The configuration uses Payload's `buildConfig()` function:
+
+```typescript title="payload.config.ts"
+import { buildConfig } from 'payload'
+import { postgresAdapter } from '@payloadcms/db-postgres'
+import { lexicalEditor } from '@payloadcms/richtext-lexical'
+import sharp from 'sharp'
+
+export default buildConfig({
+  admin: { /* ... */ },
+  collections: [ /* ... */ ],
+  globals: [ /* ... */ ],
+  editor: lexicalEditor(),
+  secret: process.env.PAYLOAD_SECRET || 'default-secret-change-me',
+  typescript: { /* ... */ },
+  db: postgresAdapter({ /* ... */ }),
+  sharp,
+})
+```
+
+## Configuration Options
+
+### admin
+
+The `admin` block configures the Payload admin panel:
+
+```typescript
+admin: {
+  user: 'users',
+  importMap: {
+    baseDir: path.resolve(dirname),
+  },
+  livePreview: {
+    url: ({ data, locale }) =>
+      `${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}/${locale?.code || 'en-gb'}/${data?.slug || ''}`,
+    collections: ['pages', 'services'],
+    breakpoints: [
+      { label: 'mobile', name: 'mobile', width: 375, height: 667 },
+      { label: 'tablet', name: 'tablet', width: 768, height: 1024 },
+      { label: 'desktop', name: 'desktop', width: 1440, height: 900 },
+    ],
+  },
+  components: {
+    // Custom admin dashboard views
+  },
+},
+```
+
+| Option | Description |
+|--------|-------------|
+| `user` | The collection slug used for admin authentication. Set to `'users'`. |
+| `importMap.baseDir` | Base directory for resolving admin component imports. |
+| `livePreview` | Configures the live preview panel (see [Live Preview](#live-preview) below). |
+| `components` | Custom React components for admin views (dashboards, navigation). |
+
+### collections
+
+The CMS defines **15 collections** organized into five admin groups, plus **2 inline-only collections** used as sub-documents within blocks:
+
+| Group | Collections |
+|-------|------------|
+| **System** | Users, Media |
+| **Content** | Pages, Services |
+| **Governance** | Campaigns, Initiatives, Governance States |
+| **Directory** | Jurisdictions, Software Categories, Software Apps, Software Features, Service Classifications, Service Requirements |
+| **News** | News, Tags |
+
+**Inline collections** (used within blocks, not directly accessible via API):
+
+- Testimonials (inline within Testimonials block)
+- Team Members (inline within Team block)
+
+Each collection is imported as a separate module and passed to the `collections` array:
+
+```typescript
+collections: [
+  Users,
+  Media,
+  Pages,
+  Services,
+  Jurisdictions,
+  Campaigns,
+  Initiatives,
+  GovernanceStates,
+  SoftwareCategories,
+  SoftwareApps,
+  SoftwareFeatures,
+  ServiceClassifications,
+  ServiceRequirements,
+  News,
+  Tags,
+],
+```
+
+### globals
+
+The CMS defines one global configuration object:
+
+```typescript
+globals: [SiteSettings],
+```
+
+See the [Site Settings](/docs/operations/configuration/site-settings) page for full field documentation.
+
+### editor
+
+The rich text editor uses Payload's Lexical editor integration:
+
+```typescript
+editor: lexicalEditor(),
+```
+
+Lexical provides a modern, extensible rich text editing experience with support for headings, lists, links, images, code blocks, and custom nodes.
+
+### secret
+
+```typescript
+secret: process.env.PAYLOAD_SECRET || 'default-secret-change-me',
+```
+
+The secret is used for encrypting user sessions and signing API keys. It falls back to a default value for development convenience, but must be set to a unique, secure string in production. See [Environment Variables](/docs/operations/configuration/environment-variables#payload_secret).
+
+### typescript
+
+```typescript
+typescript: {
+  outputFile: path.resolve(dirname, 'src/payload-types.ts'),
+},
+```
+
+Payload auto-generates TypeScript type definitions from your collection and global schemas. The generated file is written to `src/payload-types.ts` and contains interfaces for all documents, blocks, and globals.
+
+### db
+
+```typescript
+db: postgresAdapter({
+  pool: {
+    connectionString: process.env.DATABASE_URI,
+  },
+}),
+```
+
+The database adapter connects to PostgreSQL using the `DATABASE_URI` environment variable. The `pool` option configures the connection pool. See [Database](/docs/operations/deployment/database) for pool tuning and advanced configuration.
+
+### sharp
+
+```typescript
+sharp,
+```
+
+The Sharp image processing library is passed directly to the config. Payload uses Sharp for:
+
+- Generating image thumbnails and responsive sizes
+- Format conversion (WebP, AVIF)
+- Image optimization and compression
+- Metadata extraction
+
+## Live Preview
+
+Live preview enables real-time content previewing within the admin panel. It is configured for the `pages` and `services` collections.
+
+### URL Builder
+
+The `url` function constructs the preview URL from the document data and locale:
+
+```typescript
+url: ({ data, locale }) =>
+  `${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}/${locale?.code || 'en-gb'}/${data?.slug || ''}`
+```
+
+For a page with slug `about-us` and locale `en-gb`, the preview URL would be:
+
+```
+https://www.frankmax.digital/en-gb/about-us
+```
+
+### Breakpoints
+
+Three responsive breakpoints are configured for previewing at different device sizes:
+
+| Breakpoint | Width | Height | Use Case |
+|-----------|-------|--------|----------|
+| `mobile` | 375px | 667px | iPhone SE / small phones |
+| `tablet` | 768px | 1024px | iPad / tablets |
+| `desktop` | 1440px | 900px | Standard desktop monitors |
+
+### Supported Collections
+
+Live preview is enabled for:
+
+- **pages** — All CMS-managed pages with block-based layouts
+- **services** — Service offering pages across the 48 service types
+
+## Full Configuration Reference
+
+```typescript title="payload.config.ts (annotated)"
+import { buildConfig } from 'payload'
+import { postgresAdapter } from '@payloadcms/db-postgres'
+import { lexicalEditor } from '@payloadcms/richtext-lexical'
+import sharp from 'sharp'
+import path from 'path'
+import { fileURLToPath } from 'url'
+
+// Collection imports
+import { Users } from './collections/Users'
+import { Pages } from './collections/Pages'
+import { Services } from './collections/Services'
+// ... remaining collection imports
+
+// Global imports
+import { SiteSettings } from './globals/SiteSettings'
+
+const filename = fileURLToPath(import.meta.url)
+const dirname = path.dirname(filename)
+
+export default buildConfig({
+  // Admin panel configuration
+  admin: {
+    user: 'users',                    // Auth collection
+    importMap: {
+      baseDir: path.resolve(dirname), // Component resolution base
+    },
+    livePreview: {
+      url: ({ data, locale }) =>      // Preview URL builder
+        `${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}/${locale?.code || 'en-gb'}/${data?.slug || ''}`,
+      collections: ['pages', 'services'],
+      breakpoints: [
+        { label: 'mobile', name: 'mobile', width: 375, height: 667 },
+        { label: 'tablet', name: 'tablet', width: 768, height: 1024 },
+        { label: 'desktop', name: 'desktop', width: 1440, height: 900 },
+      ],
+    },
+  },
+
+  // 15 collections + 2 inline
+  collections: [
+    Users, Media, Pages, Services, Jurisdictions,
+    Campaigns, Initiatives, GovernanceStates,
+    SoftwareCategories, SoftwareApps, SoftwareFeatures,
+    ServiceClassifications, ServiceRequirements,
+    News, Tags,
+  ],
+
+  // 1 global
+  globals: [SiteSettings],
+
+  // Rich text editor
+  editor: lexicalEditor(),
+
+  // Encryption secret
+  secret: process.env.PAYLOAD_SECRET || 'default-secret-change-me',
+
+  // TypeScript output
+  typescript: {
+    outputFile: path.resolve(dirname, 'src/payload-types.ts'),
+  },
+
+  // Database adapter
+  db: postgresAdapter({
+    pool: {
+      connectionString: process.env.DATABASE_URI,
+    },
+  }),
+
+  // Image processing
+  sharp,
+})
+```
+
+## Next Steps
+
+- [Site Settings](/docs/operations/configuration/site-settings) — SiteSettings global fields reference
+- [Environment Variables](/docs/operations/configuration/environment-variables) — All environment variables
+- [Architecture Overview](/docs/technical/architecture/overview) — System architecture diagram

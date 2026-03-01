@@ -1,0 +1,67 @@
+---
+title: Products
+sidebar_position: 9
+---
+
+# Products Collection
+
+The Products collection stores product offerings associated with the five Frankmax sub-brands and their related services.
+
+## Configuration
+
+| Property | Value |
+|----------|-------|
+| **Slug** | `products` |
+| **Admin Group** | Content |
+
+## Fields
+
+| Field | Type | Required | Default | Admin | Description |
+|-------|------|----------|---------|-------|-------------|
+| `name` | text | Yes | — | — | Product name |
+| `slug` | text | Yes | — | Unique, Indexed | URL-friendly identifier |
+| `brand` | select | No | — | — | Sub-brand identifier |
+| `description` | textarea | No | — | — | Product description |
+| `price` | number | No | — | — | Price in USD |
+| `features` | array | No | — | — | List of product features |
+| `service` | relationship | No | — | — | Related service (to `services`) |
+| `category` | text | No | — | — | Product category |
+| `targetJurisdictions` | relationship | No | — | Sidebar | Target jurisdictions |
+| `targetLanguages` | select (hasMany) | No | — | Sidebar | Target languages |
+| `scheduledPublishAt` | date | No | — | Sidebar, Indexed | Scheduled publication date |
+| `expiresAt` | date | No | — | Sidebar, Indexed | Content expiration date |
+
+### Brand Options
+
+| Value | Label | Sub-Brand |
+|-------|-------|-----------|
+| `FDS001` | FDS001 | Digital Marketing Maven |
+| `FDS002` | FDS002 | Design Studio |
+| `FDS003` | FDS003 | IT Synergy |
+| `FDS004` | FDS004 | DevOps Excellence |
+| `FDS005` | FDS005 | AI Labs |
+
+### Features Array
+
+The `features` field is an array with a single sub-field:
+
+| Sub-field | Type | Description |
+|-----------|------|-------------|
+| `feature` | text | Description of a single product feature |
+
+## Relationships
+
+| Collection | Field | Direction |
+|-----------|-------|-----------|
+| Services | `service` | Product → Service |
+| Campaigns | `relatedContent` | Campaign → Product (polymorphic) |
+
+## API Endpoints
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET | `/api/products` | List products with optional filtering |
+| POST | `/api/products` | Create a new product |
+| GET | `/api/products/:id` | Get a specific product |
+| PATCH | `/api/products/:id` | Update a product |
+| DELETE | `/api/products/:id` | Delete a product |

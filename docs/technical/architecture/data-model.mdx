@@ -1,0 +1,125 @@
+---
+title: Data Model
+sidebar_position: 3
+---
+
+# Data Model
+
+The Frankmax CMS data model consists of 15 collections and 1 global, connected through relationship fields that enable multi-jurisdiction content delivery, governance workflows, and content organization.
+
+## Entity Relationship Overview
+
+```
+┌──────────────────┐     hasMany      ┌──────────────────────────┐
+│    Services      │◄────────────────►│  ServiceClassifications  │
+│                  │                  └──────────────────────────┘
+│                  │     hasMany      ┌──────────────────────────┐
+│                  │◄────────────────►│  ServiceRequirements     │
+│                  │                  └──────────────────────────┘
+│                  │     hasMany      ┌──────────────────────────┐
+│                  │◄─────────────────│     Products             │
+│                  │                  └──────────────────────────┘
+│                  │     hasMany      ┌──────────────────────────┐
+│                  │◄─────────────────│    NewsArticles          │
+│                  │                  └──────────────────────────┘
+│                  │     hasMany      ┌──────────────────────────┐
+│                  │◄─────────────────│  OpportunityBriefs       │
+└──────────────────┘                  └──────────────────────────┘
+
+┌──────────────────┐   targetJurisdictions (hasMany)
+│  Jurisdictions   │◄──────────────────────────────── Pages
+│                  │◄──────────────────────────────── Services
+│                  │◄──────────────────────────────── Products
+│                  │◄──────────────────────────────── NewsArticles
+│                  │◄──────────────────────────────── Campaigns
+│                  │
+│                  │   jurisdiction (single)
+│                  │◄──────────────────────────────── NewsArticles
+│                  │◄──────────────────────────────── OpportunityBriefs
+│                  │◄──────────────────────────────── PublishTokens
+└──────────────────┘
+
+┌──────────────────┐   polymorphic relatedContent
+│   Campaigns      │──────────────────────────────►  Pages
+│                  │──────────────────────────────►  Services
+│                  │──────────────────────────────►  NewsArticles
+│                  │──────────────────────────────►  Products
+└──────────────────┘
+
+┌──────────────────┐
+│    Doctrine      │──── ratifiedBy ──────────────►  Users
+└──────────────────┘
+
+┌──────────────────┐
+│   AuditLog       │──── user ────────────────────►  Users
+└──────────────────┘
+
+┌──────────────────┐
+│  PublishTokens   │──── publishedBy ─────────────►  Users
+│                  │──── ratifiedBy ───────────────►  Users
+│                  │──── jurisdiction ─────────────►  Jurisdictions
+└──────────────────┘
+
+┌──────────────────┐
+│ SoftwareFeatures │──── category ────────────────►  SoftwareDirectory
+└──────────────────┘
+```
+
+## Relationship Details
+
+### Services as Central Entity
+
+Services are the core content type in the Frankmax CMS. They connect to multiple collections:
+
+| Related Collection | Relationship Type | Field | Direction |
+|-------------------|------------------|-------|-----------|
+| ServiceClassifications | One-to-Many | `service` on classification | Classification → Service |
+| Products | One-to-Many | `service` on product | Product → Service |
+| NewsArticles | Many-to-Many | `services` on article (hasMany) | Article → Services |
+| OpportunityBriefs | Many-to-One | `service` on brief | Brief → Service |
+
+### Jurisdictions as Targeting Mechanism
+
+Jurisdictions serve as the primary content targeting mechanism. Most content collections include a `targetJurisdictions` field (relationship, hasMany) that determines which country-specific sites display the content.
+
+**Collections with `targetJurisdictions`:**
+- Pages
+- Services
+- Products
+- NewsArticles
+- Campaigns
+
+**Collections with single `jurisdiction`:**
+- NewsArticles (source jurisdiction, separate from targeting)
+- OpportunityBriefs
+- PublishTokens
+
+### Campaigns Polymorphic Content
+
+The Campaigns collection uses a polymorphic relationship through its `relatedContent` field. This is an array field where each entry contains a relationship that can point to any of:
+
+- `pages`
+- `services`
+- `news-articles`
+- `products`
+
+This enables campaigns to aggregate mixed content types under a single campaign entity.
+
+### Governance Chain
+
+The governance system links three collections:
+
+1. **Doctrine** stores governance documents with `ratifiedBy` pointing to `Users`
+2. **AuditLog** records all governance state changes with `user` pointing to `Users`
+3. **PublishTokens** records publishing events with `publishedBy` and `ratifiedBy` pointing to `Users`, plus `jurisdiction` pointing to `Jurisdictions`
+
+### Software Directory
+
+The software directory uses a simple two-collection model:
+
+- **SoftwareDirectory** stores software categories (sourced from Capterra)
+- **SoftwareFeatures** stores individual app features, each linked to a `SoftwareDirectory` entry via the `category` relationship
+
+## Global: SiteSettings
+
+The `SiteSettings` global stores site-wide configuration that does not belong to any specific collection. It is a singleton accessed via `/api/globals/site-settings`.

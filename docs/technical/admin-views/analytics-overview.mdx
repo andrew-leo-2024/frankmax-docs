@@ -1,0 +1,100 @@
+---
+title: Analytics Overview
+sidebar_position: 6
+---
+
+# Analytics Overview
+
+The Analytics Overview provides a platform-wide statistics dashboard with aggregate counts, status breakdowns, and recent content activity.
+
+**Source:** `src/admin/views/AnalyticsOverview.tsx`
+
+**URL:** `/admin/analytics`
+
+## Component Type
+
+Client component (`'use client'`).
+
+## Data Fetching
+
+Performs 11 parallel API fetches on mount, all using `limit=0` to retrieve only document counts (not full documents):
+
+```typescript
+// Example fetch for count
+const response = await fetch('/api/pages?limit=0');
+const data = await response.json();
+const count = data.totalDocs;
+```
+
+### Fetched Metrics
+
+| Metric | Endpoint | Description |
+|--------|----------|-------------|
+| Total Pages | `/api/pages?limit=0` | Count of all pages |
+| Total Services | `/api/services?limit=0` | Count of all services |
+| Total News | `/api/news-articles?limit=0` | Count of all news articles |
+| Total Products | `/api/products?limit=0` | Count of all products |
+| Total Campaigns | `/api/campaigns?limit=0` | Count of all campaigns |
+| Total Jurisdictions | `/api/jurisdictions?limit=0` | Count of all jurisdictions |
+| Active Campaigns | `/api/campaigns?where[status][equals]=active&limit=0` | Count of active campaigns |
+| Published Pages | `/api/pages?where[status][equals]=published&limit=0` | Count of published pages |
+| Draft Pages | `/api/pages?where[status][equals]=draft&limit=0` | Count of draft pages |
+| Recent Pages | `/api/pages?sort=-createdAt&limit=5` | 5 most recently created pages |
+| Scheduled Content | `/api/pages?where[scheduledPublishAt][greater_than]={now}&limit=5` | Upcoming scheduled pages |
+
+## Stats Interface
+
+```typescript
+interface Stats {
+  totalPages: number;
+  totalServices: number;
+  totalNews: number;
+  totalProducts: number;
+  totalCampaigns: number;
+  totalJurisdictions: number;
+  activeCampaigns: number;
+  publishedPages: number;
+  draftPages: number;
+}
+```
+
+## Dashboard Sections
+
+### Metric Cards
+
+Color-coded cards displaying aggregate counts:
+
+| Card | Color | Metric |
+|------|-------|--------|
+| Pages | Blue | `totalPages` |
+| Services | Green | `totalServices` |
+| News Articles | Purple | `totalNews` |
+| Products | Orange | `totalProducts` |
+| Campaigns | Pink | `totalCampaigns` |
+| Jurisdictions | Teal | `totalJurisdictions` |
+
+### Status Breakdown
+
+Cards showing content status distribution:
+
+| Card | Metrics |
+|------|---------|
+| Campaign Status | Active vs. total campaigns |
+| Page Status | Published vs. draft pages |
+
+### Recent Pages
+
+A list showing the 5 most recently created pages with:
+
+- Page name
+- Slug
+- Status badge
+- Creation date
+
+### Upcoming Scheduled Content
+
+A list showing pages with `scheduledPublishAt` dates in the future:
+
+- Page name
+- Scheduled publish date
+- Current status

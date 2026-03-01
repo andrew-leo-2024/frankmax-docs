@@ -1,0 +1,138 @@
+---
+title: Collections Overview
+sidebar_position: 1
+---
+
+# Collections Overview
+
+The Frankmax CMS contains 15 collections organized into five admin panel groups. Each group serves a distinct functional domain within the platform.
+
+## Admin Panel Groups
+
+### System
+
+Core platform infrastructure collections.
+
+| Collection | Slug | Purpose |
+|-----------|------|---------|
+| [Users](./users) | `users` | Authentication and role-based access |
+| [Media](./media) | `media` | File uploads (images, PDFs) |
+
+### Content
+
+Content creation and management collections.
+
+| Collection | Slug | Purpose |
+|-----------|------|---------|
+| [Services](./services) | `services` | 48 service offerings |
+| [Service Classifications](./service-classifications) | `service-classifications` | Service categorization |
+| [Service Requirements](./service-requirements) | `service-requirements` | Detailed service requirement specs |
+| [Pages](./pages) | `pages` | Block-based page compositions |
+| [Content Blocks](./content-blocks) | `content-blocks` | Block type registry |
+| [Products](./products) | `products` | Sub-brand product offerings |
+| [Campaigns](./campaigns) | `campaigns` | Marketing campaign management |
+
+### Governance
+
+Content governance, compliance, and audit trail collections.
+
+| Collection | Slug | Purpose |
+|-----------|------|---------|
+| [Doctrine](./doctrine) | `doctrine` | Governance documents with immutability |
+| [Jurisdictions](./jurisdictions) | `jurisdictions` | Country-specific site configurations |
+| [Audit Log](./audit-log) | `audit-log` | Immutable action history |
+| [Publish Tokens](./publish-tokens) | `publish-tokens` | Publication proof records |
+
+### Directory
+
+Software catalog collections.
+
+| Collection | Slug | Purpose |
+|-----------|------|---------|
+| [Software Directory](./software-directory) | `software-directory` | Software categories from Capterra |
+| [Software Features](./software-features) | `software-features` | App-level feature mappings |
+
+### News
+
+News and intelligence collections.
+
+| Collection | Slug | Purpose |
+|-----------|------|---------|
+| [News Articles](./news-articles) | `news-articles` | Curated news content |
+| [Opportunity Briefs](./opportunity-briefs) | `opportunity-briefs` | Actionable intelligence from news |
+
+## Shared Patterns
+
+Several patterns are used consistently across collections.
+
+### Slug Field
+
+Most content collections include a `slug` field with the following configuration:
+
+```typescript
+{
+  name: 'slug',
+  type: 'text',
+  required: true,
+  unique: true,
+  index: true,
+}
+```
+
+The slug serves as a URL-friendly identifier and is used for frontend routing.
+
+### Status Field
+
+Content collections use a `status` select field for workflow management:
+
+```typescript
+{
+  name: 'status',
+  type: 'select',
+  defaultValue: 'draft',
+  options: [
+    { label: 'Draft', value: 'draft' },
+    { label: 'Review', value: 'review' },
+    { label: 'Ratified', value: 'ratified' },
+    { label: 'Published', value: 'published' },
+  ],
+}
+```
+
+### Versions and Drafts
+
+Content collections that participate in governance workflows have versioning enabled:
+
+```typescript
+{
+  versions: {
+    drafts: true,
+  },
+}
+```
+
+This applies to: Pages, Services, Campaigns, and Doctrine.
+
+### Governance Hooks
+
+Collections that participate in the governance workflow use the `createGovernanceHook` factory:
+
+```typescript
+{
+  hooks: {
+    beforeChange: [createGovernanceHook('pages')],
+  },
+}
+```
+
+This applies to: Pages, Services, and Doctrine. See [Governance Hooks](../hooks/governance-hooks) for details.
+
+### Reusable Fields
+
+Three reusable field sets are shared across multiple collections:
+
+- **[Target Jurisdictions](../fields/target-jurisdictions)** — Multi-select relationship to jurisdictions
+- **[Target Languages](../fields/target-languages)** — Multi-select language codes
+- **[Scheduling](../fields/scheduling)** — Publish and expiry date fields
+
+These are imported from `src/collections/fields/` and spread into collection field arrays.

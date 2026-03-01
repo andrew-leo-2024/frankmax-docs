@@ -1,0 +1,67 @@
+---
+title: Media
+sidebar_position: 3
+---
+
+# Media Collection
+
+The Media collection handles file uploads for the Frankmax CMS, supporting images and PDF documents.
+
+## Configuration
+
+| Property | Value |
+|----------|-------|
+| **Slug** | `media` |
+| **Upload** | Enabled |
+| **Admin Group** | System |
+
+### Upload Configuration
+
+```typescript
+{
+  upload: {
+    staticDir: 'media',
+    mimeTypes: ['image/*', 'application/pdf'],
+  },
+}
+```
+
+| Setting | Value | Description |
+|---------|-------|-------------|
+| `staticDir` | `media` | Directory for storing uploaded files |
+| `mimeTypes` | `image/*`, `application/pdf` | Accepted file types |
+
+## Fields
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `alt` | text | No | Alternative text for accessibility (images) |
+
+In addition to the custom `alt` field, Payload automatically provides the following fields for upload collections:
+
+| Auto Field | Type | Description |
+|-----------|------|-------------|
+| `filename` | text | Original filename |
+| `mimeType` | text | MIME type of the uploaded file |
+| `filesize` | number | File size in bytes |
+| `width` | number | Image width in pixels (images only) |
+| `height` | number | Image height in pixels (images only) |
+| `url` | text | Public URL path to the file |
+
+## Image Processing
+
+The CMS uses Sharp for server-side image processing. Uploaded images may be automatically resized and optimized based on the Payload configuration.
+
+## API Endpoints
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| POST | `/api/media` | Upload a new file (multipart form data) |
+| GET | `/api/media` | List all media files |
+| GET | `/api/media/:id` | Get a specific media file's metadata |
+| PATCH | `/api/media/:id` | Update media metadata (e.g., alt text) |
+| DELETE | `/api/media/:id` | Delete a media file |
+
+## Usage
+
+Media items are referenced by other collections through relationship fields. For example, block components may include image fields that reference the Media collection for hero images, gallery items, or document attachments.

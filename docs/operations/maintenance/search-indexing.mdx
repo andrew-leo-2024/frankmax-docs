@@ -1,0 +1,338 @@
+---
+title: Search Indexing
+sidebar_position: 3
+---
+
+# Search Indexing
+
+The Frankmax CMS uses MeiliSearch for full-text search across services, software directory entries, and news articles. This page covers index management, configuration, reindexing procedures, and performance monitoring.
+
+## Overview
+
+MeiliSearch provides fast, typo-tolerant search with faceted filtering. The CMS maintains three search indexes, each tailored to a specific content type with optimized searchable, filterable, and sortable attributes.
+
+## Search Indexes
+
+### services
+
+The `services` index contains all 48 service offerings across the five sub-brands.
+
+| Setting | Attributes |
+|---------|-----------|
+| **Searchable** | `title`, `description`, `category`, `subBrand` |
+| **Filterable** | `subBrand`, `category`, `locale` |
+| **Sortable** | `title`, `createdAt` |
+| **Displayed** | `title`, `slug`, `description`, `category`, `subBrand`, `locale` |
+
+### software
+
+The `software` index contains software application entries from the directory.
+
+| Setting | Attributes |
+|---------|-----------|
+| **Searchable** | `name`, `description`, `category`, `features` |
+| **Filterable** | `category`, `pricing`, `platform` |
+| **Sortable** | `name`, `createdAt` |
+| **Displayed** | `name`, `slug`, `description`, `category`, `pricing`, `platform` |
+
+### news
+
+The `news` index contains published news articles and announcements.
+
+| Setting | Attributes |
+|---------|-----------|
+| **Searchable** | `title`, `summary`, `content`, `tags` |
+| **Filterable** | `tags`, `author`, `publishedDate`, `locale` |
+| **Sortable** | `publishedDate`, `title` |
+| **Displayed** | `title`, `slug`, `summary`, `author`, `publishedDate`, `tags` |
+
+## Index Initialization
+
+The `initializeIndexes()` function from `src/lib/search.ts` creates all three indexes and configures their settings. This must be run when:
+
+- Setting up the CMS for the first time
+- Resetting MeiliSearch data
+- Changing index settings (searchable/filterable/sortable attributes)
+
+### How It Works
+
+```typescript title="src/lib/search.ts"
+import { MeiliSearch } from 'meilisearch'
+
+const client = new MeiliSearch({
+  host: process.env.MEILISEARCH_HOST || 'http://localhost:7700',
+  apiKey: process.env.MEILISEARCH_KEY || 'frankmax_search_key_2026',
+})
+
+export async function initializeIndexes() {
+  // Create indexes
+  await client.createIndex('services', { primaryKey: 'id' })
+  await client.createIndex('software', { primaryKey: 'id' })
+  await client.createIndex('news', { primaryKey: 'id' })
+
+  // Configure services index
+  const servicesIndex = client.index('services')
+  await servicesIndex.updateSearchableAttributes([
+    'title', 'description', 'category', 'subBrand',
+  ])
+  await servicesIndex.updateFilterableAttributes([
+    'subBrand', 'category', 'locale',
+  ])
+  await servicesIndex.updateSortableAttributes([
+    'title', 'createdAt',
+  ])
+  await servicesIndex.updateDisplayedAttributes([
+    'title', 'slug', 'description', 'category', 'subBrand', 'locale',
+  ])
+
+  // Configure software index
+  const softwareIndex = client.index('software')
+  await softwareIndex.updateSearchableAttributes([
+    'name', 'description', 'category', 'features',
+  ])
+  await softwareIndex.updateFilterableAttributes([
+    'category', 'pricing', 'platform',
+  ])
+  await softwareIndex.updateSortableAttributes([
+    'name', 'createdAt',
+  ])
+  await softwareIndex.updateDisplayedAttributes([
+    'name', 'slug', 'description', 'category', 'pricing', 'platform',
+  ])
+
+  // Configure news index
+  const newsIndex = client.index('news')
+  await newsIndex.updateSearchableAttributes([
+    'title', 'summary', 'content', 'tags',
+  ])
+  await newsIndex.updateFilterableAttributes([
+    'tags', 'author', 'publishedDate', 'locale',
+  ])
+  await newsIndex.updateSortableAttributes([
+    'publishedDate', 'title',
+  ])
+  await newsIndex.updateDisplayedAttributes([
+    'title', 'slug', 'summary', 'author', 'publishedDate', 'tags',
+  ])
+}
+```
+
+## Reindexing
+
+### Full Reindex
+
+To rebuild all search indexes from scratch, clear existing data and re-add all documents:
+
+```typescript
+import { getPayload } from 'payload'
+import config from '@payload-config'
+import { MeiliSearch } from 'meilisearch'
+
+async function reindex() {
+  const payload = await getPayload({ config })
+  const client = new MeiliSearch({
+    host: process.env.MEILISEARCH_HOST || 'http://localhost:7700',
+    apiKey: process.env.MEILISEARCH_KEY || 'frankmax_search_key_2026',
+  })
+
+  // Clear and reinitialize indexes
+  await client.index('services').deleteAllDocuments()
+  await client.index('software').deleteAllDocuments()
+  await client.index('news').deleteAllDocuments()
+
+  // Re-add services
+  const services = await payload.find({
+    collection: 'services',
+    limit: 0, // Fetch all
+  })
+  await client.index('services').addDocuments(
+    services.docs.map((doc) => ({
+      id: doc.id,
+      title: doc.title,
+      slug: doc.slug,
+      description: doc.description,
+      category: doc.category,
+      subBrand: doc.subBrand,
+      locale: doc.locale,
+      createdAt: doc.createdAt,
+    }))
+  )
+
+  // Re-add software apps
+  const apps = await payload.find({
+    collection: 'software-apps',
+    limit: 0,
+  })
+  await client.index('software').addDocuments(
+    apps.docs.map((doc) => ({
+      id: doc.id,
+      name: doc.name,
+      slug: doc.slug,
+      description: doc.description,
+      category: doc.category,
+      pricing: doc.pricing,
+      platform: doc.platform,
+      createdAt: doc.createdAt,
+    }))
+  )
+
+  // Re-add news
+  const news = await payload.find({
+    collection: 'news',
+    limit: 0,
+    where: { status: { equals: 'published' } },
+  })
+  await client.index('news').addDocuments(
+    news.docs.map((doc) => ({
+      id: doc.id,
+      title: doc.title,
+      slug: doc.slug,
+      summary: doc.summary,
+      content: doc.content,
+      author: doc.author,
+      publishedDate: doc.publishedDate,
+      tags: doc.tags,
+    }))
+  )
+
+  console.log('Reindexing complete.')
+}
+
+reindex()
+```
+
+### Incremental Indexing
+
+Documents are indexed incrementally through Payload hooks. When a document is created, updated, or deleted, the corresponding after-change or after-delete hook updates the MeiliSearch index:
+
+```typescript
+// In collection hooks
+afterChange: [
+  async ({ doc, collection }) => {
+    const client = new MeiliSearch({
+      host: process.env.MEILISEARCH_HOST || 'http://localhost:7700',
+      apiKey: process.env.MEILISEARCH_KEY || 'frankmax_search_key_2026',
+    })
+    await client.index('services').addDocuments([doc])
+  },
+],
+afterDelete: [
+  async ({ doc }) => {
+    const client = new MeiliSearch({
+      host: process.env.MEILISEARCH_HOST || 'http://localhost:7700',
+      apiKey: process.env.MEILISEARCH_KEY || 'frankmax_search_key_2026',
+    })
+    await client.index('services').deleteDocument(doc.id)
+  },
+],
+```
+
+## Monitoring Search Performance
+
+### MeiliSearch Health Check
+
+Verify MeiliSearch is running and healthy:
+
+```bash
+curl http://localhost:7700/health
+# Response: {"status":"available"}
+```
+
+### Index Statistics
+
+Check the status and document count of each index:
+
+```bash
+# All indexes
+curl -H "Authorization: Bearer frankmax_search_key_2026" \
+  http://localhost:7700/indexes
+
+# Specific index stats
+curl -H "Authorization: Bearer frankmax_search_key_2026" \
+  http://localhost:7700/indexes/services/stats
+```
+
+Example response:
+
+```json
+{
+  "numberOfDocuments": 48,
+  "isIndexing": false,
+  "fieldDistribution": {
+    "title": 48,
+    "description": 48,
+    "category": 48,
+    "subBrand": 48
+  }
+}
+```
+
+### Task Queue
+
+MeiliSearch processes indexing tasks asynchronously. Monitor the task queue:
+
+```bash
+curl -H "Authorization: Bearer frankmax_search_key_2026" \
+  http://localhost:7700/tasks?statuses=processing,enqueued
+```
+
+### Search Performance
+
+Test search latency:
+
+```bash
+curl -X POST \
+  -H "Authorization: Bearer frankmax_search_key_2026" \
+  -H "Content-Type: application/json" \
+  -d '{"q": "cloud consulting", "limit": 10}' \
+  http://localhost:7700/indexes/services/search
+```
+
+The response includes `processingTimeMs` which indicates search execution time. Typical response times should be under 50ms for indexes of this size.
+
+## Troubleshooting
+
+### Index not found
+
+If queries return "Index not found" errors, run the index initialization:
+
+```typescript
+import { initializeIndexes } from './src/lib/search'
+await initializeIndexes()
+```
+
+### Documents not appearing in search
+
+1. Verify the document exists in MeiliSearch:
+   ```bash
+   curl -H "Authorization: Bearer frankmax_search_key_2026" \
+     http://localhost:7700/indexes/services/documents/DOCUMENT_ID
+   ```
+2. Check the task queue for failed indexing tasks
+3. Verify the document's fields match the index's `searchableAttributes`
+4. Ensure the MeiliSearch API key has write permissions
+
+### Search returning unexpected results
+
+Review and update the index settings:
+- **Searchable attributes** are ordered by priority. Attributes listed first carry more weight.
+- **Filterable attributes** must be explicitly declared before they can be used in filters.
+- Changes to index settings require a settings update call; existing documents are automatically reprocessed.
+
+### MeiliSearch connection refused
+
+Ensure MeiliSearch is running and accessible at the configured `MEILISEARCH_HOST`:
+
+```bash
+# Check if MeiliSearch is running
+curl http://localhost:7700/health
+
+# Check Docker container status (if using Docker)
+docker ps | grep meilisearch
+```
+
+## Next Steps
+
+- [Prerequisites](/docs/operations/deployment/prerequisites) — MeiliSearch installation
+- [Environment Variables](/docs/operations/configuration/environment-variables) — MeiliSearch configuration variables
+- [Seeding](/docs/operations/maintenance/seeding) — Populate data before indexing

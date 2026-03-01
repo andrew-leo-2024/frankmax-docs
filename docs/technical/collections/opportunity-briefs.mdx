@@ -1,0 +1,71 @@
+---
+title: Opportunity Briefs
+sidebar_position: 18
+---
+
+# Opportunity Briefs Collection
+
+The Opportunity Briefs collection stores actionable intelligence derived from news articles, connecting market signals to specific services and jurisdictions with urgency-based prioritization.
+
+## Configuration
+
+| Property | Value |
+|----------|-------|
+| **Slug** | `opportunity-briefs` |
+| **Admin Group** | News |
+
+## Fields
+
+| Field | Type | Required | Default | Description |
+|-------|------|----------|---------|-------------|
+| `title` | text | Yes | — | Brief title summarizing the opportunity |
+| `summary` | textarea | No | — | Detailed summary of the opportunity |
+| `newsArticle` | relationship | No | — | Source news article (to `news-articles`) |
+| `jurisdiction` | relationship | No | — | Relevant jurisdiction (to `jurisdictions`) |
+| `service` | relationship | No | — | Related service offering (to `services`) |
+| `urgency` | select | No | — | Priority level for action |
+| `actionItems` | array | No | — | Recommended actions |
+
+### Urgency Options
+
+| Value | Label | Description |
+|-------|-------|-------------|
+| `low` | Low | Informational, no immediate action required |
+| `medium` | Medium | Should be reviewed in normal course of business |
+| `high` | High | Requires prompt attention |
+| `critical` | Critical | Requires immediate action |
+
+### Action Items Array
+
+The `actionItems` field is an array with a single sub-field:
+
+| Sub-field | Type | Description |
+|-----------|------|-------------|
+| `action` | text | A specific recommended action step |
+
+## Relationships
+
+| Collection | Field | Direction |
+|-----------|-------|-----------|
+| News Articles | `newsArticle` | Brief → Article |
+| Jurisdictions | `jurisdiction` | Brief → Jurisdiction |
+| Services | `service` | Brief → Service |
+
+## Usage
+
+Opportunity briefs bridge the gap between news monitoring and business development:
+
+1. News articles are ingested and curated
+2. Analysts create opportunity briefs linking relevant articles to services
+3. Briefs are tagged with urgency levels and jurisdictions
+4. Action items provide specific next steps for the sales team
+
+## API Endpoints
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET | `/api/opportunity-briefs` | List opportunity briefs |
+| POST | `/api/opportunity-briefs` | Create a new brief |
+| GET | `/api/opportunity-briefs/:id` | Get a specific brief |
+| PATCH | `/api/opportunity-briefs/:id` | Update a brief |
+| DELETE | `/api/opportunity-briefs/:id` | Delete a brief |

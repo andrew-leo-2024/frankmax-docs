@@ -1,0 +1,152 @@
+---
+title: Environment Variables
+sidebar_position: 1
+---
+
+# Environment Variables
+
+This page provides a complete reference for all environment variables used by the Frankmax CMS. Variables are configured in a `.env` file in the project root or set directly in your hosting environment.
+
+## Variable Reference
+
+### PAYLOAD_SECRET
+
+| Property | Value |
+|----------|-------|
+| **Description** | Secret key used by Payload CMS for encrypting user sessions, API keys, and other sensitive data. Must be a strong, unique string in production. |
+| **Required** | Yes |
+| **Default** | `default-secret-change-me` |
+| **Example** | `a7f3b9c2e1d4f6a8b0c3e5d7f9a1b3c5e7d9f1a3b5c7` |
+
+:::danger
+The default value `default-secret-change-me` is for development only. In production, generate a cryptographically secure random string of at least 32 characters:
+
+```bash
+openssl rand -base64 48
+```
+
+Changing `PAYLOAD_SECRET` after deployment will invalidate all existing user sessions and encrypted data.
+:::
+
+### DATABASE_URI
+
+| Property | Value |
+|----------|-------|
+| **Description** | PostgreSQL connection string. Used by the `@payloadcms/db-postgres` adapter to connect to the database via a connection pool. |
+| **Required** | Yes |
+| **Default** | None |
+| **Format** | `postgresql://user:password@host:port/database` |
+| **Example** | `postgresql://postgres:password@localhost:5432/frankmax_cms` |
+
+The connection string supports standard PostgreSQL parameters:
+
+```
+postgresql://user:password@host:port/database?sslmode=require&connect_timeout=10
+```
+
+### NEXT_PUBLIC_SITE_URL
+
+| Property | Value |
+|----------|-------|
+| **Description** | The public-facing URL of the site. Used for generating canonical URLs, sitemap entries, Open Graph metadata, and live preview URLs. The `NEXT_PUBLIC_` prefix makes this variable available in client-side code. |
+| **Required** | No |
+| **Default** | `http://localhost:3000` |
+| **Example** | `https://www.frankmax.digital` |
+
+:::caution
+Do not include a trailing slash. The URL should be the bare origin:
+- Correct: `https://www.frankmax.digital`
+- Incorrect: `https://www.frankmax.digital/`
+:::
+
+### MEILISEARCH_HOST
+
+| Property | Value |
+|----------|-------|
+| **Description** | URL of the MeiliSearch instance used for full-text search across services, software directory, and news. |
+| **Required** | No |
+| **Default** | `http://localhost:7700` |
+| **Example** | `http://meilisearch.internal:7700` |
+
+### MEILISEARCH_KEY
+
+| Property | Value |
+|----------|-------|
+| **Description** | API key for authenticating with the MeiliSearch instance. Corresponds to the master key or an API key configured in MeiliSearch. |
+| **Required** | No |
+| **Default** | `frankmax_search_key_2026` |
+| **Example** | `your-production-meilisearch-api-key` |
+
+:::tip
+In production, generate a unique MeiliSearch master key and use API keys with restricted permissions for the application. The default key should only be used in development.
+:::
+
+## Summary Table
+
+| Variable | Required | Default | Used By |
+|----------|----------|---------|---------|
+| `PAYLOAD_SECRET` | Yes | `default-secret-change-me` | Payload CMS — session encryption, API key signing |
+| `DATABASE_URI` | Yes | None | `@payloadcms/db-postgres` — PostgreSQL connection |
+| `NEXT_PUBLIC_SITE_URL` | No | `http://localhost:3000` | Next.js — URLs, metadata, live preview |
+| `MEILISEARCH_HOST` | No | `http://localhost:7700` | `src/lib/search.ts` — search client connection |
+| `MEILISEARCH_KEY` | No | `frankmax_search_key_2026` | `src/lib/search.ts` — search authentication |
+
+## Example .env File
+
+```bash title=".env"
+# Payload CMS
+PAYLOAD_SECRET=default-secret-change-me
+
+# Database
+DATABASE_URI=postgresql://postgres:password@localhost:5432/frankmax_cms
+
+# Site URL
+NEXT_PUBLIC_SITE_URL=http://localhost:3000
+
+# MeiliSearch
+MEILISEARCH_HOST=http://localhost:7700
+MEILISEARCH_KEY=frankmax_search_key_2026
+```
+
+## Environment-Specific Configuration
+
+### Development
+
+Use the defaults for local development. Only `DATABASE_URI` must be explicitly set to point to your local PostgreSQL instance.
+
+### Staging
+
+Mirror production settings but use staging-specific values:
+
+```bash
+PAYLOAD_SECRET=staging-unique-secret-value-here
+DATABASE_URI=postgresql://frankmax_user:password@staging-db:5432/frankmax_staging
+NEXT_PUBLIC_SITE_URL=https://staging.frankmax.digital
+MEILISEARCH_HOST=http://staging-meilisearch:7700
+MEILISEARCH_KEY=staging-meilisearch-key
+```
+
+### Production
+
+All variables must be explicitly set. Never rely on defaults in production:
+
+```bash
+PAYLOAD_SECRET=<generated-secret-min-32-chars>
+DATABASE_URI=postgresql://frankmax_user:password@prod-db:5432/frankmax_cms
+NEXT_PUBLIC_SITE_URL=https://www.frankmax.digital
+MEILISEARCH_HOST=http://prod-meilisearch:7700
+MEILISEARCH_KEY=<production-meilisearch-key>
+```
+
+## Security Considerations
+
+- Store production secrets in a secrets manager (AWS Secrets Manager, HashiCorp Vault, or similar) rather than in `.env` files on disk.
+- Ensure `.env` is listed in `.gitignore` and never committed to version control.
+- Rotate `PAYLOAD_SECRET` periodically. Be aware that rotation invalidates existing sessions.
+- Use separate MeiliSearch API keys with restricted index access for the application, reserving the master key for administrative operations only.
+
+## Next Steps
+
+- [Payload Config](/docs/operations/configuration/payload-config) — How these variables are consumed in `payload.config.ts`
+- [Local Development](/docs/operations/deployment/local-development) — Setting up your development environment
+- [Production Deployment](/docs/operations/deployment/production) — Production configuration guide

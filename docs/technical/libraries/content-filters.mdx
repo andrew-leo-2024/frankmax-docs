@@ -1,0 +1,166 @@
+---
+title: Content Filters
+sidebar_position: 1
+---
+
+# Content Filters
+
+The content filters library provides a function to build Payload `Where` clauses that filter content by jurisdiction, language, and scheduling constraints. This is the primary mechanism for delivering jurisdiction-specific content on the frontend.
+
+**Source:** `src/lib/content-filters.ts`
+
+## buildContentFilter(options)
+
+Builds a Payload `Where` clause based on the provided filtering options.
+
+```typescript
+function buildContentFilter(options: ContentFilterOptions): Where
+```
+
+### ContentFilterOptions
+
+```typescript
+interface ContentFilterOptions {
+  jurisdictionId?: string;
+  lang?: string;
+  scheduling?: boolean; // default: true
+}
+```
+
+| Option | Type | Default | Description |
+|--------|------|---------|-------------|
+| `jurisdictionId` | string | — | ID of the target jurisdiction |
+| `lang` | string | — | Language code (e.g., `en`, `fr`) |
+| `scheduling` | boolean | `true` | Whether to apply scheduling filters |
+
+### Return Value
+
+Returns a Payload `Where` object with an `and` array containing the applicable conditions.
+
+```typescript
+{
+  and: [
+    // jurisdiction condition (if jurisdictionId provided)
+    // language condition (if lang provided)
+    // scheduling conditions (if scheduling !== false)
+  ],
+}
+```
+
+## Filter Conditions
+
+### Jurisdiction Filter
+
+When `jurisdictionId` is provided, generates an `or` condition that matches:
+
+- Documents with no `targetJurisdictions` set (global content)
+- Documents with `targetJurisdictions` containing the specified ID
+
+```typescript
+{
+  or: [
+    { targetJurisdictions: { exists: false } },
+    { targetJurisdictions: { equals: jurisdictionId } },
+  ],
+}
+```
+
+### Language Filter
+
+When `lang` is provided, generates an `or` condition that matches:
+
+- Documents with no `targetLanguages` set (language-universal content)
+- Documents with `targetLanguages` containing the specified language code
+
+```typescript
+{
+  or: [
+    { targetLanguages: { exists: false } },
+    { targetLanguages: { contains: lang } },
+  ],
+}
+```
+
+### Scheduling Filter
+
+When `scheduling` is `true` (the default), generates two conditions:
+
+**Publication date:** Content must have a `scheduledPublishAt` in the past/present, or no value:
+
+```typescript
+{
+  or: [
+    { scheduledPublishAt: { less_than_equal: now } },
+    { scheduledPublishAt: { exists: false } },
+  ],
+}
+```
+
+**Expiration date:** Content must have an `expiresAt` in the future, or no value:
+
+```typescript
+{
+  or: [
+    { expiresAt: { greater_than: now } },
+    { expiresAt: { exists: false } },
+  ],
+}
+```
+
+## Usage Example
+
+```typescript
+import { buildContentFilter } from '@/lib/content-filters';
+import { getPayloadClient } from '@/lib/payload';
+
+const payload = await getPayloadClient();
+
+const filter = buildContentFilter({
+  jurisdictionId: jurisdiction.id,
+  lang: 'en',
+  scheduling: true,
+});
+
+const pages = await payload.find({
+  collection: 'pages',
+  where: {
+    ...filter,
+    status: { equals: 'published' },
+  },
+});
+```
+
+## Full Output Example
+
+Given `jurisdictionId: '123'`, `lang: 'en'`, `scheduling: true`:
+
+```typescript
+{
+  and: [
+    {
+      or: [
+        { targetJurisdictions: { exists: false } },
+        { targetJurisdictions: { equals: '123' } },
+      ],
+    },
+    {
+      or: [
+        { targetLanguages: { exists: false } },
+        { targetLanguages: { contains: 'en' } },
+      ],
+    },
+    {
+      or: [
+        { scheduledPublishAt: { less_than_equal: '2026-03-01T00:00:00.000Z' } },
+        { scheduledPublishAt: { exists: false } },
+      ],
+    },
+    {
+      or: [
+        { expiresAt: { greater_than: '2026-03-01T00:00:00.000Z' } },
+        { expiresAt: { exists: false } },
+      ],
+    },
+  ],
+}
+```

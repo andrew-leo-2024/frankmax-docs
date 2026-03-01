@@ -1,0 +1,90 @@
+---
+title: Target Languages Field
+sidebar_position: 2
+---
+
+# Target Languages Field
+
+A reusable select field that allows content to be targeted to specific languages within the Frankmax multi-lingual platform.
+
+**Source:** `src/collections/fields/targetLanguages.ts`
+
+## Configuration
+
+```typescript
+{
+  name: 'targetLanguages',
+  type: 'select',
+  hasMany: true,
+  admin: {
+    position: 'sidebar',
+  },
+  options: [
+    { label: 'English', value: 'en' },
+    { label: 'French', value: 'fr' },
+    { label: 'Spanish', value: 'es' },
+    { label: 'German', value: 'de' },
+    { label: 'Portuguese', value: 'pt' },
+    { label: 'Arabic', value: 'ar' },
+    { label: 'Chinese', value: 'zh' },
+    { label: 'Japanese', value: 'ja' },
+    { label: 'Hindi', value: 'hi' },
+    { label: 'Russian', value: 'ru' },
+  ],
+}
+```
+
+## Field Properties
+
+| Property | Value |
+|----------|-------|
+| **Name** | `targetLanguages` |
+| **Type** | select |
+| **Has Many** | `true` |
+| **Admin Position** | sidebar |
+
+## Language Options
+
+| Code | Language |
+|------|----------|
+| `en` | English |
+| `fr` | French |
+| `es` | Spanish |
+| `de` | German |
+| `pt` | Portuguese |
+| `ar` | Arabic |
+| `zh` | Chinese |
+| `ja` | Japanese |
+| `hi` | Hindi |
+| `ru` | Russian |
+
+## Behavior
+
+- When **populated**: Content is only displayed for the selected languages
+- When **empty**: Content is treated as language-universal and displayed for all languages
+
+This follows the same "empty means all" convention as `targetJurisdictions`. The `buildContentFilter()` function generates a language filter using:
+
+```typescript
+{
+  or: [
+    { targetLanguages: { exists: false } },
+    { targetLanguages: { contains: lang } },
+  ],
+}
+```
+
+The language code is extracted from the locale string using `extractLanguage()` (e.g., `en-gb` yields `en`).
+
+## Collections Using This Field
+
+| Collection | Purpose |
+|-----------|---------|
+| Pages | Target which languages display the page |
+| Services | Target which languages show the service |
+| Products | Target product language availability |
+| News Articles | Target article language availability |
+
+## Admin UI
+
+The field appears in the sidebar as a multi-select dropdown. Editors can select one or more language codes, or leave empty for all languages.

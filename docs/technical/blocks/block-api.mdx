@@ -1,0 +1,292 @@
+---
+title: Block API Reference
+sidebar_position: 3
+---
+
+# Block API Reference
+
+Complete field reference for all 20 blocks in the Frankmax CMS. Each block is listed with its slug, fields, and rendering component.
+
+---
+
+## Layout Blocks
+
+### heroBlock
+
+Full-width hero section for page headers.
+
+**Component:** `HeroBlock`
+
+| Field | Type | Required | Default | Description |
+|-------|------|----------|---------|-------------|
+| `heading` | text | Yes | — | Main hero heading |
+| `subheading` | text | No | — | Secondary heading text |
+| `backgroundImage` | upload (media) | No | — | Hero background image |
+| `ctaText` | text | No | — | Call-to-action button text |
+| `ctaLink` | text | No | — | Call-to-action button URL |
+| `alignment` | select | No | `center` | Text alignment: left, center, right |
+| `overlay` | checkbox | No | `true` | Apply dark overlay on background image |
+
+### columnsBlock
+
+Multi-column layout container for organizing content.
+
+**Component:** `ColumnsBlock`
+
+| Field | Type | Required | Default | Description |
+|-------|------|----------|---------|-------------|
+| `columns` | array | Yes | — | Array of column entries |
+| `columns.width` | select | No | `equal` | Column width: narrow, equal, wide |
+| `columns.content` | richText | No | — | Column content |
+| `gap` | select | No | `medium` | Gap between columns: small, medium, large |
+
+### spacerBlock
+
+Vertical spacing element between blocks.
+
+**Component:** `SpacerBlock`
+
+| Field | Type | Required | Default | Description |
+|-------|------|----------|---------|-------------|
+| `size` | select | No | `medium` | Spacing size: small (1rem), medium (2rem), large (4rem), xlarge (6rem) |
+
+### dividerBlock
+
+Horizontal rule divider between content sections.
+
+**Component:** `DividerBlock`
+
+| Field | Type | Required | Default | Description |
+|-------|------|----------|---------|-------------|
+| `style` | select | No | `solid` | Line style: solid, dashed, dotted |
+| `width` | select | No | `full` | Divider width: narrow (50%), medium (75%), full (100%) |
+
+### sectionBlock
+
+Generic content section wrapper with optional background.
+
+**Component:** `SectionBlock`
+
+| Field | Type | Required | Default | Description |
+|-------|------|----------|---------|-------------|
+| `heading` | text | No | — | Section heading |
+| `content` | richText | No | — | Section body content |
+| `backgroundColor` | text | No | — | CSS background color value |
+| `padding` | select | No | `medium` | Section padding: small, medium, large |
+| `maxWidth` | select | No | `default` | Content max-width: narrow, default, wide, full |
+
+---
+
+## Content Blocks
+
+### richTextBlock
+
+Lexical rich text content area.
+
+**Component:** `RichTextBlock`
+
+| Field | Type | Required | Default | Description |
+|-------|------|----------|---------|-------------|
+| `content` | richText | Yes | — | Rich text content (Lexical editor) |
+
+### headingBlock
+
+Standalone heading element with configurable level.
+
+**Component:** `HeadingBlock`
+
+| Field | Type | Required | Default | Description |
+|-------|------|----------|---------|-------------|
+| `text` | text | Yes | — | Heading text |
+| `level` | select | No | `h2` | Heading level: h1, h2, h3, h4, h5, h6 |
+| `alignment` | select | No | `left` | Text alignment: left, center, right |
+
+### statsBlock
+
+Statistics and metrics display grid.
+
+**Component:** `StatsBlock`
+
+| Field | Type | Required | Default | Description |
+|-------|------|----------|---------|-------------|
+| `heading` | text | No | — | Section heading above stats |
+| `stats` | array | Yes | — | Array of statistic entries |
+| `stats.value` | text | Yes | — | Metric value (e.g., "250+", "$5.5K") |
+| `stats.label` | text | Yes | — | Metric label (e.g., "Countries", "Daily Rate") |
+| `stats.description` | text | No | — | Additional context |
+| `columns` | select | No | `4` | Grid columns: 2, 3, 4 |
+
+### pricingBlock
+
+Pricing cards or comparison tables.
+
+**Component:** `PricingBlock`
+
+| Field | Type | Required | Default | Description |
+|-------|------|----------|---------|-------------|
+| `heading` | text | No | — | Section heading |
+| `plans` | array | Yes | — | Array of pricing plans |
+| `plans.name` | text | Yes | — | Plan name |
+| `plans.price` | text | Yes | — | Price display text |
+| `plans.period` | text | No | — | Billing period (e.g., "/month") |
+| `plans.features` | array | No | — | Plan feature list |
+| `plans.features.feature` | text | Yes | — | Feature description |
+| `plans.ctaText` | text | No | — | CTA button text |
+| `plans.ctaLink` | text | No | — | CTA button URL |
+| `plans.highlighted` | checkbox | No | `false` | Highlight this plan as recommended |
+
+### faqBlock
+
+Accordion-style frequently asked questions.
+
+**Component:** `FaqBlock`
+
+| Field | Type | Required | Default | Description |
+|-------|------|----------|---------|-------------|
+| `heading` | text | No | — | Section heading |
+| `items` | array | Yes | — | Array of FAQ entries |
+| `items.question` | text | Yes | — | Question text |
+| `items.answer` | richText | Yes | — | Answer content |
+
+### testimonialBlock
+
+Customer testimonial display.
+
+**Component:** `TestimonialBlock`
+
+| Field | Type | Required | Default | Description |
+|-------|------|----------|---------|-------------|
+| `testimonials` | array | Yes | — | Array of testimonial entries |
+| `testimonials.quote` | textarea | Yes | — | Testimonial quote text |
+| `testimonials.author` | text | Yes | — | Author name |
+| `testimonials.role` | text | No | — | Author role/title |
+| `testimonials.company` | text | No | — | Author company |
+| `testimonials.avatar` | upload (media) | No | — | Author photo |
+| `layout` | select | No | `grid` | Display layout: grid, carousel, single |
+
+### ctaBlock
+
+Call-to-action banner section.
+
+**Component:** `CtaBlock`
+
+| Field | Type | Required | Default | Description |
+|-------|------|----------|---------|-------------|
+| `heading` | text | Yes | — | CTA heading |
+| `description` | textarea | No | — | Supporting description text |
+| `buttonText` | text | Yes | — | Button label |
+| `buttonLink` | text | Yes | — | Button URL |
+| `style` | select | No | `primary` | Visual style: primary, secondary, outline |
+| `alignment` | select | No | `center` | Content alignment: left, center, right |
+
+---
+
+## Media Blocks
+
+### imageBlock
+
+Single image with optional caption.
+
+**Component:** `ImageBlock`
+
+| Field | Type | Required | Default | Description |
+|-------|------|----------|---------|-------------|
+| `image` | upload (media) | Yes | — | Image file |
+| `caption` | text | No | — | Image caption text |
+| `alignment` | select | No | `center` | Image alignment: left, center, right |
+| `size` | select | No | `default` | Image display size: small, default, large, full |
+
+### galleryBlock
+
+Image gallery with grid layout.
+
+**Component:** `GalleryBlock`
+
+| Field | Type | Required | Default | Description |
+|-------|------|----------|---------|-------------|
+| `images` | array | Yes | — | Array of gallery images |
+| `images.image` | upload (media) | Yes | — | Gallery image file |
+| `images.caption` | text | No | — | Image caption |
+| `columns` | select | No | `3` | Grid columns: 2, 3, 4 |
+| `gap` | select | No | `medium` | Gap between images: small, medium, large |
+
+### videoBlock
+
+Embedded video player.
+
+**Component:** `VideoBlock`
+
+| Field | Type | Required | Default | Description |
+|-------|------|----------|---------|-------------|
+| `url` | text | Yes | — | Video URL (YouTube, Vimeo, or direct) |
+| `caption` | text | No | — | Video caption text |
+| `autoplay` | checkbox | No | `false` | Auto-play on page load |
+| `aspectRatio` | select | No | `16:9` | Video aspect ratio: 16:9, 4:3, 1:1 |
+
+---
+
+## Feed Blocks
+
+### servicesListBlock
+
+Dynamic listing of services from the Services collection.
+
+**Component:** `ServicesListBlock`
+
+| Field | Type | Required | Default | Description |
+|-------|------|----------|---------|-------------|
+| `heading` | text | No | — | Section heading |
+| `limit` | number | No | `12` | Maximum number of services to display |
+| `serviceType` | select | No | — | Filter by service type: professional, managed |
+| `layout` | select | No | `grid` | Display layout: grid, list |
+
+### newsListBlock
+
+Dynamic news article feed.
+
+**Component:** `NewsListBlock`
+
+| Field | Type | Required | Default | Description |
+|-------|------|----------|---------|-------------|
+| `heading` | text | No | — | Section heading |
+| `limit` | number | No | `6` | Maximum number of articles to display |
+| `industry` | text | No | — | Filter by industry tag |
+| `layout` | select | No | `grid` | Display layout: grid, list |
+
+### softwareListBlock
+
+Software directory browser block.
+
+**Component:** `SoftwareListBlock`
+
+| Field | Type | Required | Default | Description |
+|-------|------|----------|---------|-------------|
+| `heading` | text | No | — | Section heading |
+| `limit` | number | No | `12` | Maximum number of categories to display |
+| `layout` | select | No | `grid` | Display layout: grid, list |
+
+### campaignBlock
+
+Campaign content display block.
+
+**Component:** `CampaignBlock`
+
+| Field | Type | Required | Default | Description |
+|-------|------|----------|---------|-------------|
+| `campaign` | relationship | No | — | Specific campaign to display (to `campaigns`) |
+| `showBudget` | checkbox | No | `false` | Display budget information |
+| `showKpis` | checkbox | No | `false` | Display KPI targets |
+| `showContent` | checkbox | No | `true` | Display related content list |
+
+### relatedContentBlock
+
+Related content suggestions block.
+
+**Component:** `RelatedContentBlock`
+
+| Field | Type | Required | Default | Description |
+|-------|------|----------|---------|-------------|
+| `heading` | text | No | `Related Content` | Section heading |
+| `contentType` | select | No | — | Filter by collection: pages, services, news-articles, products |
+| `limit` | number | No | `4` | Maximum number of items to display |
+| `layout` | select | No | `grid` | Display layout: grid, list |

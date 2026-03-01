@@ -1,0 +1,137 @@
+---
+title: Sovereign Theming
+sidebar_position: 4
+---
+
+# Sovereign Theming
+
+The sovereign theming system enables each jurisdiction (country) to have its own visual identity through a set of CSS custom properties derived from the jurisdiction's theme configuration.
+
+**Source:** `src/lib/sovereign-theme.ts`
+
+## SovereignPalette Interface
+
+```typescript
+interface SovereignPalette {
+  primary: string;
+  secondary: string;
+  accent: string;
+  background: string;
+  foreground: string;
+  sidebarBg: string;
+  sidebarFg: string;
+  surface: string;
+}
+```
+
+Each field in the `SovereignPalette` maps to a hex color string that controls a specific aspect of the jurisdiction's visual theme.
+
+| Field | CSS Variable | Purpose |
+|-------|-------------|---------|
+| `primary` | `--primary` | Primary brand color |
+| `secondary` | `--secondary` | Secondary brand color |
+| `accent` | `--accent` | Accent/highlight color |
+| `background` | `--background` | Page background color |
+| `foreground` | `--foreground` | Primary text color |
+| `sidebarBg` | `--sidebar-bg` | Sidebar background color |
+| `sidebarFg` | `--sidebar-fg` | Sidebar text color |
+| `surface` | `--surface` | Card/surface background color |
+
+## DEFAULT_PALETTE
+
+The default palette is applied when a jurisdiction does not define a custom theme or when specific theme fields are missing:
+
+```typescript
+const DEFAULT_PALETTE: SovereignPalette = {
+  primary: '#1e40af',
+  secondary: '#7c3aed',
+  accent: '#f59e0b',
+  background: '#ffffff',
+  foreground: '#0f172a',
+  sidebarBg: '#1e293b',
+  sidebarFg: '#f8fafc',
+  surface: '#f8fafc',
+};
+```
+
+## API Functions
+
+### `buildCSSVariables(theme?)`
+
+Merges the provided theme object with `DEFAULT_PALETTE` and returns a `Record<string, string>` mapping CSS custom property names to color values.
+
+```typescript
+function buildCSSVariables(theme?: Partial<SovereignPalette>): Record<string, string>
+```
+
+**Parameters:**
+- `theme` (optional) — A partial `SovereignPalette` object. Missing fields fall back to `DEFAULT_PALETTE`.
+
+**Returns:** An object like:
+
+```typescript
+{
+  '--primary': '#1e40af',
+  '--secondary': '#7c3aed',
+  '--accent': '#f59e0b',
+  '--background': '#ffffff',
+  '--foreground': '#0f172a',
+  '--sidebar-bg': '#1e293b',
+  '--sidebar-fg': '#f8fafc',
+  '--surface': '#f8fafc',
+}
+```
+
+### `cssVariablesToStyle()`
+
+Converts the CSS variables object into an inline style string suitable for use in HTML `style` attributes.
+
+```typescript
+function cssVariablesToStyle(vars: Record<string, string>): string
+```
+
+**Returns:** A semicolon-separated string of CSS declarations:
+
+```
+--primary: #1e40af; --secondary: #7c3aed; --accent: #f59e0b; ...
+```
+
+## Jurisdiction Theme Fields
+
+The `Jurisdictions` collection includes a `theme` group field whose sub-fields directly correspond to the `SovereignPalette` interface:
+
+| Sub-field | Type | Default |
+|-----------|------|---------|
+| `primary` | text | — |
+| `secondary` | text | — |
+| `accent` | text | — |
+| `background` | text | `#ffffff` |
+| `foreground` | text | `#0f172a` |
+| `sidebarBg` | text | — |
+| `sidebarFg` | text | — |
+| `surface` | text | — |
+
+## Usage in Locale Layout
+
+The sovereign theme is applied in the locale layout (`src/app/(frontend)/[locale]/layout.tsx`):
+
+1. The layout resolves the jurisdiction from the locale parameter
+2. The jurisdiction's `theme` group is passed to `buildCSSVariables()`
+3. The resulting CSS variables are applied as inline styles on the wrapping `<div>`
+4. All child components can reference these CSS variables (e.g., `color: var(--primary)`)
+
+```tsx
+// Simplified example from layout.tsx
+const jurisdiction = await resolveJurisdiction(locale);
+const cssVars = buildCSSVariables(jurisdiction?.theme);
+
+return (
+  <div style={cssVars}>
+    <Header locale={locale} countryName={jurisdiction?.name} />
+    <main>{children}</main>
+    <Footer locale={locale} />
+  </div>
+);
+```
+
+This approach ensures that each country-specific page automatically renders with the correct brand colors without requiring separate stylesheets or build-time configuration.

@@ -1,0 +1,97 @@
+---
+title: Language Targeting
+sidebar_position: 2
+---
+
+# Language Targeting
+
+The Frankmax CMS supports 10 languages across its global network of jurisdiction sites. Language targeting allows you to control which content appears for visitors browsing in a particular language.
+
+## Supported Languages
+
+The CMS supports the following 10 languages:
+
+| Code | Language |
+|------|----------|
+| `en` | English |
+| `fr` | French |
+| `es` | Spanish |
+| `de` | German |
+| `pt` | Portuguese |
+| `ar` | Arabic |
+| `zh` | Chinese |
+| `ja` | Japanese |
+| `hi` | Hindi |
+| `ru` | Russian |
+
+## The targetLanguages Field
+
+The `targetLanguages` field is a multi-select field available on pages, services, news articles, and products. It appears in the sidebar panel of the content editor.
+
+| targetLanguages Value | Behaviour |
+|-----------------------|-----------|
+| **Empty** (no languages selected) | The content appears in **all languages** |
+| **One or more languages selected** | The content appears only when the site is viewed in one of the selected languages |
+
+To configure language targeting:
+
+1. Open the content item in the editor.
+2. Locate the **targetLanguages** field in the sidebar.
+3. Click to open the multi-select dropdown.
+4. Select the languages you want the content to appear in.
+5. Save the content item.
+
+## How Language Is Extracted from Locale
+
+Each jurisdiction URL uses a locale pattern like `en-gb`, `fr-fr`, or `es-mx`. The language code is the part before the hyphen:
+
+| Locale | Extracted Language |
+|--------|--------------------|
+| `en-gb` | `en` |
+| `en-us` | `en` |
+| `fr-fr` | `fr` |
+| `fr-ca` | `fr` |
+| `es-mx` | `es` |
+| `de-de` | `de` |
+| `pt-br` | `pt` |
+| `ar-ae` | `ar` |
+| `zh-cn` | `zh` |
+| `ja-jp` | `ja` |
+
+The content filter extracts this language code and matches it against the `targetLanguages` field values.
+
+## Common Language Targeting Patterns
+
+### All Languages (Default)
+
+Leave `targetLanguages` empty. The content appears regardless of the visitor's language. This is the default and most common setting.
+
+### Single Language
+
+Select one language (e.g., `en`). The content appears only on English-language versions of jurisdiction sites. This is useful for:
+
+- Content that has not yet been translated.
+- Language-specific resources (e.g., an English-language whitepaper).
+- Content that references language-specific cultural contexts.
+
+### Multiple Languages
+
+Select several languages (e.g., `en`, `fr`, `es`). The content appears on sites viewed in any of those languages. This is useful for:
+
+- Content available in a subset of translated languages.
+- Regional content where specific language groups are targeted.
+
+## Combining Language and Jurisdiction Targeting
+
+Language and jurisdiction targeting work together with AND logic:
+
+- A page with `targetJurisdictions: [United Kingdom, France]` and `targetLanguages: [en, fr]` will appear on the UK site (in English) and the France site (in French).
+- A page with no jurisdiction restrictions and `targetLanguages: [en]` will appear on all jurisdiction sites that are accessed in English.
+
+This combination gives you fine-grained control over content visibility across the global network.
+
+## Tips
+
+- Most content should leave `targetLanguages` empty (all languages) unless you have a specific reason to restrict it.
+- Language targeting is about **visibility**, not **translation**. The `targetLanguages` field controls which language contexts show the content; it does not automatically translate the content.
+- If you need the same content in multiple languages with different text, create separate content items for each language and use `targetLanguages` to ensure each version appears in the correct language context.

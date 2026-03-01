@@ -1,0 +1,115 @@
+---
+title: Services
+sidebar_position: 10
+---
+
+# Services
+
+The Services collection manages the 48 service offerings that form the core of Frankmax Digital's consulting business. Services span five sub-brands and two service delivery models.
+
+## The Five Sub-Brands
+
+| Code | Sub-Brand | Focus Area |
+|------|-----------|------------|
+| **FDS001** | Digital Marketing Maven | Digital marketing, SEO, social media, content strategy |
+| **FDS002** | Design Studio | UI/UX design, branding, creative services |
+| **FDS003** | IT Synergy | IT infrastructure, systems integration, cloud services |
+| **FDS004** | DevOps Excellence | CI/CD, infrastructure automation, platform engineering |
+| **FDS005** | AI Labs | Artificial intelligence, machine learning, data science |
+
+## Service Types
+
+Each service is classified as one of two delivery models:
+
+| Type | Description |
+|------|-------------|
+| **Professional Services** | Consulting and strategy engagements with defined scopes and timelines. Consultant fees range from $1,750 to $5,500 per day |
+| **Managed Services** | Ongoing operational services with recurring delivery and SLAs |
+
+## Service Fields
+
+### Identity Fields
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| **serviceCode** | Text | Yes | A unique code identifying the service (e.g., "FDS001-SVC-001") |
+| **entityCode** | Text | Yes | The sub-brand entity code (FDS001 through FDS005) |
+| **slNo** | Number | Yes | A serial number for ordering within the sub-brand |
+| **name** | Text | Yes | The display name of the service |
+| **slug** | Text | Yes | The URL-friendly identifier, auto-generated from the name |
+
+### Description Fields
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| **description** | Textarea | No | A summary description of the service |
+| **marketingCopy** | Rich Text | No | Extended marketing content with full formatting |
+
+### Entity Fields
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| **entityName** | Text | No | The full name of the sub-brand entity (e.g., "Digital Marketing Maven") |
+| **websiteUrl** | URL | No | The sub-brand's website URL |
+| **systemeUrl** | URL | No | The sub-brand's Systeme.io landing page URL |
+| **mailbox** | Email | No | The service-specific email address |
+| **emailAlias** | Text | No | An email alias for the service |
+
+### Pricing
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| **consultantFeePerDay** | Number | No | The daily consultant fee in USD (range: $1,750 - $5,500) |
+| **serviceType** | Select | Yes | The delivery model. Options: `professional` (consulting/strategy), `managed` (ongoing operations) |
+
+### Status and Workflow
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| **status** | Select | Yes | The service's lifecycle status: Draft, Review, Ratified, or Published |
+
+### Content Targeting
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| **targetJurisdictions** | Relationship (hasMany) | No | Jurisdictions where this service is offered. Leave empty for global availability |
+| **targetLanguages** | Multi-select | No | Languages in which this service is displayed. Leave empty for all languages |
+| **scheduledPublishAt** | Day and Time | No | Date/time after which the service becomes visible |
+| **expiresAt** | Day and Time | No | Date/time after which the service is hidden |
+
+## Creating a New Service
+
+1. Navigate to **Services** in the sidebar.
+2. Click **Create New**.
+3. Fill in the required identity fields (serviceCode, entityCode, slNo, name).
+4. Set the serviceType (professional or managed).
+5. Add a description and marketing copy.
+6. Configure entity fields (websiteUrl, systemeUrl, mailbox).
+7. Set the consultant fee if applicable.
+8. Configure targeting (jurisdictions, languages, scheduling) in the sidebar.
+9. Save as Draft to begin the review process.
+
+## Managing Existing Services
+
+### Listing and Searching
+
+The Services list view supports:
+
+- **Search** by service name, service code, or entity name.
+- **Filter** by status, entity code (sub-brand), or service type.
+- **Sort** by name, service code, or last modified date.
+
+### Editing Services
+
+Click a service in the list to open the editor. Make changes and save. Remember that services follow the same content lifecycle as pages (Draft, Review, Ratified, Published).
+
+### Live Preview
+
+Services support [Live Preview](/docs/user-guide/live-preview), allowing you to see how the service page will render on the frontend before publishing.
+
+## Tips
+
+- Use the `serviceCode` field consistently. The format `FDS00X-SVC-NNN` helps with identification and sorting.
+- The `consultantFeePerDay` field is used for display purposes on the frontend. Ensure it reflects current pricing.
+- Services with `published` status and no jurisdiction restrictions are visible across all 250+ jurisdiction sites.
+- Use the [ServiceShowcase](/docs/user-guide/page-builder/feed-blocks#serviceshowcase) block to display services dynamically on pages, filtered by sub-brand.

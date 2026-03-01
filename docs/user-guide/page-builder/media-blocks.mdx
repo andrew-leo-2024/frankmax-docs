@@ -1,0 +1,100 @@
+---
+title: Media Blocks
+sidebar_position: 4
+---
+
+# Media Blocks
+
+Media blocks handle images, video, and embedded third-party content. There are three media block types available.
+
+## ImageGallery
+
+The ImageGallery block displays a collection of images in various layout modes with optional captions.
+
+### Fields
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| **heading** | Text | No | An optional heading displayed above the gallery |
+| **layout** | Select | Yes | The gallery layout mode. Options: `grid` (uniform grid), `masonry` (Pinterest-style variable height), `slider` (horizontal slideshow) |
+| **columns** | Select | No | Number of columns for `grid` and `masonry` layouts. Options: `2`, `3`, `4`. Default: `3`. Ignored for `slider` layout |
+| **images** | Array | Yes | The gallery images (minimum 1) |
+
+### Image Item Fields
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| **images[n].image** | Upload | Yes | An image from the Media library |
+| **images[n].caption** | Text | No | A caption displayed below the image |
+
+### Layout Comparison
+
+| Layout | Best For | Behaviour |
+|--------|----------|-----------|
+| **Grid** | Uniform image sets (product photos, team headshots) | All images cropped to equal dimensions, arranged in rows and columns |
+| **Masonry** | Mixed-aspect-ratio images (portfolio, editorial) | Images maintain their natural aspect ratio, flowing into columns with variable heights |
+| **Slider** | Featured images, hero galleries | One image shown at a time with navigation arrows and optional swipe |
+
+### Usage Tips
+
+- Use `grid` with `3` columns for most general-purpose galleries.
+- Use `masonry` for portfolio or editorial galleries where images have varying aspect ratios.
+- Use `slider` when you want to showcase individual images full-width, one at a time.
+- Captions appear below each image in grid and masonry modes, and as an overlay in slider mode.
+- On mobile, grid and masonry layouts automatically reduce to fewer columns.
+
+---
+
+## Video
+
+The Video block embeds a video player on the page. It supports both external URLs (YouTube, Vimeo) and direct file uploads.
+
+### Fields
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| **heading** | Text | No | An optional heading displayed above the video |
+| **source** | Select | Yes | The video source type. Options: `url` (external embed), `upload` (file from Media library) |
+| **url** | URL | Conditional | Shown when source is `url`. A YouTube or Vimeo URL. Standard watch URLs are supported (e.g., `https://www.youtube.com/watch?v=XXXXX` or `https://vimeo.com/XXXXX`) |
+| **file** | Upload | Conditional | Shown when source is `upload`. A video file uploaded to the Media library |
+| **caption** | Text | No | A caption displayed below the video player |
+
+### Supported URL Formats
+
+The following URL patterns are supported for the `url` source type:
+
+- `https://www.youtube.com/watch?v=VIDEO_ID`
+- `https://youtu.be/VIDEO_ID`
+- `https://vimeo.com/VIDEO_ID`
+
+### Usage Tips
+
+- Prefer external URLs (YouTube/Vimeo) for most video content to reduce hosting bandwidth and storage costs.
+- Use the `upload` source type only for short clips, product demos, or content that must be self-hosted for compliance reasons.
+- Uploaded video files should be in MP4 format for maximum browser compatibility.
+- The video player is responsive and adapts to the container width automatically.
+
+---
+
+## Embed
+
+The Embed block allows you to insert arbitrary HTML code into the page. This is used for third-party widgets, interactive tools, maps, social media embeds, or any content that requires custom HTML/JavaScript.
+
+### Fields
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| **heading** | Text | No | An optional heading displayed above the embed |
+| **html** | Code | Yes | The raw HTML code to embed. This field uses a code editor with syntax highlighting |
+| **maxWidth** | Select | No | Controls the maximum width of the embed container. Options: `sm` (480px), `md` (640px), `lg` (960px), `full` (100% width). Default: `full` |
+
+### Usage Tips
+
+- Use this block for Google Maps iframes, social media embed codes, Calendly widgets, or any third-party snippet.
+- The `maxWidth` setting is useful for centring smaller embeds (like a social media post) rather than stretching them to full width.
+- Be cautious with the HTML field: only paste embed codes from trusted sources. Malicious scripts could affect the page.
+- Test embedded content across breakpoints (mobile, tablet, desktop) to ensure it renders correctly at all sizes.
+
+:::warning Security Note
+The Embed block renders raw HTML on the frontend. Only users with appropriate admin permissions should have access to create or edit Embed blocks. Always verify that embed codes come from trusted, known sources.
+:::

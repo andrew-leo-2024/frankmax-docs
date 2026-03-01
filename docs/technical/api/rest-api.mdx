@@ -1,0 +1,187 @@
+---
+title: REST API
+sidebar_position: 1
+---
+
+# REST API
+
+The Frankmax CMS exposes a REST API through Payload CMS, providing full CRUD access to all 15 collections and the SiteSettings global.
+
+## Base URL
+
+All API endpoints are served from the `/api` path:
+
+```
+https://your-domain.com/api/{collection}
+```
+
+## Authentication
+
+### Cookie Authentication
+
+After logging in via `POST /api/users/login`, Payload sets an HTTP-only cookie that is automatically sent with subsequent requests.
+
+### Authorization Header
+
+Alternatively, use a JWT token in the Authorization header:
+
+```
+Authorization: JWT <token>
+```
+
+Tokens are obtained from the login endpoint response.
+
+## Collection Endpoints
+
+### List Documents
+
+```
+GET /api/{collection}
+```
+
+Returns a paginated list of documents.
+
+**Query Parameters:**
+
+| Parameter | Type | Description |
+|-----------|------|-------------|
+| `where` | object | Filter conditions (see [Content Filtering](./content-filtering)) |
+| `sort` | string | Sort field. Prefix with `-` for descending (e.g., `-createdAt`) |
+| `limit` | number | Documents per page (default: 10) |
+| `page` | number | Page number (default: 1) |
+| `depth` | number | Relationship population depth (default: 0) |
+
+**Response:**
+
+```json
+{
+  "docs": [...],
+  "totalDocs": 100,
+  "limit": 10,
+  "totalPages": 10,
+  "page": 1,
+  "pagingCounter": 1,
+  "hasPrevPage": false,
+  "hasNextPage": true,
+  "prevPage": null,
+  "nextPage": 2
+}
+```
+
+### Create Document
+
+```
+POST /api/{collection}
+Content-Type: application/json
+
+{
+  "name": "New Document",
+  "slug": "new-document",
+  "status": "draft"
+}
+```
+
+### Get Document
+
+```
+GET /api/{collection}/{id}
+```
+
+**Query Parameters:**
+
+| Parameter | Type | Description |
+|-----------|------|-------------|
+| `depth` | number | Relationship population depth |
+| `draft` | boolean | Include draft versions |
+
+### Update Document
+
+```
+PATCH /api/{collection}/{id}
+Content-Type: application/json
+
+{
+  "status": "review"
+}
+```
+
+Only the fields included in the request body are updated. Other fields remain unchanged.
+
+### Delete Document
+
+```
+DELETE /api/{collection}/{id}
+```
+
+## Global Endpoints
+
+### Get Global
+
+```
+GET /api/globals/{slug}
+```
+
+For the Frankmax CMS, the available global is:
+
+```
+GET /api/globals/site-settings
+```
+
+### Update Global
+
+```
+POST /api/globals/{slug}
+Content-Type: application/json
+
+{
+  "field": "value"
+}
+```
+
+## Available Collections
+
+| Collection Slug | Group | Auth Required |
+|----------------|-------|---------------|
+| `users` | System | Yes |
+| `media` | System | Yes |
+| `services` | Content | Yes |
+| `service-classifications` | Content | Yes |
+| `service-requirements` | Content | Yes |
+| `pages` | Content | Yes |
+| `content-blocks` | Content | Yes |
+| `products` | Content | Yes |
+| `campaigns` | Content | Yes |
+| `doctrine` | Governance | Yes |
+| `jurisdictions` | Governance | Yes |
+| `audit-log` | Governance | Read only |
+| `publish-tokens` | Governance | Read only |
+| `software-directory` | Directory | Yes |
+| `software-features` | Directory | Yes |
+| `news-articles` | News | Yes |
+| `opportunity-briefs` | News | Yes |
+
+## Depth Parameter
+
+The `depth` parameter controls how many levels of relationships are resolved:
+
+- `depth=0` — Relationships return only the document ID
+- `depth=1` — Relationships return the full referenced document
+- `depth=2` — Relationships within related documents are also resolved
+
+**Example:**
+
+```
+GET /api/campaigns/123?depth=1
+```
+
+This returns the campaign document with `targetJurisdictions` and `relatedContent` entries fully populated.
+
+## Error Responses
+
+| Status Code | Description |
+|-------------|-------------|
+| `400` | Bad request (invalid data or query) |
+| `401` | Unauthorized (not logged in) |
+| `403` | Forbidden (insufficient permissions) |
+| `404` | Document not found |
+| `500` | Internal server error |

@@ -1,0 +1,94 @@
+---
+title: Analytics Overview
+sidebar_position: 15
+---
+
+# Analytics Overview
+
+The Analytics Overview is a custom admin dashboard that provides a high-level summary of content and activity across the Frankmax CMS. It is accessible at `/admin/analytics` from the **Command Center** section of the sidebar navigation.
+
+## Accessing the Dashboard
+
+1. Log in to the admin panel.
+2. In the sidebar, click **Analytics** under the Command Center section.
+3. The dashboard loads at `/admin/analytics`.
+
+## Metric Cards
+
+The top of the dashboard displays a row of colour-coded metric cards, each showing the total count for a key collection:
+
+| Metric | Colour | Description |
+|--------|--------|-------------|
+| **Pages** | Blue | Total number of pages in the CMS |
+| **Services** | Green | Total number of service offerings (up to 48) |
+| **News Articles** | Purple | Total number of news articles |
+| **Products** | Orange | Total number of products |
+| **Campaigns** | Red | Total number of campaigns |
+| **Jurisdictions** | Teal | Total number of jurisdictions (250+) |
+
+Each card displays a large number with the metric label below it. The colour coding helps you quickly identify each metric type.
+
+## Status Breakdown
+
+Below the metric cards, the dashboard shows a more detailed status breakdown for key collections:
+
+### Published Pages
+
+The count of pages currently in **Published** status -- these are live and visible on the frontend.
+
+### Draft Pages
+
+The count of pages currently in **Draft** status -- these are works in progress that are not yet visible.
+
+### Active Campaigns
+
+The count of campaigns with **active** status -- these are currently running marketing initiatives.
+
+This status breakdown helps you quickly assess the operational state of the platform:
+
+- A high ratio of Published to Draft pages indicates a mature content set.
+- The Active Campaigns count shows how many marketing initiatives are currently running.
+
+## Recently Updated Pages
+
+The dashboard includes a **Recently Updated Pages** list showing pages that have been modified most recently. Each entry displays:
+
+| Column | Description |
+|--------|-------------|
+| **Page Name** | The name of the page |
+| **Status** | The current status (Draft, Review, Ratified, Published) |
+| **Last Updated** | The date and time of the most recent change |
+| **Updated By** | The admin user who made the change |
+
+Click a page name to navigate directly to the page editor.
+
+This list is useful for:
+
+- Tracking recent editorial activity.
+- Identifying pages that may need review or publishing.
+- Monitoring team productivity.
+
+## Upcoming Scheduled Content
+
+The dashboard also shows an **Upcoming Scheduled Content** list displaying content items with a `scheduledPublishAt` date in the future. Each entry shows:
+
+| Column | Description |
+|--------|-------------|
+| **Content Name** | The name of the content item |
+| **Collection** | Which collection it belongs to (pages, services, news articles, products) |
+| **Scheduled For** | The date and time the content is scheduled to become visible |
+| **Status** | The current status |
+
+This list helps you:
+
+- Plan ahead by seeing what content is queued for future publication.
+- Verify that scheduled content has the correct publish dates.
+- Identify content that may need to be expedited or rescheduled.
+
+## Tips
+
+- Check the Analytics Overview at the start of each day to get a quick pulse on the platform's state.
+- Use the Recently Updated Pages list to stay informed about team activity without needing to check individual collections.
+- Monitor the Upcoming Scheduled Content list to ensure nothing is scheduled incorrectly.
+- The metric cards provide a useful snapshot for management reporting and stakeholder updates.
+- If a metric count seems unexpectedly low or high, navigate to the relevant collection to investigate.

@@ -1,0 +1,124 @@
+---
+title: Content Orchestrator
+sidebar_position: 3
+---
+
+# Content Orchestrator
+
+The Content Orchestrator is a bulk operations tool for managing content across multiple jurisdictions and statuses. It is accessible at `/admin/orchestrator` from the **Command Center** section of the sidebar navigation.
+
+## Accessing the Content Orchestrator
+
+1. Log in to the admin panel.
+2. In the sidebar, click **Content Orchestrator** under the Command Center section.
+3. The orchestrator loads at `/admin/orchestrator`.
+
+## How It Works
+
+The Content Orchestrator follows a four-step workflow: **Select Collection**, **Filter**, **Select Items**, **Apply Action**.
+
+### Step 1: Select Collection
+
+At the top of the orchestrator, choose the collection you want to work with:
+
+| Collection | Description |
+|------------|-------------|
+| **Pages** | Website pages |
+| **Services** | Service offerings |
+| **News Articles** | News content |
+| **Products** | Product listings |
+
+Select a collection from the dropdown. The orchestrator loads the items from that collection.
+
+### Step 2: Filter by Status
+
+Once a collection is selected, you can filter the displayed items by their current status. This helps you focus on specific subsets of content:
+
+- **Draft** -- Show only draft items.
+- **Review** -- Show only items in review.
+- **Ratified** -- Show only ratified items.
+- **Published** -- Show only published items.
+- **All** -- Show items in any status.
+
+The item list updates to reflect the selected filter.
+
+### Step 3: Select Items
+
+The orchestrator displays a list of items from the chosen collection (filtered by status if applicable). Each item has a **checkbox** on the left.
+
+- Click individual checkboxes to select specific items.
+- Use the **Select All** checkbox in the header to select all visible items.
+- Selected items are highlighted to confirm your selection.
+
+The selection count is displayed so you can verify how many items will be affected.
+
+### Step 4: Choose and Apply a Bulk Action
+
+With items selected, choose a bulk action from the available options:
+
+#### Assign to Jurisdiction
+
+Adds one or more jurisdictions to the `targetJurisdictions` field of all selected items.
+
+1. Select **Assign to Jurisdiction** from the action dropdown.
+2. A jurisdiction picker appears. Search for and select the jurisdiction(s) you want to assign.
+3. Click **Apply**.
+4. The selected jurisdictions are added to each selected item's `targetJurisdictions` field. Existing jurisdiction assignments are preserved (the new jurisdictions are added, not replaced).
+
+#### Change Status
+
+Updates the status of all selected items to a new status.
+
+1. Select **Change Status** from the action dropdown.
+2. Choose the target status from the dropdown.
+3. Click **Apply**.
+4. Each selected item's status is updated to the chosen status.
+
+:::caution
+Status changes are subject to the same governance rules as individual edits. If a transition is invalid (e.g., Draft directly to Published), the action will fail for that item. The orchestrator reports which items succeeded and which failed.
+:::
+
+## Results and Feedback
+
+After clicking **Apply**, the orchestrator processes each selected item and displays results:
+
+| Result | Meaning |
+|--------|---------|
+| **Success** | The action was applied successfully to the item |
+| **Error** | The action failed for this item (e.g., invalid status transition). The error message explains why |
+
+A summary is displayed showing the total number of successes and failures.
+
+## Common Use Cases
+
+### Rolling Out Content to a New Jurisdiction
+
+When a new jurisdiction site launches:
+
+1. Select the **Pages** collection.
+2. Filter by **Published** status.
+3. Select all pages that should appear on the new jurisdiction.
+4. Choose **Assign to Jurisdiction** and select the new jurisdiction.
+5. Apply.
+6. Repeat for Services, News Articles, and Products as needed.
+
+### Bulk Publishing Reviewed Content
+
+After a review session where multiple items have been ratified:
+
+1. Select the appropriate collection.
+2. Filter by **Ratified** status.
+3. Select the items that are ready to publish.
+4. Choose **Change Status** and select **Published**.
+5. Apply.
+
+### Retiring Content from a Jurisdiction
+
+To remove content from a specific jurisdiction, you would need to edit the items individually to remove the jurisdiction from their `targetJurisdictions` field. The orchestrator's Assign to Jurisdiction action adds jurisdictions but does not remove them.
+
+## Tips
+
+- Always verify your selection count before applying a bulk action. Unintended selections can affect a large number of items.
+- Use status filters to narrow the list before selecting items, reducing the risk of accidentally including wrong items.
+- For large operations, consider applying actions in batches rather than selecting hundreds of items at once.
+- Check the results summary after each operation to ensure all items were processed successfully.

@@ -1,0 +1,91 @@
+---
+title: Services
+sidebar_position: 5
+---
+
+# Services Collection
+
+The Services collection is the central content entity in the Frankmax CMS, representing the 48 service offerings across AI, Blockchain, Cloud, Cybersecurity, DevOps, and other domains.
+
+## Configuration
+
+| Property | Value |
+|----------|-------|
+| **Slug** | `services` |
+| **Admin Group** | Content |
+| **Versions/Drafts** | `true` |
+| **Hooks** | `beforeChange: [createGovernanceHook('services')]` |
+
+## Fields
+
+| Field | Type | Required | Default | Admin | Description |
+|-------|------|----------|---------|-------|-------------|
+| `serviceCode` | text | No | — | — | Internal service identifier code |
+| `entityCode` | text | No | — | — | Parent entity code (e.g., FDS001) |
+| `slNo` | number | No | — | — | Serial number for ordering |
+| `name` | text | Yes | — | — | Display name of the service |
+| `slug` | text | Yes | — | Unique, Indexed | URL-friendly identifier |
+| `description` | textarea | No | — | — | Brief service description |
+| `entityName` | text | No | — | — | Name of the parent sub-brand entity |
+| `websiteUrl` | text | No | — | — | Primary website URL |
+| `systemeUrl` | text | No | — | — | Systeme.io landing page URL |
+| `mailbox` | email | No | — | — | Service-specific email address |
+| `emailAlias` | email | No | — | — | Email alias for the service |
+| `consultantFeePerDay` | number | No | — | — | Daily consultant fee in USD ($1,750–$5,500) |
+| `serviceType` | select | No | — | — | Service delivery model |
+| `marketingCopy` | richText | No | — | — | Marketing content (Lexical editor) |
+| `status` | select | No | `draft` | — | Governance workflow status |
+| `targetJurisdictions` | relationship | No | — | Sidebar | Jurisdictions this service targets |
+| `targetLanguages` | select (hasMany) | No | — | Sidebar | Languages this service is available in |
+| `scheduledPublishAt` | date | No | — | Sidebar, Indexed | Scheduled publication date |
+| `expiresAt` | date | No | — | Sidebar, Indexed | Content expiration date |
+
+### Service Type Options
+
+| Value | Label | Description |
+|-------|-------|-------------|
+| `professional` | Professional Services | Consulting and strategy engagements |
+| `managed` | Managed Services | Ongoing operational services |
+
+### Status Options
+
+| Value | Label |
+|-------|-------|
+| `draft` | Draft |
+| `review` | Review |
+| `ratified` | Ratified |
+| `published` | Published |
+
+## Relationships
+
+Services are referenced by multiple collections:
+
+| Collection | Field | Relationship |
+|-----------|-------|-------------|
+| ServiceClassifications | `service` | Many classifications per service |
+| Products | `service` | Many products per service |
+| NewsArticles | `services` | Many-to-many (hasMany on article) |
+| OpportunityBriefs | `service` | Many briefs per service |
+
+## Governance
+
+Services participate in the governance workflow via `createGovernanceHook('services')`. See [Governance Hooks](../hooks/governance-hooks) for details.
+
+## Search Integration
+
+Services are indexed in MeiliSearch under the `services` index. See [Search Library](../libraries/search) for configuration details.
+
+## Frontend Routes
+
+- **Listing:** `/[locale]/services` — Displays all published services filtered by jurisdiction
+- **Detail:** `/[locale]/services/[slug]` — Individual service page
+
+## API Endpoints
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET | `/api/services` | List services with optional filtering |
+| POST | `/api/services` | Create a new service |
+| GET | `/api/services/:id` | Get a specific service |
+| PATCH | `/api/services/:id` | Update a service |
+| DELETE | `/api/services/:id` | Delete a service |

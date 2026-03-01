@@ -1,0 +1,109 @@
+---
+title: Search
+sidebar_position: 16
+---
+
+# Search
+
+The Frankmax CMS uses **MeiliSearch** as its search engine to provide fast, typo-tolerant, full-text search across the site. MeiliSearch powers the search functionality on the frontend, allowing visitors to find services, software listings, and news articles instantly.
+
+## Search Architecture
+
+MeiliSearch is a dedicated search engine that runs alongside the CMS. Content from the CMS is indexed into MeiliSearch, and the frontend queries MeiliSearch directly for search results. This separation ensures search is fast and does not add load to the primary database.
+
+## Search Indexes
+
+Three indexes are configured in MeiliSearch, each serving a different content type:
+
+### Services Index
+
+| Property | Value |
+|----------|-------|
+| **Index name** | `services` |
+| **Source collection** | Services |
+| **Searchable fields** | `name`, `description`, `entityName`, `serviceCode` |
+
+Visitors can search for services by name, description text, the sub-brand entity name (e.g., "Digital Marketing Maven"), or the service code (e.g., "FDS001-SVC-001").
+
+### Software Index
+
+| Property | Value |
+|----------|-------|
+| **Index name** | `software` |
+| **Source collection** | Software/Products |
+| **Searchable fields** | `name`, `description` |
+
+The software index enables searching across software and product listings by name and description.
+
+### News Index
+
+| Property | Value |
+|----------|-------|
+| **Index name** | `news` |
+| **Source collection** | News Articles |
+| **Searchable fields** | `title`, `summary`, `source` |
+
+Visitors can search for news articles by headline, summary text, or the source publication name.
+
+## The Search Page
+
+The frontend provides a dedicated search page accessible at:
+
+```
+/{locale}/search
+```
+
+For example:
+
+- `/en-gb/search` for the UK English site
+- `/fr-fr/search` for the France French site
+- `/de-de/search` for the Germany German site
+
+### Search Page Features
+
+The search page provides:
+
+- A **search input** field where visitors type their query.
+- **Instant results** that update as the visitor types (no need to press Enter).
+- **Typo tolerance** -- MeiliSearch returns relevant results even when the query contains spelling mistakes.
+- **Categorised results** -- results are grouped by type (Services, Software, News) so visitors can quickly find what they are looking for.
+- **Result cards** showing the item's title, a snippet of the matching text, and a link to the full item.
+
+## How Content Gets Indexed
+
+Content is indexed into MeiliSearch when it is created or updated in the CMS. The indexing process:
+
+1. Extracts the searchable fields from the content item.
+2. Sends the data to the appropriate MeiliSearch index.
+3. MeiliSearch processes and stores the data for fast retrieval.
+
+Only content with **Published** status is indexed. Draft, Review, and Ratified content is not included in the search index.
+
+## Search Behaviour
+
+### Typo Tolerance
+
+MeiliSearch includes built-in typo tolerance. If a visitor searches for "cybersecurty" (missing the 'i'), MeiliSearch will still return results for "cybersecurity". This makes search forgiving and user-friendly.
+
+### Ranking
+
+Search results are ranked by relevance. MeiliSearch considers:
+
+- **Exact matches** rank highest.
+- **Proximity** of search terms to each other in the content.
+- **Field weight** -- matches in the `name`/`title` fields rank higher than matches in `description` or `summary`.
+- **Typo count** -- results with fewer typos rank higher.
+
+### Speed
+
+MeiliSearch is designed for speed. Search results typically return in under 50 milliseconds, providing an instant-feeling search experience for visitors.
+
+## Tips for Content Authors
+
+To ensure content is discoverable through search:
+
+- Write clear, descriptive **titles and names** that include the terms visitors are likely to search for.
+- Include relevant keywords naturally in **descriptions** and **summaries**.
+- For services, ensure the **entityName** and **serviceCode** fields are populated, as these are searchable.
+- For news articles, write informative **summaries** that capture the key topics of the article.
+- Remember that only **published** content appears in search results. Draft content is not searchable by visitors.

@@ -1,0 +1,99 @@
+---
+title: Blocks Overview
+sidebar_position: 1
+---
+
+# Blocks Overview
+
+The Frankmax CMS uses a block-based architecture for composing page layouts. Blocks are reusable content components that editors can arrange in any order within the Pages collection's `layout` field.
+
+## Architecture
+
+The block system consists of three parts:
+
+1. **Block Definitions** (`src/blocks/*.ts`) — Payload `Block` type configurations that define each block's slug and fields
+2. **Block Components** (`src/components/blocks/*.tsx`) — React components that render each block type
+3. **Block Registry** (`src/blocks/index.ts`) — The `allBlocks` array that exports all block definitions for use in the Pages `layout` field
+
+### How Blocks Work
+
+```
+payload.config.ts
+  └── Pages collection
+       └── layout field (type: 'blocks', blocks: allBlocks)
+            └── allBlocks array (src/blocks/index.ts)
+                 └── 20 individual block definitions
+
+RenderBlocks.tsx
+  └── blockComponents map (slug → React component)
+       └── 20 individual block components
+```
+
+When a page is rendered:
+
+1. The `layout` array is read from the page document
+2. `RenderBlocks` iterates over each block in the array
+3. Each block's `blockType` property is used to look up the corresponding component
+4. The component is rendered with the block's fields as props, plus the `locale`
+
+## Block Categories
+
+### Layout Blocks (5)
+
+Structural blocks that define page sections and spatial organization.
+
+| Slug | Component | Description |
+|------|-----------|-------------|
+| `heroBlock` | HeroBlock | Full-width hero section with heading, subheading, and CTA |
+| `columnsBlock` | ColumnsBlock | Multi-column layout container |
+| `spacerBlock` | SpacerBlock | Vertical spacing element |
+| `dividerBlock` | DividerBlock | Horizontal rule divider |
+| `sectionBlock` | SectionBlock | Generic content section wrapper |
+
+### Content Blocks (7)
+
+Blocks for displaying text, data, and structured content.
+
+| Slug | Component | Description |
+|------|-----------|-------------|
+| `richTextBlock` | RichTextBlock | Lexical rich text content |
+| `headingBlock` | HeadingBlock | Heading element with level selection |
+| `statsBlock` | StatsBlock | Statistics/metrics display grid |
+| `pricingBlock` | PricingBlock | Pricing cards or tables |
+| `faqBlock` | FaqBlock | Accordion-style FAQ section |
+| `testimonialBlock` | TestimonialBlock | Customer testimonial display |
+| `ctaBlock` | CtaBlock | Call-to-action banner |
+
+### Media Blocks (3)
+
+Blocks for images, videos, and visual content.
+
+| Slug | Component | Description |
+|------|-----------|-------------|
+| `imageBlock` | ImageBlock | Single image with caption |
+| `galleryBlock` | GalleryBlock | Image gallery grid |
+| `videoBlock` | VideoBlock | Embedded video player |
+
+### Feed Blocks (5)
+
+Blocks that pull and display dynamic content from collections.
+
+| Slug | Component | Description |
+|------|-----------|-------------|
+| `servicesListBlock` | ServicesListBlock | Dynamic services listing |
+| `newsListBlock` | NewsListBlock | Dynamic news articles feed |
+| `softwareListBlock` | SoftwareListBlock | Software directory browser |
+| `campaignBlock` | CampaignBlock | Campaign content display |
+| `relatedContentBlock` | RelatedContentBlock | Related content suggestions |
+
+## Block Slug Convention
+
+Block slugs use camelCase identifiers (e.g., `heroBlock`, `richTextBlock`). The slug serves as:
+
+- The unique identifier in the `allBlocks` array
+- The `blockType` value stored in page layout data
+- The key in the `blockComponents` map in `RenderBlocks.tsx`
+
+## Adding New Blocks
+
+See [Creating Blocks](./creating-blocks) for step-by-step instructions on adding new block types.

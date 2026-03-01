@@ -1,0 +1,93 @@
+---
+title: Publishing
+sidebar_position: 2
+---
+
+# Publishing
+
+Publishing is the final step in the content lifecycle. When content transitions to **Published** status, the CMS performs several integrity and verification steps before the content becomes visible on the live site.
+
+## What Happens When You Publish
+
+When a content item's status is changed to **Published** and saved, the following sequence occurs:
+
+1. **Content Hash Generation:** The system generates a **SHA-256 hash** of the content. This hash is a cryptographic fingerprint of the content at the moment of publishing, used to verify content integrity.
+
+2. **Publish Token Creation:** A **PublishToken** record is created in the PublishTokens collection. This token links the content item to its hash and the publishing event metadata (timestamp, publishing user).
+
+3. **Content Becomes Live:** The content item is now eligible to appear on the frontend. The catch-all slug page route checks the content status and only renders items with `published` status.
+
+## Content Hashing (SHA-256)
+
+Content hashing provides a tamper-detection mechanism. The SHA-256 hash is computed from the content's data at publish time. This hash can later be used to verify that the content has not been altered outside the normal CMS workflow.
+
+### How It Works
+
+- When content is published, the system serialises the content fields and computes a SHA-256 digest.
+- The hash is stored alongside the publish token.
+- If the content is later compared against its stored hash and the values differ, it indicates the content has been modified since it was published.
+
+### Why It Matters
+
+In a global operation spanning 250+ jurisdictions, content integrity is critical. The hash provides:
+
+- **Audit trail:** Proof of what was published and when.
+- **Tamper detection:** Ability to verify that published content has not been altered.
+- **Governance compliance:** Evidence that the published content matches what was reviewed and ratified.
+
+## Publish Tokens
+
+The PublishTokens collection stores a record for each publishing event:
+
+| Field | Description |
+|-------|-------------|
+| **Content reference** | Which content item was published |
+| **Content hash** | The SHA-256 hash at publish time |
+| **Published at** | The timestamp of the publishing event |
+| **Published by** | The admin user who performed the publish action |
+
+Publish tokens are created automatically. You do not need to manage them manually, but you can view them for audit purposes in the PublishTokens collection.
+
+## Frontend Rendering
+
+The frontend uses a catch-all slug route to render pages. The rendering logic includes a status check:
+
+```
+If page.status !== 'published' → return 404 Not Found
+```
+
+This means:
+
+- **Published** pages render normally with their full layout and blocks.
+- **Draft**, **Review**, and **Ratified** pages return a 404 response to visitors.
+- There is no "soft" unpublished state -- content is either fully live or completely hidden.
+
+:::info Live Preview
+Content in non-published statuses can still be previewed using the [Live Preview](/docs/user-guide/live-preview) feature, which uses a separate preview route that bypasses the status check. This allows editors to see how content will look before publishing.
+:::
+
+## Unpublishing Content
+
+To remove content from the live site:
+
+1. Open the content item in the editor.
+2. Change the status from **Published** to **Draft**.
+3. Save.
+
+The content immediately stops appearing on the frontend. The previous publish token remains in the system for audit purposes, but the content is no longer served.
+
+## Republishing
+
+When previously published content is revised and published again:
+
+1. A new SHA-256 hash is computed from the updated content.
+2. A new PublishToken is created with the new hash.
+3. The previous publish token is retained (it is not overwritten or deleted).
+
+This creates a complete publishing history for each content item.
+
+## Tips
+
+- Always review content in Live Preview before publishing to verify its appearance across breakpoints.
+- The PublishTokens collection provides a chronological log of all publishing events. Use it for audit and compliance reporting.
+- Publishing is not reversible in a single action -- if you publish by mistake, change the status back to Draft immediately to remove the content from the live site.

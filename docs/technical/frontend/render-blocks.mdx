@@ -1,0 +1,142 @@
+---
+title: RenderBlocks
+sidebar_position: 2
+---
+
+# RenderBlocks
+
+The `RenderBlocks` component is the rendering engine for block-based page layouts. It maps block type slugs to React components and renders them in sequence.
+
+**Source:** `src/components/blocks/RenderBlocks.tsx`
+
+## Component API
+
+```typescript
+interface RenderBlocksProps {
+  layout: Array<{
+    blockType: string;
+    id?: string;
+    [key: string]: any;
+  }>;
+  locale: string;
+}
+
+function RenderBlocks({ layout, locale }: RenderBlocksProps): JSX.Element
+```
+
+### Props
+
+| Prop | Type | Required | Description |
+|------|------|----------|-------------|
+| `layout` | array | Yes | Array of block objects from the page's `layout` field |
+| `locale` | string | Yes | Current locale string (e.g., `en-gb`) |
+
+### Layout Array Items
+
+Each item in the `layout` array is a block instance with:
+
+| Property | Type | Description |
+|----------|------|-------------|
+| `blockType` | string | The block's slug identifier (e.g., `heroBlock`) |
+| `id` | string | Unique instance ID for the block |
+| Additional fields | varies | All fields defined in the block's configuration |
+
+## blockComponents Map
+
+The `blockComponents` record maps block slugs to their React components:
+
+```typescript
+const blockComponents: Record<string, ComponentType<any>> = {
+  // Layout
+  heroBlock: HeroBlock,
+  columnsBlock: ColumnsBlock,
+  spacerBlock: SpacerBlock,
+  dividerBlock: DividerBlock,
+  sectionBlock: SectionBlock,
+
+  // Content
+  richTextBlock: RichTextBlock,
+  headingBlock: HeadingBlock,
+  statsBlock: StatsBlock,
+  pricingBlock: PricingBlock,
+  faqBlock: FaqBlock,
+  testimonialBlock: TestimonialBlock,
+  ctaBlock: CtaBlock,
+
+  // Media
+  imageBlock: ImageBlock,
+  galleryBlock: GalleryBlock,
+  videoBlock: VideoBlock,
+
+  // Feed
+  servicesListBlock: ServicesListBlock,
+  newsListBlock: NewsListBlock,
+  softwareListBlock: SoftwareListBlock,
+  campaignBlock: CampaignBlock,
+  relatedContentBlock: RelatedContentBlock,
+};
+```
+
+## Rendering Logic
+
+The component iterates over the `layout` array and renders each block:
+
+```tsx
+function RenderBlocks({ layout, locale }: RenderBlocksProps) {
+  return (
+    <>
+      {layout?.map((block) => {
+        const { blockType, ...blockProps } = block;
+        const Component = blockComponents[blockType];
+
+        if (!Component) {
+          return null; // Skip unknown block types
+        }
+
+        return (
+          <Component
+            key={block.id}
+            {...blockProps}
+            locale={locale}
+          />
+        );
+      })}
+    </>
+  );
+}
+```
+
+**Process:**
+
+1. Iterates over each block in the `layout` array
+2. Destructures `blockType` from the rest of the block's fields
+3. Looks up the component in `blockComponents` using `blockType` as the key
+4. If no matching component exists, the block is skipped (returns `null`)
+5. Otherwise, renders the component with all block fields spread as props, plus the `locale`
+
+## Usage
+
+```tsx
+import { RenderBlocks } from '@/components/blocks/RenderBlocks';
+
+export default async function Page({ params }) {
+  const payload = await getPayloadClient();
+  const page = await payload.find({
+    collection: 'pages',
+    where: { slug: { equals: params.slug } },
+  });
+
+  const pageData = page.docs[0];
+
+  return (
+    <RenderBlocks
+      layout={pageData.layout}
+      locale={params.locale}
+    />
+  );
+}
+```
+
+## Adding New Blocks
+
+To register a new block component, add an entry to the `blockComponents` map. The key must exactly match the block definition's `slug`. See [Creating Blocks](../blocks/creating-blocks).

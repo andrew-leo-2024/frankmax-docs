@@ -1,0 +1,193 @@
+---
+title: Seeding
+sidebar_position: 2
+---
+
+# Seeding
+
+Data seeding populates the Frankmax CMS database with initial content required for the platform to function. This includes jurisdictions, services, service classifications, and software directory data.
+
+## Overview
+
+The seeding process uses the Payload Local API to programmatically create documents across multiple collections. This ensures all validation rules, hooks, and relationships are properly applied during data insertion.
+
+## Running the Seed Script
+
+```bash
+pnpm seed
+```
+
+This executes the seed script which populates the database in the correct order to satisfy relationship dependencies.
+
+:::caution
+Seeding should only be run on a fresh or empty database. Running it against a database with existing data may cause duplicate entries or constraint violations.
+:::
+
+## Seed Data Contents
+
+### Jurisdictions (250+ Countries)
+
+The jurisdictions seed imports all country-specific data required for the multi-jurisdiction site network:
+
+| Field | Description | Example |
+|-------|-------------|---------|
+| `name` | Country name | `United Kingdom` |
+| `code` | ISO country code | `GB` |
+| `locale` | URL locale path | `en-gb` |
+| `flagColors` | Array of hex colors from national flag | `['#00247D', '#CF142B', '#FFFFFF']` |
+| `currency` | Local currency code | `GBP` |
+| `region` | Geographic region | `Europe` |
+
+Each jurisdiction generates a locale-based URL path (e.g., `/en-gb`, `/en-us`, `/fr-fr`) used for content routing and sovereign theming.
+
+### Services (48 Offerings)
+
+The 48 service offerings span five sub-brands:
+
+| Sub-Brand | Code | Service Count |
+|-----------|------|---------------|
+| Digital Marketing Maven | FDS001 | ~10 |
+| Design Studio | FDS002 | ~8 |
+| IT Synergy | FDS003 | ~10 |
+| DevOps Excellence | FDS004 | ~10 |
+| AI Labs | FDS005 | ~10 |
+
+Each service includes:
+- Title and slug
+- Description and detailed content
+- Sub-brand assignment
+- Service category
+- Consultant day rate range ($1,750 - $5,500)
+
+### Service Classifications (91 Classifications)
+
+Service classifications organize the 48 services into a taxonomy:
+
+- 91 classification entries
+- 891 detailed service requirements linked to classifications
+- Maps service capabilities to specific deliverables
+
+### Software Directory (3,259 Categories)
+
+The software directory is seeded from the Capterra category taxonomy:
+
+| Collection | Count | Description |
+|-----------|-------|-------------|
+| Software Categories | 3,259 | Application categories (e.g., CRM, ERP, Project Management) |
+| Software Apps | Variable | Individual software applications |
+| Software Features | 6,700+ | Feature mappings across categories |
+
+## Seed Script Architecture
+
+### Execution Order
+
+The seed script follows a specific order to resolve collection dependencies:
+
+```
+1. Jurisdictions     (no dependencies)
+2. Service Classifications  (no dependencies)
+3. Service Requirements     (depends on Service Classifications)
+4. Services                 (depends on Service Classifications)
+5. Software Categories      (no dependencies)
+6. Software Features        (depends on Software Categories)
+7. Software Apps            (depends on Software Categories, Software Features)
+```
+
+### Using the Payload Local API
+
+The seed script initializes Payload in local mode (no HTTP server) and uses the Local API for all data operations:
+
+```typescript title="seed-data.ts"
+import { getPayload } from 'payload'
+import config from './payload.config'
+
+async function seed() {
+  const payload = await getPayload({ config })
+
+  // Seed jurisdictions
+  for (const jurisdiction of jurisdictionData) {
+    await payload.create({
+      collection: 'jurisdictions',
+      data: jurisdiction,
+    })
+  }
+
+  // Seed services
+  for (const service of serviceData) {
+    await payload.create({
+      collection: 'services',
+      data: service,
+    })
+  }
+
+  // ... additional collections
+
+  console.log('Seeding complete.')
+  process.exit(0)
+}
+
+seed()
+```
+
+### Benefits of Local API Seeding
+
+- **Validation**: All field validations are applied, catching data errors early
+- **Hooks**: Before-change and after-change hooks execute, ensuring data consistency (e.g., slug generation, content hashing)
+- **Relationships**: Payload resolves and validates relationship references automatically
+- **Access control**: Runs with internal access, bypassing user-level permissions
+
+## Selective Seeding
+
+To seed only specific collections, the seed script can accept arguments:
+
+```bash
+# Seed only jurisdictions
+pnpm seed -- --collection=jurisdictions
+
+# Seed only services and classifications
+pnpm seed -- --collection=services --collection=service-classifications
+```
+
+## Data Sources
+
+Seed data is stored in structured files within the project:
+
+```
+src/
+  seed/
+    jurisdictions.json     # 250+ country records
+    services.json          # 48 service offerings
+    classifications.json   # 91 service classifications
+    requirements.json      # 891 service requirements
+    software-categories.json  # 3,259 Capterra categories
+    seed-data.ts           # Main seed orchestration script
+```
+
+## Re-Seeding
+
+To re-seed the database, first clear the existing data:
+
+```bash
+# Option 1: Reset the entire database
+dropdb frankmax_cms
+createdb frankmax_cms
+pnpm payload migrate
+pnpm seed
+
+# Option 2: Clear specific collections via Payload API
+# (implement a reset script or use the admin panel to bulk-delete)
+```
+
+## Best Practices
+
+- **Run migrations before seeding.** The database schema must exist before data can be inserted.
+- **Seed in dependency order.** Collections with relationships must be seeded after their dependencies.
+- **Use idempotent checks** where possible. Check for existing records before creating to allow re-runs without duplicates.
+- **Log progress.** For large datasets (3,259 categories, 6,700+ features), log progress to monitor long-running seed operations.
+- **Validate data files** before seeding. Ensure JSON files are well-formed and field values match collection schemas.
+
+## Next Steps
+
+- [Migrations](/docs/operations/maintenance/migrations) — Apply database schema before seeding
+- [Search Indexing](/docs/operations/maintenance/search-indexing) — Index seeded data in MeiliSearch
+- [Database](/docs/operations/deployment/database) — Database backup before and after seeding

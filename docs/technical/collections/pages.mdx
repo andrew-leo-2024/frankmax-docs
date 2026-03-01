@@ -1,0 +1,83 @@
+---
+title: Pages
+sidebar_position: 4
+---
+
+# Pages Collection
+
+The Pages collection stores block-based page compositions that form the primary content structure of the Frankmax website network.
+
+## Configuration
+
+| Property | Value |
+|----------|-------|
+| **Slug** | `pages` |
+| **Admin Group** | Content |
+| **Versions/Drafts** | `true` |
+| **Hooks** | `beforeChange: [createGovernanceHook('pages')]` |
+
+## Fields
+
+| Field | Type | Required | Default | Admin | Description |
+|-------|------|----------|---------|-------|-------------|
+| `name` | text | Yes | — | — | Display name of the page |
+| `slug` | text | Yes | — | Indexed | URL-friendly identifier |
+| `description` | textarea | No | — | — | Brief page description for metadata |
+| `pageUrl` | text | No | — | — | Full URL path of the page |
+| `layout` | blocks | No | — | — | Composable content blocks (uses `allBlocks`) |
+| `status` | select | No | `draft` | — | Governance workflow status |
+| `targetJurisdictions` | relationship | No | — | Sidebar | Jurisdictions this page targets |
+| `targetLanguages` | select (hasMany) | No | — | Sidebar | Languages this page is available in |
+| `scheduledPublishAt` | date | No | — | Sidebar, Indexed | Scheduled publication date |
+| `expiresAt` | date | No | — | Sidebar, Indexed | Content expiration date |
+
+### Status Options
+
+| Value | Label |
+|-------|-------|
+| `draft` | Draft |
+| `review` | Review |
+| `ratified` | Ratified |
+| `published` | Published |
+
+### Layout (Blocks Field)
+
+The `layout` field accepts any of the 20 registered block types from the `allBlocks` array. Pages are composed by stacking blocks in the desired order. See [Blocks Overview](../blocks/overview) for the complete list.
+
+## Governance
+
+Pages participate in the governance workflow through the `createGovernanceHook('pages')` hook. This enforces:
+
+- Valid status transitions: `draft` → `review` → `ratified` → `published`
+- Audit log entries on status changes
+- Content hashing and publish token generation on publish
+- Reversal paths: `review` → `draft`, `ratified` → `review`, `published` → `draft`
+
+See [Governance Hooks](../hooks/governance-hooks) for full details.
+
+## Content Filtering
+
+Pages are filtered for frontend display using the `buildContentFilter()` function, which evaluates:
+
+- `targetJurisdictions` — matches the current locale's jurisdiction
+- `targetLanguages` — matches the current locale's language
+- `scheduledPublishAt` / `expiresAt` — time-based visibility
+
+See [Content Filters](../libraries/content-filters) for details.
+
+## Frontend Rendering
+
+Pages are rendered via two routes:
+
+1. **Catch-all route** (`/[locale]/[...slug]/page.tsx`) — Looks up pages by slug and renders the `layout` blocks using `RenderBlocks`
+2. **Homepage** (`/[locale]/page.tsx`) — Renders the page with a designated home slug
+
+## API Endpoints
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET | `/api/pages` | List pages with optional filtering |
+| POST | `/api/pages` | Create a new page |
+| GET | `/api/pages/:id` | Get a specific page |
+| PATCH | `/api/pages/:id` | Update a page |
+| DELETE | `/api/pages/:id` | Delete a page |

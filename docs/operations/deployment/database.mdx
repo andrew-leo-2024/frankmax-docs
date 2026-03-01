@@ -1,0 +1,242 @@
+---
+title: Database
+sidebar_position: 4
+---
+
+# Database
+
+The Frankmax CMS uses PostgreSQL as its primary data store, accessed through the `@payloadcms/db-postgres` adapter which is built on Drizzle ORM. This page covers database setup, connection configuration, pool tuning, and backup strategies.
+
+## PostgreSQL Setup
+
+### Installation
+
+Refer to the [Prerequisites](/docs/operations/deployment/prerequisites) page for platform-specific installation instructions. PostgreSQL 15 or later is required.
+
+### Creating the Database
+
+Create a dedicated database for the CMS:
+
+```bash
+# Using the createdb utility
+createdb frankmax_cms
+
+# Or via psql
+psql -U postgres -c "CREATE DATABASE frankmax_cms;"
+```
+
+For production, create a dedicated user with limited privileges:
+
+```sql
+-- Connect as the postgres superuser
+psql -U postgres
+
+-- Create a dedicated user
+CREATE USER frankmax_user WITH PASSWORD 'strong-password-here';
+
+-- Create the database
+CREATE DATABASE frankmax_cms OWNER frankmax_user;
+
+-- Grant privileges
+GRANT ALL PRIVILEGES ON DATABASE frankmax_cms TO frankmax_user;
+
+\q
+```
+
+## Connection Configuration
+
+The CMS connects to PostgreSQL via the `DATABASE_URI` environment variable. This must be a valid PostgreSQL connection string:
+
+```
+postgresql://user:password@host:port/database
+```
+
+### Examples
+
+```bash
+# Local development
+DATABASE_URI=postgresql://postgres:password@localhost:5432/frankmax_cms
+
+# Production with dedicated user
+DATABASE_URI=postgresql://frankmax_user:strong-password@db.frankmax.digital:5432/frankmax_cms
+
+# With SSL required
+DATABASE_URI=postgresql://frankmax_user:password@db-host:5432/frankmax_cms?sslmode=require
+```
+
+## Adapter Configuration
+
+The `@payloadcms/db-postgres` adapter is configured in `payload.config.ts`:
+
+```typescript title="payload.config.ts"
+import { postgresAdapter } from '@payloadcms/db-postgres'
+
+export default buildConfig({
+  db: postgresAdapter({
+    pool: {
+      connectionString: process.env.DATABASE_URI,
+    },
+  }),
+  // ... other config
+})
+```
+
+### Pool Configuration
+
+The adapter uses a connection pool managed by the `pg` library. The `pool` option accepts all standard `pg.Pool` configuration parameters:
+
+```typescript
+db: postgresAdapter({
+  pool: {
+    connectionString: process.env.DATABASE_URI,
+    // Optional pool tuning
+    max: 20,              // Maximum number of connections (default: 10)
+    min: 2,               // Minimum connections to maintain
+    idleTimeoutMillis: 30000,  // Close idle connections after 30s
+    connectionTimeoutMillis: 5000,  // Timeout for new connections
+  },
+}),
+```
+
+### Pool Sizing Guidelines
+
+| Environment | `max` | `min` | Notes |
+|-------------|-------|-------|-------|
+| Development | 5 | 1 | Low concurrency, single developer |
+| Staging | 10 | 2 | Moderate traffic for testing |
+| Production | 20-50 | 5 | Adjust based on concurrent users |
+
+:::tip
+The total number of pool connections across all application instances must not exceed the PostgreSQL `max_connections` setting (default: 100). If running multiple instances behind a load balancer, divide the pool `max` accordingly.
+:::
+
+## Database Schema
+
+Payload CMS automatically manages the database schema through Drizzle ORM. The schema includes tables for:
+
+- **15 collections**: Users, Pages, Services, Jurisdictions, Media, Campaigns, Initiatives, Governance States, Software Categories, Software Apps, Software Features, Service Classifications, Service Requirements, News, Tags
+- **Block tables**: Inline tables for each of the 20 content blocks
+- **Relationship tables**: Join tables for many-to-many relationships (e.g., `pages_rels`, `services_rels`)
+- **Locale tables**: Translation tables for localized fields
+- **1 global**: SiteSettings with its associated fields
+
+## Migrations
+
+Database migrations are managed through Payload's migration system using Drizzle ORM. See the [Migrations](/docs/operations/maintenance/migrations) page for detailed instructions on creating, running, and rolling back migrations.
+
+Apply all pending migrations:
+
+```bash
+pnpm payload migrate
+```
+
+## Backup Strategies
+
+### pg_dump (Logical Backup)
+
+Use `pg_dump` for portable, logical backups:
+
+```bash
+# Full database backup
+pg_dump -U frankmax_user -h localhost -d frankmax_cms -F c -f backup_$(date +%Y%m%d_%H%M%S).dump
+
+# Compressed SQL backup
+pg_dump -U frankmax_user -h localhost -d frankmax_cms | gzip > backup_$(date +%Y%m%d_%H%M%S).sql.gz
+```
+
+Restore from a backup:
+
+```bash
+# From custom format
+pg_restore -U frankmax_user -h localhost -d frankmax_cms -c backup_20260301_120000.dump
+
+# From SQL
+gunzip -c backup_20260301_120000.sql.gz | psql -U frankmax_user -h localhost -d frankmax_cms
+```
+
+### Automated Backup Script
+
+Create a cron job for scheduled backups:
+
+```bash title="/usr/local/bin/backup-frankmax-db.sh"
+#!/bin/bash
+BACKUP_DIR="/var/backups/frankmax"
+TIMESTAMP=$(date +%Y%m%d_%H%M%S)
+RETENTION_DAYS=30
+
+mkdir -p "$BACKUP_DIR"
+
+# Create backup
+pg_dump -U frankmax_user -h localhost -d frankmax_cms -F c \
+  -f "$BACKUP_DIR/frankmax_cms_$TIMESTAMP.dump"
+
+# Remove backups older than retention period
+find "$BACKUP_DIR" -name "*.dump" -mtime +$RETENTION_DAYS -delete
+
+echo "Backup completed: frankmax_cms_$TIMESTAMP.dump"
+```
+
+Add to crontab for daily execution:
+
+```bash
+# Run daily at 2:00 AM
+0 2 * * * /usr/local/bin/backup-frankmax-db.sh >> /var/log/frankmax-backup.log 2>&1
+```
+
+### Continuous Archiving (WAL)
+
+For production environments requiring point-in-time recovery, configure PostgreSQL WAL (Write-Ahead Log) archiving:
+
+```ini title="postgresql.conf"
+wal_level = replica
+archive_mode = on
+archive_command = 'cp %p /var/backups/frankmax/wal/%f'
+```
+
+This enables restoring the database to any point in time, not just the last backup snapshot.
+
+### Backup Verification
+
+Regularly test your backups by restoring to a separate database:
+
+```bash
+createdb frankmax_cms_test
+pg_restore -U postgres -d frankmax_cms_test backup_20260301_120000.dump
+psql -U postgres -d frankmax_cms_test -c "SELECT count(*) FROM pages;"
+dropdb frankmax_cms_test
+```
+
+## Monitoring
+
+### Connection Monitoring
+
+Check active connections:
+
+```sql
+SELECT count(*) AS active_connections
+FROM pg_stat_activity
+WHERE datname = 'frankmax_cms';
+```
+
+### Database Size
+
+```sql
+SELECT pg_size_pretty(pg_database_size('frankmax_cms')) AS db_size;
+```
+
+### Table Sizes
+
+```sql
+SELECT
+  relname AS table_name,
+  pg_size_pretty(pg_total_relation_size(relid)) AS total_size
+FROM pg_catalog.pg_statio_user_tables
+ORDER BY pg_total_relation_size(relid) DESC
+LIMIT 20;
+```
+
+## Next Steps
+
+- [Migrations](/docs/operations/maintenance/migrations) — Creating and running database migrations
+- [Production Deployment](/docs/operations/deployment/production) — Full production setup guide
+- [Environment Variables](/docs/operations/configuration/environment-variables) — All configuration variables

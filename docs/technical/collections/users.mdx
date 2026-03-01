@@ -1,0 +1,64 @@
+---
+title: Users
+sidebar_position: 2
+---
+
+# Users Collection
+
+The Users collection provides authentication and role-based access control for the Frankmax CMS admin panel.
+
+## Configuration
+
+| Property | Value |
+|----------|-------|
+| **Slug** | `users` |
+| **Auth** | `true` |
+| **Use as Title** | `email` |
+| **Admin Group** | System |
+
+## Fields
+
+| Field | Type | Required | Default | Description |
+|-------|------|----------|---------|-------------|
+| `email` | email | Yes | — | User's email address (provided by Payload auth) |
+| `role` | select | Yes | `editor` | Access level for the user |
+
+### Role Options
+
+| Value | Label | Description |
+|-------|-------|-------------|
+| `admin` | Admin | Full access to all collections and admin views |
+| `editor` | Editor | Can create and edit content, cannot manage users |
+| `viewer` | Viewer | Read-only access to content |
+
+## Authentication
+
+The Users collection has `auth: true` enabled, which provides:
+
+- Email/password authentication
+- Session management via HTTP-only cookies
+- JWT token generation for API access
+- Password hashing and salt management
+- Login/logout/refresh endpoints
+
+## API Endpoints
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| POST | `/api/users/login` | Authenticate with email and password |
+| POST | `/api/users/logout` | End the current session |
+| POST | `/api/users/refresh-token` | Refresh the JWT token |
+| GET | `/api/users/me` | Get the current authenticated user |
+| POST | `/api/users` | Create a new user (admin only) |
+| GET | `/api/users` | List all users |
+| GET | `/api/users/:id` | Get a specific user |
+| PATCH | `/api/users/:id` | Update a user |
+| DELETE | `/api/users/:id` | Delete a user |
+
+## Relationships
+
+The Users collection is referenced by:
+
+- **Doctrine** — `ratifiedBy` field
+- **Audit Log** — `user` field
+- **Publish Tokens** — `publishedBy` and `ratifiedBy` fields

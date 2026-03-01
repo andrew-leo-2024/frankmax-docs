@@ -1,0 +1,101 @@
+---
+title: Getting Started
+sidebar_position: 1
+---
+
+# Getting Started
+
+This guide walks you through logging into the Frankmax CMS admin panel and introduces the key areas you will use day-to-day. The CMS is built on Payload CMS v3 with Next.js and provides a purpose-built interface for managing a global network of 250+ jurisdiction-specific websites.
+
+## Logging In
+
+Navigate to your site's admin URL (typically `https://yourdomain.com/admin`). You will see the Payload CMS login screen.
+
+1. Enter your **email address** and **password**.
+2. Click **Log In**.
+3. If your account has two-factor authentication enabled, complete the verification step.
+
+After logging in, you land on the admin dashboard.
+
+:::tip
+If you have forgotten your password, click the **Forgot Password** link on the login screen. A reset email will be sent to your registered address.
+:::
+
+## Admin Panel Overview
+
+The admin panel consists of three main areas:
+
+| Area | Location | Purpose |
+|------|----------|---------|
+| **Navigation sidebar** | Left side | Access collections, globals, and custom views |
+| **Main content area** | Centre | View and edit records |
+| **Top bar** | Top | Account menu, locale selector, and live preview controls |
+
+## Navigating Collections
+
+Collections are the core data types in the CMS. You will work with these collections most frequently:
+
+| Collection | Description |
+|------------|-------------|
+| **Pages** | Website pages built from blocks |
+| **Services** | The 48 service offerings across 5 sub-brands |
+| **News Articles** | Curated news content with source attribution |
+| **Products** | Product listings linked to services and brands |
+| **Campaigns** | Marketing campaigns with KPI tracking |
+| **Jurisdictions** | 250+ country/territory definitions with sovereign theming |
+| **Media** | Uploaded images and documents |
+
+Click any collection name in the sidebar to see a list view of all records. From the list view you can:
+
+- **Search** using the search bar at the top.
+- **Filter** by status, jurisdiction, language, or other fields using the filter controls.
+- **Sort** by clicking column headers.
+- **Create** a new record using the **Create New** button.
+
+## Navigating Globals
+
+Globals are singleton configuration objects that apply across the entire site. Unlike collections, globals have only one instance each. Common globals include site-wide settings such as navigation menus and footer content. Access them from the **Globals** section in the sidebar.
+
+## The Command Center
+
+The sidebar includes a set of custom admin views collectively known as the **Command Center**. These provide high-level operational dashboards beyond standard collection management.
+
+### Sites Dashboard
+
+**Path:** `/admin/sites`
+
+A visual grid of all 250+ jurisdictions. Each card displays the country name, locale code (e.g., `en-gb`), status badge, theme colour swatches, and region. Use this to get a bird's-eye view of your global site network and drill down into individual jurisdictions.
+
+[Learn more about the Sites Dashboard &rarr;](/docs/user-guide/multi-site/sites-dashboard)
+
+### Campaigns Dashboard
+
+**Path:** `/admin/campaigns-dashboard`
+
+A timeline/Gantt-style view of all marketing campaigns. Campaigns are displayed as colour-coded bars showing their duration and status. Use this to plan, monitor, and coordinate campaign activities across jurisdictions.
+
+[Learn more about the Campaigns Dashboard &rarr;](/docs/user-guide/campaigns/campaigns-dashboard)
+
+### Content Orchestrator
+
+**Path:** `/admin/orchestrator`
+
+A bulk operations tool for managing content across jurisdictions. Select a collection, filter by status, pick individual items, and apply bulk actions such as jurisdiction assignment or status changes.
+
+[Learn more about the Content Orchestrator &rarr;](/docs/user-guide/multi-site/content-orchestrator)
+
+### Analytics Overview
+
+**Path:** `/admin/analytics`
+
+A metrics dashboard showing counts of pages, services, news articles, products, campaigns, and jurisdictions. It also displays status breakdowns and lists of recently updated and upcoming scheduled content.
+
+[Learn more about the Analytics Overview &rarr;](/docs/user-guide/analytics)
+
+## Next Steps
+
+Now that you are familiar with the admin panel layout, proceed to:
+
+- [Creating Pages](/docs/user-guide/creating-pages) to learn how to build your first page.
+- [Page Builder Overview](/docs/user-guide/page-builder/overview) to understand the block-based content system.
+- [Content Lifecycle](/docs/user-guide/workflows/content-lifecycle) to learn about the Draft-to-Published workflow.

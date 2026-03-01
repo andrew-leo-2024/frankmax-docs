@@ -1,0 +1,46 @@
+---
+title: Software Features
+sidebar_position: 17
+---
+
+# Software Features Collection
+
+The Software Features collection stores individual app-level feature mappings, linking specific software applications to their parent categories in the Software Directory.
+
+## Configuration
+
+| Property | Value |
+|----------|-------|
+| **Slug** | `software-features` |
+| **Admin Group** | Directory |
+
+## Fields
+
+| Field | Type | Required | Default | Description |
+|-------|------|----------|---------|-------------|
+| `appName` | text | Yes | — | Name of the software application |
+| `appUrl` | text | No | — | URL of the software application |
+| `featureName` | text | Yes | — | Name of the specific feature |
+| `category` | relationship | No | — | Parent category (to `software-directory`) |
+
+## Data Volume
+
+The Frankmax platform includes 6,700+ feature mappings across the software catalog.
+
+## Relationships
+
+| Collection | Field | Direction |
+|-----------|-------|-----------|
+| Software Directory | `category` | Feature → Directory |
+
+Each feature entry links to a single software directory category, enabling hierarchical browsing of the software catalog: Category → Applications → Features.
+
+## API Endpoints
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET | `/api/software-features` | List software features |
+| POST | `/api/software-features` | Create a new feature |
+| GET | `/api/software-features/:id` | Get a specific feature |
+| PATCH | `/api/software-features/:id` | Update a feature |
+| DELETE | `/api/software-features/:id` | Delete a feature |

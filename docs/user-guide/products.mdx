@@ -1,0 +1,86 @@
+---
+title: Products
+sidebar_position: 12
+---
+
+# Products
+
+The Products collection manages product listings within the Frankmax CMS. Products are linked to sub-brands and services, and they can be targeted to specific jurisdictions and languages.
+
+## Product Fields
+
+### Core Fields
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| **name** | Text | Yes | The product name |
+| **slug** | Text | Yes | The URL-friendly identifier, auto-generated from the name |
+| **brand** | Select | Yes | The sub-brand this product belongs to. Options: `FDS001` (Digital Marketing Maven), `FDS002` (Design Studio), `FDS003` (IT Synergy), `FDS004` (DevOps Excellence), `FDS005` (AI Labs) |
+| **description** | Rich Text | No | A detailed product description with rich text formatting |
+| **price** | Number | No | The product price in USD |
+| **category** | Text | No | A category label for organising products (e.g., "Software", "Training", "Toolkit") |
+
+### Features
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| **features** | Array | No | A list of product features or capabilities |
+
+Each feature entry is a text field describing one feature or benefit of the product. Features are displayed as a bulleted list on the product page.
+
+### Relationships
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| **service** | Relationship (single) | No | The service this product is associated with. Links the product to one of the 48 service offerings |
+
+### Content Targeting
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| **targetJurisdictions** | Relationship (hasMany) | No | Jurisdictions where this product is available. Leave empty for global availability |
+| **targetLanguages** | Multi-select | No | Languages in which this product is displayed. Leave empty for all languages |
+| **scheduledPublishAt** | Day and Time | No | Date/time after which the product becomes visible |
+| **expiresAt** | Day and Time | No | Date/time after which the product is hidden |
+
+### Status
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| **status** | Select | Yes | The product's lifecycle status: Draft, Review, Ratified, or Published |
+
+## Creating a Product
+
+1. Navigate to **Products** in the sidebar.
+2. Click **Create New**.
+3. Enter the **name** and let the slug auto-generate.
+4. Select the **brand** (FDS001-FDS005).
+5. Write a **description** using the rich text editor.
+6. Set the **price** in USD.
+7. Add **features** by clicking "Add Feature" and entering each feature description.
+8. Optionally link a **service** to associate the product with a service offering.
+9. Set a **category** for organisation.
+10. Configure targeting (jurisdictions, languages, scheduling) in the sidebar.
+11. Save as Draft.
+
+## Managing Products
+
+### List View
+
+The Products list view allows you to:
+
+- **Search** by product name or category.
+- **Filter** by brand, status, or category.
+- **Sort** by name, price, brand, or last modified date.
+
+### Editing
+
+Click a product in the list to open the editor. Make changes and save. Products follow the standard content lifecycle (Draft, Review, Ratified, Published).
+
+## Tips
+
+- Link products to their corresponding service using the **service** relationship field. This enables the frontend to display related products on service pages.
+- Use the **features** array to highlight key selling points. Aim for 3-8 features per product for a balanced presentation.
+- The **price** field stores values in USD. Currency conversion for different jurisdictions is handled by the frontend display layer.
+- Products with no jurisdiction restrictions are available globally across all 250+ sites.
+- Use the [Content Orchestrator](/docs/user-guide/multi-site/content-orchestrator) for bulk-assigning products to specific jurisdictions.

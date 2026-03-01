@@ -1,0 +1,87 @@
+---
+title: Jurisdiction Targeting
+sidebar_position: 1
+---
+
+# Jurisdiction Targeting
+
+The Frankmax CMS manages 250+ jurisdiction-specific websites, each representing a country or territory. Jurisdiction targeting controls which content appears on which sites. This is a fundamental concept that underpins the entire multi-site architecture.
+
+## How Jurisdiction Targeting Works
+
+Every content item (pages, services, news articles, products) has a **targetJurisdictions** relationship field. This field determines where the content is visible across the global site network.
+
+The targeting logic follows a simple rule:
+
+| targetJurisdictions Value | Behaviour |
+|---------------------------|-----------|
+| **Empty** (no jurisdictions selected) | The content is **global** -- it appears on all jurisdiction sites |
+| **One or more jurisdictions selected** | The content is **restricted** -- it appears only on the selected jurisdiction sites |
+
+## The targetJurisdictions Field
+
+The `targetJurisdictions` field is a relationship field that references the Jurisdictions collection. It supports multiple selections (hasMany).
+
+When editing a page, service, news article, or product, you will find this field in the sidebar panel. Click the field to open a dropdown of all available jurisdictions. You can:
+
+- **Search** by country name or locale code.
+- **Select multiple** jurisdictions by clicking each one.
+- **Remove** a jurisdiction by clicking the "x" next to its name.
+- **Clear all** to return to global visibility.
+
+## Content Filtering with buildContentFilter()
+
+On the frontend, when a visitor accesses a jurisdiction-specific URL (e.g., `/en-gb/services`), the system calls `buildContentFilter()` to determine which content to display. The filter logic works as follows:
+
+1. **Identify the visitor's jurisdiction** from the URL locale (e.g., `en-gb` maps to the United Kingdom jurisdiction).
+2. **Query content** where either:
+   - `targetJurisdictions` is empty (global content), **OR**
+   - `targetJurisdictions` includes the visitor's jurisdiction.
+3. **Combine** with other filters (status, language, scheduling) to produce the final content set.
+
+This means global content acts as a baseline that appears everywhere, while targeted content appears only on specific sites.
+
+## Common Targeting Patterns
+
+### Global Content (Default)
+
+Leave `targetJurisdictions` empty. The content will appear on all 250+ jurisdiction sites. This is appropriate for:
+
+- Core service descriptions that apply worldwide.
+- Company-wide announcements.
+- Brand pages and general information.
+
+### Single-Jurisdiction Content
+
+Select one jurisdiction. The content will appear only on that country's site. This is appropriate for:
+
+- Country-specific regulatory information.
+- Local case studies or client testimonials.
+- Region-specific pricing or offers.
+
+### Regional Content
+
+Select multiple jurisdictions within a region (e.g., all EU countries, all APAC countries). The content will appear on all selected sites. This is appropriate for:
+
+- Regional campaign landing pages.
+- Content that applies to a geographic region but not globally.
+- Language-specific content for countries sharing a language.
+
+### Excluding a Few Jurisdictions
+
+There is no "exclude" mode. If you want content to appear everywhere except a few jurisdictions, you would need to select all jurisdictions except those you want to exclude. For large exclusion sets, consider whether the content should be global with jurisdiction-specific overrides instead.
+
+## Combining with Other Targeting
+
+Jurisdiction targeting works alongside two other targeting mechanisms:
+
+- **Language targeting** (`targetLanguages`) -- restricts content to specific languages. See [Language Targeting](/docs/user-guide/content-targeting/languages).
+- **Scheduling** (`scheduledPublishAt`, `expiresAt`) -- restricts content to specific time windows. See [Scheduling](/docs/user-guide/content-targeting/scheduling).
+
+All three filters are combined with AND logic. Content must satisfy all applicable filters to appear on the frontend.
+
+## Tips
+
+- When in doubt, leave `targetJurisdictions` empty for global visibility. You can always restrict it later.
+- Use the [Content Orchestrator](/docs/user-guide/multi-site/content-orchestrator) for bulk-assigning jurisdictions to multiple content items at once.
+- Check the [Sites Dashboard](/docs/user-guide/multi-site/sites-dashboard) to see which content is targeted to a specific jurisdiction.

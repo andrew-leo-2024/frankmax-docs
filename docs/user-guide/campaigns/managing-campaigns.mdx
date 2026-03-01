@@ -1,0 +1,112 @@
+---
+title: Managing Campaigns
+sidebar_position: 2
+---
+
+# Managing Campaigns
+
+Once a campaign is created, you manage it through its lifecycle by updating its status, tracking KPIs, linking content, and monitoring the budget. This guide covers the day-to-day management of campaigns.
+
+## Campaign Statuses
+
+Campaigns progress through five statuses:
+
+| Status | Meaning | Typical Use |
+|--------|---------|-------------|
+| **draft** | Campaign is being planned and configured | Initial creation, strategy development |
+| **scheduled** | Campaign is fully configured and waiting to start | All content is ready, start date is in the future |
+| **active** | Campaign is currently running | Between start and end dates, content is live |
+| **paused** | Campaign is temporarily halted | Holiday periods, budget constraints, strategic pivots |
+| **completed** | Campaign has finished | End date has passed, results are being reviewed |
+
+### Status Transitions
+
+The typical lifecycle flows as follows:
+
+```
+draft → scheduled → active → completed
+                      ↓
+                    paused → active (resume)
+```
+
+- **draft to scheduled:** Set this when all campaign content is prepared, reviewed, and ready to launch.
+- **scheduled to active:** Change this when the campaign officially starts (on or after the start date).
+- **active to paused:** Use this to temporarily halt a campaign without marking it as complete.
+- **paused to active:** Resume a paused campaign.
+- **active to completed:** Mark a campaign as finished when its end date arrives or its goals have been met.
+
+You can also move a campaign back to `draft` from any status if it needs significant rework.
+
+## Linking Content Items
+
+The **relatedContent** field connects the campaign to specific content items across the CMS. Content can be added or removed at any time during the campaign lifecycle.
+
+### Adding Content
+
+1. Open the campaign in the editor.
+2. Scroll to the **Related Content** section.
+3. Click **Add Relationship**.
+4. Select the collection type (pages, services, news-articles, or products).
+5. Search for and select the specific item.
+6. Save the campaign.
+
+### Removing Content
+
+1. Locate the content item in the Related Content list.
+2. Click the remove button next to the item.
+3. Save the campaign.
+
+### Content Visibility
+
+Linking content to a campaign does not automatically affect that content's visibility on the frontend. The campaign's `relatedContent` field is an organisational tool for tracking which content items are part of the campaign. Content visibility is still governed by each item's own status, jurisdiction targeting, language targeting, and scheduling fields.
+
+## KPI Tracking
+
+KPIs (Key Performance Indicators) let you define measurable goals for each campaign and track progress against them.
+
+### Defining KPIs
+
+When creating or editing a campaign, add KPI entries to the `kpiTargets` array:
+
+1. Click **Add KPI Target**.
+2. Enter the **metric** name (e.g., "Page Views", "Leads Generated", "Revenue").
+3. Set the **target** value (the goal you want to achieve).
+4. Leave **actual** empty initially -- you will update this as data comes in.
+
+### Updating KPI Actuals
+
+As the campaign runs, update the **actual** field for each KPI:
+
+1. Open the campaign.
+2. Navigate to the KPI Targets section.
+3. Enter the current actual value for each metric.
+4. Save the campaign.
+
+### Evaluating Performance
+
+Compare **target** vs **actual** values to assess campaign performance:
+
+| Metric | Target | Actual | Status |
+|--------|--------|--------|--------|
+| Page Views | 10,000 | 8,500 | 85% of target |
+| Form Submissions | 250 | 310 | Exceeded target |
+| Conversion Rate | 2.5% | 3.1% | Exceeded target |
+
+## Budget Management
+
+The **budget** field records the planned campaign budget in USD. Use this field to:
+
+- Set the approved budget during the planning (draft) phase.
+- Reference the budget when making campaign decisions.
+- Compare actual spend against the budget after campaign completion.
+
+:::note
+The budget field is a reference value stored in the CMS. Actual spend tracking and financial reporting should be managed through your finance systems. The CMS budget field provides a convenient reference point for campaign managers.
+:::
+
+## Tips
+
+- Review campaign statuses regularly to ensure they reflect the actual state of the initiative.
+- Update KPI actuals at consistent intervals (weekly or bi-weekly) for meaningful trend analysis.
+- Use the [Campaigns Dashboard](/docs/user-guide/campaigns/campaigns-dashboard) for a visual overview of all campaigns and their timelines.
+- When a campaign is completed, review its KPIs before creating follow-up campaigns to inform future strategy.

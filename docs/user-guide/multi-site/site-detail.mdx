@@ -1,0 +1,87 @@
+---
+title: Site Detail
+sidebar_position: 2
+---
+
+# Site Detail
+
+The Site Detail view provides comprehensive information about a single jurisdiction. It is accessible at `/admin/sites/:id` by clicking a jurisdiction card on the [Sites Dashboard](/docs/user-guide/multi-site/sites-dashboard).
+
+## Accessing Site Detail
+
+1. Navigate to the [Sites Dashboard](/docs/user-guide/multi-site/sites-dashboard) at `/admin/sites`.
+2. Search for or locate the jurisdiction you want to inspect.
+3. Click the jurisdiction card.
+4. The Site Detail view loads at `/admin/sites/:id`.
+
+A **Back to Sites** link at the top of the page returns you to the Sites Dashboard.
+
+## Jurisdiction Information
+
+The top section displays the jurisdiction's core attributes:
+
+| Field | Description | Example |
+|-------|-------------|---------|
+| **Name** | The full name of the jurisdiction | United Kingdom |
+| **Region** | The geographic region | Europe |
+| **Language** | The primary language | English |
+| **Locale Code** | The locale identifier used in URLs | `en-gb` |
+| **Status** | The jurisdiction's current status (Active, Draft, Suspended) | Active |
+
+## Sovereign Theme Preview
+
+Below the jurisdiction information, the Site Detail view displays a **theme preview** showing all colour tokens derived from the jurisdiction's national flag. These colours are applied to all content rendered on the jurisdiction's website.
+
+The theme preview displays colour swatches for:
+
+| Token | Purpose |
+|-------|---------|
+| **Primary** | The dominant brand colour (derived from the flag's primary colour) |
+| **Secondary** | A complementary colour used for secondary UI elements |
+| **Accent** | A contrasting colour used for highlights, links, and interactive elements |
+| **Surface** | Background colours for cards, panels, and content areas |
+| **Text** | Text colours calibrated for contrast against the surface colours |
+| **Border** | Border and divider colours |
+
+Each swatch shows the hex colour value and a visual sample, allowing you to see exactly how the theme will look on the jurisdiction's site.
+
+## Targeted Content
+
+The Site Detail view lists all content items that are targeted to this jurisdiction. Content appears here if it has this jurisdiction selected in its `targetJurisdictions` field, or if it has no jurisdiction restrictions (global content).
+
+### Pages
+
+A list of all pages targeted to (or visible on) this jurisdiction, showing:
+
+- Page name
+- Status (Draft, Review, Ratified, Published)
+- Last updated date
+
+Click a page name to open it in the page editor.
+
+### Campaigns
+
+A list of campaigns targeting this jurisdiction, showing:
+
+- Campaign name
+- Status (draft, scheduled, active, paused, completed)
+- Start and end dates
+
+Click a campaign name to open it in the campaign editor.
+
+### News Articles
+
+A list of news articles associated with this jurisdiction, showing:
+
+- Article title
+- Source
+- Published date
+
+Click an article title to open it in the article editor.
+
+## Tips
+
+- Use the Site Detail view to audit which content is visible on a specific jurisdiction site.
+- Check the theme preview before publishing new content to ensure it will look appropriate with the jurisdiction's colour scheme.
+- The targeted content lists help you identify gaps -- for example, if a jurisdiction has no targeted pages, it is only showing global content.
+- Use the **Back to Sites** link to return to the dashboard and check other jurisdictions.

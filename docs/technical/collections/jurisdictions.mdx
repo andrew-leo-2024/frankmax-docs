@@ -1,0 +1,93 @@
+---
+title: Jurisdictions
+sidebar_position: 7
+---
+
+# Jurisdictions Collection
+
+The Jurisdictions collection defines country-specific site configurations, including locale settings, website details, and sovereign theme palettes. Each jurisdiction represents a country in the Frankmax global website network.
+
+## Configuration
+
+| Property | Value |
+|----------|-------|
+| **Slug** | `jurisdictions` |
+| **Admin Group** | Governance |
+
+## Fields
+
+| Field | Type | Required | Default | Admin | Description |
+|-------|------|----------|---------|-------|-------------|
+| `name` | text | Yes | — | — | Country or jurisdiction name |
+| `countryCode` | text | Yes | — | Unique, Indexed | ISO country code (e.g., `gb`, `us`) |
+| `locale` | text | No | — | — | Region description (used for filtering) |
+| `language` | text | No | `English` | — | Primary language name |
+| `languageCode` | text | No | — | — | ISO language code (e.g., `en`, `fr`) |
+| `websiteUrl` | text | No | — | — | Country-specific website URL |
+| `websiteName` | text | No | — | — | Country-specific website name |
+| `description` | textarea | No | — | — | Description of the jurisdiction |
+| `theme` | group | No | — | — | Sovereign theme palette |
+| `status` | select | No | — | — | Jurisdiction operational status |
+
+### Status Options
+
+| Value | Label | Description |
+|-------|-------|-------------|
+| `draft` | Draft | Jurisdiction is being configured |
+| `active` | Active | Jurisdiction site is live |
+| `suspended` | Suspended | Jurisdiction site is temporarily disabled |
+
+### Theme Group
+
+The `theme` group contains fields that map to the `SovereignPalette` interface:
+
+| Sub-field | Type | Default | CSS Variable |
+|-----------|------|---------|-------------|
+| `primary` | text | — | `--primary` |
+| `secondary` | text | — | `--secondary` |
+| `accent` | text | — | `--accent` |
+| `background` | text | `#ffffff` | `--background` |
+| `foreground` | text | `#0f172a` | `--foreground` |
+| `sidebarBg` | text | — | `--sidebar-bg` |
+| `sidebarFg` | text | — | `--sidebar-fg` |
+| `surface` | text | — | `--surface` |
+
+See [Sovereign Theming](../architecture/sovereign-theming) for details on how these values are applied.
+
+## Relationships
+
+Jurisdictions are referenced by many collections via `targetJurisdictions`:
+
+| Collection | Field | Type |
+|-----------|-------|------|
+| Pages | `targetJurisdictions` | hasMany |
+| Services | `targetJurisdictions` | hasMany |
+| Products | `targetJurisdictions` | hasMany |
+| NewsArticles | `targetJurisdictions` | hasMany |
+| Campaigns | `targetJurisdictions` | hasMany |
+| NewsArticles | `jurisdiction` | single |
+| OpportunityBriefs | `jurisdiction` | single |
+| PublishTokens | `jurisdiction` | single |
+
+## Locale Resolution
+
+The `resolveJurisdiction()` function extracts the country code from a locale string (e.g., `en-gb` → `gb`) and queries this collection to find the matching jurisdiction. See [Resolve Jurisdiction](../libraries/resolve-jurisdiction).
+
+## Admin Views
+
+Jurisdictions have two dedicated admin views:
+
+- **Sites Dashboard** (`/admin/sites`) — Grid view of all jurisdictions with search, region filtering, and status filtering
+- **Site Detail** (`/admin/sites/:id`) — Detailed view of a single jurisdiction with associated pages, campaigns, and news
+
+See [Sites Dashboard](../admin-views/sites-dashboard) and [Site Detail](../admin-views/site-detail).
+
+## API Endpoints
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET | `/api/jurisdictions` | List all jurisdictions |
+| POST | `/api/jurisdictions` | Create a new jurisdiction |
+| GET | `/api/jurisdictions/:id` | Get a specific jurisdiction |
+| PATCH | `/api/jurisdictions/:id` | Update a jurisdiction |
+| DELETE | `/api/jurisdictions/:id` | Delete a jurisdiction |

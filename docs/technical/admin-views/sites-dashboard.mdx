@@ -1,0 +1,78 @@
+---
+title: Sites Dashboard
+sidebar_position: 2
+---
+
+# Sites Dashboard
+
+The Sites Dashboard provides a grid view of all jurisdictions (country-specific sites) with search, region filtering, and status filtering capabilities.
+
+**Source:** `src/admin/views/SitesDashboard.tsx`
+
+**URL:** `/admin/sites`
+
+## Component Type
+
+Client component (`'use client'`).
+
+## Data Fetching
+
+Fetches jurisdictions from the Payload REST API:
+
+```
+GET /api/jurisdictions?limit=300&sort=name
+```
+
+## State
+
+| State Variable | Type | Description |
+|---------------|------|-------------|
+| `jurisdictions` | array | All fetched jurisdiction documents |
+| `search` | string | Text search filter |
+| `regionFilter` | string | Selected region filter |
+| `statusFilter` | string | Selected status filter |
+
+## Features
+
+### Search
+
+Text input that filters jurisdictions by name or country code. The search is performed client-side against the fetched data.
+
+### Region Filter
+
+A dropdown populated by extracting unique regions from each jurisdiction's `locale` field. Allows filtering jurisdictions by geographic region.
+
+### Status Filter
+
+A dropdown with options matching jurisdiction status values:
+
+| Value | Label |
+|-------|-------|
+| (all) | All Statuses |
+| `draft` | Draft |
+| `active` | Active |
+| `suspended` | Suspended |
+
+### Jurisdiction Cards
+
+Each jurisdiction is displayed as a card showing:
+
+| Element | Source Field | Description |
+|---------|------------|-------------|
+| Name | `name` | Jurisdiction display name |
+| Country Code | `countryCode` | ISO country code |
+| Status Badge | `status` | Color-coded status indicator |
+| Theme Swatches | `theme.*` | Small color circles showing the theme palette |
+| Region | `locale` | Geographic region extracted from locale |
+
+### Navigation
+
+Each card links to the Site Detail view:
+
+```
+/admin/sites/{id}
+```
+
+## Layout
+
+The dashboard uses a responsive grid layout that adjusts the number of columns based on viewport width.

@@ -1,0 +1,108 @@
+---
+title: Media Library
+sidebar_position: 13
+---
+
+# Media Library
+
+The Media Library is the centralised repository for all uploaded files used across the Frankmax CMS. Images and documents uploaded here are referenced by blocks, collections, and other content throughout the system.
+
+## Upload Configuration
+
+The Media collection is configured with the following settings:
+
+| Setting | Value | Description |
+|---------|-------|-------------|
+| **Static Directory** | `media` | Uploaded files are stored in the `media` directory on the server |
+| **Allowed MIME Types** | `image/*`, `application/pdf` | Only images (all formats: JPEG, PNG, WebP, SVG, GIF, etc.) and PDF documents can be uploaded |
+
+## Media Fields
+
+Each media item has the following fields:
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| **File** | Upload | Yes | The file itself (image or PDF) |
+| **alt** | Text | No | Alternative text for the image. Used for accessibility (screen readers) and SEO. Displayed when the image cannot be loaded |
+| **filename** | Text | Auto | The stored filename, auto-generated from the uploaded file |
+| **mimeType** | Text | Auto | The file's MIME type (e.g., `image/jpeg`, `image/png`, `application/pdf`) |
+| **filesize** | Number | Auto | The file size in bytes |
+| **width** | Number | Auto | The image width in pixels (images only) |
+| **height** | Number | Auto | The image height in pixels (images only) |
+
+## Uploading Media
+
+### From the Media Collection
+
+1. Navigate to **Media** in the sidebar.
+2. Click **Create New**.
+3. Drag and drop a file onto the upload area, or click to browse your computer.
+4. Enter **alt text** for the image.
+5. Click **Save**.
+
+### From Within a Block
+
+When editing a page and configuring a block that has an image or upload field:
+
+1. Click the upload field (e.g., "Background Image" in a HeroBanner).
+2. You can either:
+   - **Select existing media** by searching the media library.
+   - **Upload new media** directly from the field.
+3. Once selected or uploaded, the media item is linked to the block.
+
+## How Media Is Used in Blocks
+
+Many blocks reference the Media collection through `upload` fields with `relationTo: 'media'`. Here is where media is used across the block types:
+
+| Block | Media Fields |
+|-------|-------------|
+| **HeroBanner** | `backgroundImage`, `backgroundVideo` |
+| **TwoColumn** | `left.image`, `right.image` |
+| **ThreeColumn** | `column[n].image` (3 columns) |
+| **FourColumn** | `column[n].image` (4 columns) |
+| **BentoGrid** | `featured.image`, `cards[n].image` |
+| **Carousel** | `cards[n].image` |
+| **PeopleGrid** | `people[n].photo` |
+| **ImageGallery** | `images[n].image` |
+| **Video** | `file` (when source is `upload`) |
+
+## Best Practices
+
+### Alt Text
+
+Always provide meaningful **alt text** for images. Good alt text:
+
+- Describes the image content concisely (e.g., "Team meeting in London office" rather than "image1").
+- Supports screen readers for accessibility compliance.
+- Improves SEO by giving search engines context about the image.
+
+### Image Formats
+
+| Format | Best For |
+|--------|----------|
+| **JPEG** | Photographs and images with gradients |
+| **PNG** | Images requiring transparency, logos, screenshots |
+| **WebP** | Modern format with superior compression. Recommended where browser support allows |
+| **SVG** | Logos, icons, and simple graphics that need to scale without quality loss |
+
+### Image Dimensions
+
+- **Hero images:** At least 1920px wide for full-width backgrounds.
+- **Content images:** 800-1200px wide for general content areas.
+- **Thumbnails:** 400-600px wide for card images and grid items.
+- **Profile photos:** 400x400px square for PeopleGrid.
+
+### File Sizes
+
+Keep image file sizes reasonable to maintain fast page load times:
+
+- Photographs: aim for under 200KB after compression.
+- Large hero images: aim for under 500KB.
+- Use modern formats (WebP) where possible for better compression.
+
+## Tips
+
+- Before uploading a new image, search the existing media library to check if a suitable image already exists.
+- Use descriptive filenames before uploading (e.g., `london-office-team-meeting.jpg` rather than `IMG_4532.jpg`). The filename is preserved in the URL.
+- The media library supports bulk selection when referenced from blocks -- you can search and filter to find the right image quickly.
+- PDF files can be uploaded for downloadable resources (whitepapers, brochures) and linked from rich text content.

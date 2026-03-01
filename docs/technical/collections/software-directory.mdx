@@ -1,0 +1,55 @@
+---
+title: Software Directory
+sidebar_position: 16
+---
+
+# Software Directory Collection
+
+The Software Directory collection stores software categories sourced from Capterra, forming the top-level taxonomy for the Frankmax software catalog.
+
+## Configuration
+
+| Property | Value |
+|----------|-------|
+| **Slug** | `software-directory` |
+| **Admin Group** | Directory |
+
+## Fields
+
+| Field | Type | Required | Default | Admin | Description |
+|-------|------|----------|---------|-------|-------------|
+| `name` | text | Yes | — | — | Software category name |
+| `slug` | text | Yes | — | Indexed | URL-friendly identifier |
+| `sourceUrl` | text | No | — | — | Capterra category URL |
+| `description` | textarea | No | — | — | Category description |
+
+## Data Volume
+
+The Frankmax platform catalogs 3,259 software app categories sourced from Capterra.
+
+## Relationships
+
+| Collection | Field | Direction |
+|-----------|-------|-----------|
+| Software Features | `category` | Feature → Directory (category) |
+
+Each software directory entry can have multiple software features linked to it through the `category` relationship on the Software Features collection.
+
+## Search Integration
+
+Software directory entries are indexed in MeiliSearch under the `software` index. See [Search Library](../libraries/search) for configuration.
+
+## Frontend Routes
+
+- **Listing:** `/[locale]/software` — Browse software categories
+- **Detail:** `/[locale]/software/[slug]` — Individual category with associated features
+
+## API Endpoints
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET | `/api/software-directory` | List software categories |
+| POST | `/api/software-directory` | Create a new category |
+| GET | `/api/software-directory/:id` | Get a specific category |
+| PATCH | `/api/software-directory/:id` | Update a category |
+| DELETE | `/api/software-directory/:id` | Delete a category |

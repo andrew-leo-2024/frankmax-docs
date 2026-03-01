@@ -1,0 +1,123 @@
+---
+title: Routing
+sidebar_position: 1
+---
+
+# Routing
+
+The Frankmax CMS frontend uses the Next.js App Router with a `(frontend)` route group and locale-based routing to serve country-specific content.
+
+## Route Structure
+
+All public-facing routes are nested under the `(frontend)` route group with a `[locale]` dynamic segment:
+
+```
+src/app/(frontend)/[locale]/
+├── layout.tsx                    # Locale layout with sovereign theme
+├── page.tsx                      # Homepage
+├── [...slug]/
+│   └── page.tsx                  # Catch-all page renderer
+├── preview/
+│   └── page.tsx                  # Live preview route
+├── services/
+│   ├── page.tsx                  # Services listing
+│   └── [slug]/
+│       └── page.tsx              # Service detail
+├── software/
+│   ├── page.tsx                  # Software directory listing
+│   └── [slug]/
+│       └── page.tsx              # Software detail
+├── news/
+│   └── page.tsx                  # News articles listing
+├── contact/
+│   └── page.tsx                  # Contact page
+└── search/
+    └── page.tsx                  # Search results
+```
+
+## Locale Format
+
+The `[locale]` segment uses the format `{lang}-{country}` where:
+
+- `{lang}` is a two-letter ISO 639-1 language code (e.g., `en`, `fr`)
+- `{country}` is a two-letter ISO 3166-1 country code (e.g., `gb`, `us`)
+
+**Examples:**
+
+| Locale | URL Path | Country |
+|--------|----------|---------|
+| `en-gb` | `/en-gb/services` | United Kingdom |
+| `en-us` | `/en-us/services` | United States |
+| `fr-fr` | `/fr-fr/services` | France |
+| `de-de` | `/de-de/services` | Germany |
+| `ar-ae` | `/ar-ae/services` | UAE |
+
+## Route Details
+
+### Homepage — `/[locale]/`
+
+Renders the default homepage for the jurisdiction. Fetches the homepage page document and renders its layout blocks.
+
+### Catch-All — `/[locale]/[...slug]/`
+
+Handles all page routes not matched by named routes. The `[...slug]` segment captures the full URL path and looks up the matching page by slug.
+
+```typescript
+// Simplified
+const page = await payload.find({
+  collection: 'pages',
+  where: { slug: { equals: slugPath } },
+});
+```
+
+### Services Listing — `/[locale]/services`
+
+Lists all published services filtered by the current jurisdiction. Uses `buildContentFilter()` to apply jurisdiction and scheduling filters.
+
+### Service Detail — `/[locale]/services/[slug]`
+
+Displays a single service by slug. Renders the service's marketing copy and details.
+
+### Software Listing — `/[locale]/software`
+
+Browses the software directory categories.
+
+### Software Detail — `/[locale]/software/[slug]`
+
+Displays a single software category with its associated features.
+
+### News — `/[locale]/news`
+
+Lists news articles filtered by the current jurisdiction.
+
+### Contact — `/[locale]/contact`
+
+Contact page for the jurisdiction.
+
+### Search — `/[locale]/search`
+
+Full-text search across services, software, and news using MeiliSearch.
+
+### Preview — `/[locale]/preview`
+
+Live preview route supporting `collection` search parameter. Supports `collection=pages` and `collection=services`. Displays a yellow "Preview Mode" banner. See [Live Preview](./live-preview).
+
+## Metadata
+
+Route components use `generateMetadata()` to build page-specific metadata:
+
+```typescript
+export async function generateMetadata({ params }) {
+  const page = await fetchPage(params.slug);
+  return {
+    title: page?.name ? `${page.name} | Frankmax Digital` : 'Frankmax Digital',
+  };
+}
+```
+
+## Route Groups
+
+| Group | Path | Purpose |
+|-------|------|---------|
+| `(frontend)` | Public routes | Customer-facing website |
+| `(payload)` | `/admin`, `/api` | Payload admin panel and REST API |

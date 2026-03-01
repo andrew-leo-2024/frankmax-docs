@@ -1,0 +1,117 @@
+---
+title: Search (MeiliSearch)
+sidebar_position: 4
+---
+
+# Search (MeiliSearch)
+
+The search library configures and initializes the MeiliSearch client for full-text search across services, software, and news content.
+
+**Source:** `src/lib/search.ts`
+
+## Client Configuration
+
+The MeiliSearch client is initialized with environment variables:
+
+```typescript
+import { MeiliSearch } from 'meilisearch';
+
+const client = new MeiliSearch({
+  host: process.env.MEILISEARCH_HOST,
+  apiKey: process.env.MEILISEARCH_KEY,
+});
+```
+
+| Environment Variable | Description |
+|---------------------|-------------|
+| `MEILISEARCH_HOST` | MeiliSearch server URL (e.g., `http://localhost:7700`) |
+| `MEILISEARCH_KEY` | MeiliSearch API key for authentication |
+
+## INDEXES Constant
+
+Defines the three search indexes used by the platform:
+
+```typescript
+const INDEXES = {
+  services: 'services',
+  software: 'software',
+  news: 'news',
+};
+```
+
+| Index | Collection Source | Description |
+|-------|------------------|-------------|
+| `services` | `services` | Service offerings search |
+| `software` | `software-directory` | Software category search |
+| `news` | `news-articles` | News article search |
+
+## initializeIndexes()
+
+Configures searchable attributes, filterable attributes, sortable attributes, and displayed attributes for each MeiliSearch index.
+
+```typescript
+async function initializeIndexes(): Promise<void>
+```
+
+### Services Index Configuration
+
+| Setting | Attributes |
+|---------|-----------|
+| **Searchable** | `name`, `description`, `marketingCopy`, `entityName`, `serviceCode` |
+| **Filterable** | `serviceType`, `status`, `targetJurisdictions`, `targetLanguages` |
+| **Sortable** | `name`, `consultantFeePerDay`, `createdAt` |
+| **Displayed** | `name`, `slug`, `description`, `serviceType`, `consultantFeePerDay`, `entityName` |
+
+### Software Index Configuration
+
+| Setting | Attributes |
+|---------|-----------|
+| **Searchable** | `name`, `description` |
+| **Filterable** | `slug` |
+| **Sortable** | `name` |
+| **Displayed** | `name`, `slug`, `description`, `sourceUrl` |
+
+### News Index Configuration
+
+| Setting | Attributes |
+|---------|-----------|
+| **Searchable** | `title`, `summary`, `content`, `source`, `industry` |
+| **Filterable** | `jurisdiction`, `services`, `industry`, `targetJurisdictions` |
+| **Sortable** | `publishedAt`, `title` |
+| **Displayed** | `title`, `slug`, `summary`, `source`, `publishedAt`, `industry` |
+
+## Frontend Search Route
+
+The search page at `/[locale]/search` uses the MeiliSearch client to perform queries:
+
+```typescript
+const results = await client.index(INDEXES.services).search(query, {
+  filter: [`targetJurisdictions = ${jurisdictionId}`],
+  limit: 20,
+});
+```
+
+## Usage
+
+```typescript
+import { client, INDEXES, initializeIndexes } from '@/lib/search';
+
+// Initialize indexes (run once on setup)
+await initializeIndexes();
+
+// Search services
+const results = await client.index(INDEXES.services).search('cloud computing', {
+  filter: ['serviceType = professional'],
+  sort: ['name:asc'],
+  limit: 10,
+});
+
+// Search software
+const softwareResults = await client.index(INDEXES.software).search('CRM');
+
+// Search news
+const newsResults = await client.index(INDEXES.news).search('cybersecurity', {
+  filter: ['industry = Technology'],
+  sort: ['publishedAt:desc'],
+});
+```

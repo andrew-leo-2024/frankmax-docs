@@ -1,0 +1,96 @@
+---
+title: Live Preview
+sidebar_position: 14
+---
+
+# Live Preview
+
+Live Preview allows you to see how content will look on the frontend before publishing it. This feature is enabled for the **Pages** and **Services** collections and supports multiple device breakpoints.
+
+## How Live Preview Works
+
+When you edit a page or service in the admin panel, you can activate Live Preview to see a real-time rendering of the content as it would appear on the live site. Changes you make in the editor are reflected immediately in the preview pane without needing to save or publish.
+
+The system uses the `LivePreviewListener` component on the frontend, which connects to the admin panel via the `useLivePreview` hook from Payload CMS. This establishes a communication channel between the editor and the preview, syncing changes in real time.
+
+## Enabling Live Preview
+
+Live Preview is available when editing items in the following collections:
+
+| Collection | Live Preview Supported |
+|------------|----------------------|
+| **Pages** | Yes |
+| **Services** | Yes |
+| **News Articles** | No |
+| **Products** | No |
+| **Campaigns** | No |
+
+When you open a page or service in the editor, the Live Preview panel can be toggled from the editor interface.
+
+## Preview URL Format
+
+The preview URL follows this pattern:
+
+```
+/{locale}/preview?slug={slug}&collection={collection}
+```
+
+For example:
+
+| Content | Preview URL |
+|---------|-------------|
+| A page with slug `about-us` | `/en-gb/preview?slug=about-us&collection=pages` |
+| A service with slug `cloud-migration` | `/en-gb/preview?slug=cloud-migration&collection=services` |
+
+The preview route bypasses the normal `published` status check, allowing you to preview content in any status (Draft, Review, Ratified).
+
+## Breakpoints
+
+The preview pane supports three device breakpoints, allowing you to test how content renders across different screen sizes:
+
+| Breakpoint | Width x Height | Use Case |
+|------------|---------------|----------|
+| **Mobile** | 375 x 667 | iPhone SE / standard mobile portrait |
+| **Tablet** | 768 x 1024 | iPad / standard tablet portrait |
+| **Desktop** | 1440 x 900 | Standard desktop / laptop |
+
+### Switching Breakpoints
+
+In the preview panel, you will find breakpoint toggle buttons (typically represented by device icons). Click the desired breakpoint to resize the preview pane to that resolution. The content re-renders to show how it adapts to the selected screen size.
+
+### What to Check at Each Breakpoint
+
+| Breakpoint | Check For |
+|------------|-----------|
+| **Mobile** | Content stacking order, text readability, button tap targets, image scaling, navigation collapse |
+| **Tablet** | Column layouts (2-column should still display side-by-side), image proportions, form usability |
+| **Desktop** | Full layout rendering, hero image quality, multi-column alignment, whitespace balance |
+
+## Preview Banner
+
+When viewing content through the preview route, a **"Preview Mode"** banner is displayed at the top of the page. This banner:
+
+- Clearly indicates that you are viewing unpublished content.
+- Distinguishes the preview from the live site to prevent confusion.
+- Is only visible in preview mode and does not appear on the published site.
+
+## Real-Time Sync
+
+The Live Preview syncs changes as you type. The `useLivePreview` hook on the frontend listens for field changes from the admin panel and re-renders the preview accordingly. This includes:
+
+- Text changes in titles, descriptions, and rich text fields.
+- Block additions, removals, and reordering.
+- Image and media changes.
+- Layout and configuration changes (e.g., column ratios, colour variants).
+
+:::note
+Some complex changes (such as relationship field updates that require database queries) may take a moment to reflect in the preview. If the preview does not update immediately, save the content and refresh the preview.
+:::
+
+## Tips
+
+- Always check content at all three breakpoints before publishing, especially for pages with complex layouts (multi-column blocks, BentoGrid, carousels).
+- Use the Mobile breakpoint to verify that CTA buttons are large enough to tap and that text remains readable.
+- The preview uses the jurisdiction's sovereign theme, so the colours in the preview match what visitors will see on the live site.
+- Live Preview is a pre-publish tool. It does not affect the live site -- only the preview route shows the unpublished content.
+- If the preview appears blank, verify that the content has at least one block in the layout field.

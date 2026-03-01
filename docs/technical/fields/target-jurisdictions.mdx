@@ -1,0 +1,67 @@
+---
+title: Target Jurisdictions Field
+sidebar_position: 1
+---
+
+# Target Jurisdictions Field
+
+A reusable relationship field that enables content to be targeted to specific jurisdictions (countries) in the Frankmax network.
+
+**Source:** `src/collections/fields/targetJurisdictions.ts`
+
+## Configuration
+
+```typescript
+{
+  name: 'targetJurisdictions',
+  type: 'relationship',
+  relationTo: 'jurisdictions',
+  hasMany: true,
+  admin: {
+    position: 'sidebar',
+    description: 'Leave empty to target all jurisdictions (global)',
+  },
+}
+```
+
+## Field Properties
+
+| Property | Value |
+|----------|-------|
+| **Name** | `targetJurisdictions` |
+| **Type** | relationship |
+| **Relation To** | `jurisdictions` |
+| **Has Many** | `true` |
+| **Admin Position** | sidebar |
+
+## Behavior
+
+- When **populated**: Content is only displayed for the selected jurisdictions
+- When **empty**: Content is treated as global and displayed for all jurisdictions
+
+This "empty means global" convention is implemented in the `buildContentFilter()` function, which generates a Payload `Where` clause using an `or` condition:
+
+```typescript
+{
+  or: [
+    { targetJurisdictions: { exists: false } },
+    { targetJurisdictions: { equals: jurisdictionId } },
+  ],
+}
+```
+
+See [Content Filters](../libraries/content-filters) for the full implementation.
+
+## Collections Using This Field
+
+| Collection | Purpose |
+|-----------|---------|
+| Pages | Target which jurisdictions display the page |
+| Services | Target which jurisdictions offer the service |
+| Products | Target which jurisdictions sell the product |
+| News Articles | Target which jurisdictions show the article |
+| Campaigns | Target which jurisdictions run the campaign |
+
+## Admin UI
+
+The field appears in the sidebar of the document editor, providing a searchable multi-select relationship picker. Editors can select one or more jurisdictions, or leave the field empty for global targeting.

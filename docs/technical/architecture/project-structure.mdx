@@ -1,0 +1,117 @@
+---
+title: Project Structure
+sidebar_position: 2
+---
+
+# Project Structure
+
+The Frankmax CMS follows the standard Payload CMS v3 + Next.js App Router conventions with additional directories for blocks, custom admin views, and shared libraries.
+
+## Directory Layout
+
+```
+app/
+├── payload.config.ts                  # Payload CMS configuration
+├── src/
+│   ├── admin/
+│   │   └── views/                     # Custom admin panel views
+│   │       ├── NavLinks.tsx           # Sidebar navigation links
+│   │       ├── SitesDashboard.tsx     # Jurisdiction management grid
+│   │       ├── SiteDetail.tsx         # Individual jurisdiction detail
+│   │       ├── CampaignsDashboard.tsx # Campaign timeline & management
+│   │       ├── ContentOrchestrator.tsx# Bulk content operations
+│   │       └── AnalyticsOverview.tsx  # Platform-wide statistics
+│   │
+│   ├── app/
+│   │   ├── (frontend)/
+│   │   │   └── [locale]/             # Locale-based routing group
+│   │   │       ├── layout.tsx        # Locale layout with sovereign theme
+│   │   │       ├── page.tsx          # Homepage
+│   │   │       ├── [...slug]/
+│   │   │       │   └── page.tsx      # Catch-all page renderer
+│   │   │       ├── preview/
+│   │   │       │   └── page.tsx      # Live preview route
+│   │   │       ├── services/
+│   │   │       │   ├── page.tsx      # Services listing
+│   │   │       │   └── [slug]/
+│   │   │       │       └── page.tsx  # Service detail
+│   │   │       ├── software/
+│   │   │       │   ├── page.tsx      # Software directory listing
+│   │   │       │   └── [slug]/
+│   │   │       │       └── page.tsx  # Software detail
+│   │   │       ├── news/
+│   │   │       │   └── page.tsx      # News articles listing
+│   │   │       ├── contact/
+│   │   │       │   └── page.tsx      # Contact page
+│   │   │       └── search/
+│   │   │           └── page.tsx      # Search results
+│   │   │
+│   │   └── (payload)/                # Payload admin group
+│   │       ├── admin/                # Payload admin panel
+│   │       └── api/                  # Payload REST API
+│   │
+│   ├── blocks/                       # Block type definitions
+│   │   ├── index.ts                  # allBlocks array export
+│   │   └── [BlockName].ts           # Individual block configs (20 files)
+│   │
+│   ├── collections/                  # Collection configurations
+│   │   ├── [CollectionName].ts      # Individual collection configs (15 files)
+│   │   ├── fields/                   # Reusable field definitions
+│   │   │   ├── targetJurisdictions.ts
+│   │   │   ├── targetLanguages.ts
+│   │   │   └── scheduling.ts
+│   │   └── hooks/                    # Collection hooks
+│   │       └── governanceHooks.ts
+│   │
+│   ├── components/                   # React components
+│   │   ├── Header.tsx               # Site header with navigation
+│   │   ├── Footer.tsx               # Site footer
+│   │   ├── LivePreviewListener.tsx  # Live preview wrapper
+│   │   └── blocks/
+│   │       ├── RenderBlocks.tsx     # Block renderer with component map
+│   │       └── [BlockName].tsx      # Individual block components (20 files)
+│   │
+│   ├── globals/                      # Global configurations
+│   │   └── SiteSettings.ts         # Site-wide settings global
+│   │
+│   ├── lib/                         # Shared libraries
+│   │   ├── payload.ts              # Payload client singleton
+│   │   ├── content-filters.ts      # Query filter builders
+│   │   ├── resolve-jurisdiction.ts # Locale-to-jurisdiction resolver
+│   │   ├── sovereign-theme.ts      # Theme CSS variable builder
+│   │   └── search.ts              # MeiliSearch client & indexes
+│   │
+│   ├── migrations/                  # Database migrations
+│   │   └── *.ts                    # Drizzle migration files
+│   │
+│   └── payload-types.ts            # Auto-generated TypeScript types
+```
+
+## Key Files
+
+### `payload.config.ts`
+
+The root Payload configuration file. Defines all collections, globals, block registrations, admin panel customizations, database adapter, editor configuration, and plugin registrations.
+
+### `src/blocks/index.ts`
+
+Exports the `allBlocks` array containing all 20 block type definitions. This array is referenced by the Pages collection's `layout` field.
+
+### `src/payload-types.ts`
+
+Auto-generated TypeScript type definitions for all collections, globals, and blocks. Regenerated via `payload generate:types`.
+
+### `src/lib/payload.ts`
+
+Singleton factory for the Payload client instance. Used by server components and API routes to interact with the CMS.
+
+## Conventions
+
+| Convention | Details |
+|-----------|---------|
+| Collection files | PascalCase filenames (e.g., `NewsArticles.ts`) |
+| Block files | PascalCase filenames matching the block slug |
+| Component files | PascalCase filenames with `.tsx` extension |
+| Library files | kebab-case filenames with `.ts` extension |
+| Route groups | `(frontend)` for public routes, `(payload)` for admin/API |
+| Locale format | `en-{country-code}` (e.g., `en-gb`, `en-us`) |

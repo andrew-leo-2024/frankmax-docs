@@ -1,0 +1,157 @@
+---
+title: Prerequisites
+sidebar_position: 1
+---
+
+# Prerequisites
+
+Before deploying the Frankmax CMS, ensure your environment meets the following system requirements. These apply to both local development and production environments.
+
+## System Requirements
+
+| Component | Minimum Version | Recommended | Notes |
+|-----------|----------------|-------------|-------|
+| **Node.js** | 20.x | 20 LTS or later | Required by Next.js and Payload CMS v3 |
+| **PostgreSQL** | 15+ | 16.x | Primary data store |
+| **pnpm** | 8.x | Latest | Recommended package manager |
+| **MeiliSearch** | 1.x | Latest stable | Full-text search engine |
+| **Sharp** | Bundled | — | Image processing (installed via pnpm) |
+
+## Node.js
+
+Payload CMS v3 and Next.js require Node.js version 20 or later. Verify your installation:
+
+```bash
+node --version
+# Expected: v20.x.x or higher
+```
+
+If you need to install or manage multiple Node.js versions, use [nvm](https://github.com/nvm-sh/nvm) (Linux/macOS) or [nvm-windows](https://github.com/coreybutler/nvm-windows):
+
+```bash
+nvm install 20
+nvm use 20
+```
+
+## PostgreSQL
+
+PostgreSQL 15 or later is required. The CMS connects via the `@payloadcms/db-postgres` adapter using Drizzle ORM.
+
+### Installation
+
+**macOS (Homebrew):**
+
+```bash
+brew install postgresql@16
+brew services start postgresql@16
+```
+
+**Ubuntu/Debian:**
+
+```bash
+sudo apt update
+sudo apt install postgresql-16
+sudo systemctl start postgresql
+sudo systemctl enable postgresql
+```
+
+**Windows:**
+
+Download and install from the [official PostgreSQL website](https://www.postgresql.org/download/windows/). Alternatively, use [Chocolatey](https://chocolatey.org/):
+
+```powershell
+choco install postgresql16
+```
+
+### Create Database
+
+After installation, create a database for the CMS:
+
+```bash
+createdb frankmax_cms
+```
+
+Or via the PostgreSQL shell:
+
+```sql
+CREATE DATABASE frankmax_cms;
+```
+
+## pnpm
+
+pnpm is the recommended package manager for the Frankmax CMS. Install it globally:
+
+```bash
+npm install -g pnpm
+```
+
+Verify the installation:
+
+```bash
+pnpm --version
+```
+
+## MeiliSearch
+
+MeiliSearch provides full-text search for services, software directory entries, and news articles. It must be running and accessible for the search features to function.
+
+### Installation
+
+**Docker (recommended):**
+
+```bash
+docker run -d \
+  --name meilisearch \
+  -p 7700:7700 \
+  -e MEILI_MASTER_KEY='frankmax_search_key_2026' \
+  -v $(pwd)/meili_data:/meili_data \
+  getmeili/meilisearch:latest
+```
+
+**macOS (Homebrew):**
+
+```bash
+brew install meilisearch
+meilisearch --master-key='frankmax_search_key_2026'
+```
+
+**Binary download:**
+
+Download the appropriate binary from the [MeiliSearch releases page](https://github.com/meilisearch/meilisearch/releases) and run it:
+
+```bash
+./meilisearch --master-key='frankmax_search_key_2026'
+```
+
+MeiliSearch runs on port `7700` by default. The CMS expects it at `http://localhost:7700` unless overridden by the `MEILISEARCH_HOST` environment variable.
+
+## Environment Variables
+
+The following environment variables must be configured before starting the CMS. See the [Environment Variables](/docs/operations/configuration/environment-variables) reference for full details.
+
+| Variable | Required | Description |
+|----------|----------|-------------|
+| `DATABASE_URI` | Yes | PostgreSQL connection string |
+| `PAYLOAD_SECRET` | Yes | Encryption secret for Payload CMS |
+| `NEXT_PUBLIC_SITE_URL` | No | Public URL (defaults to `http://localhost:3000`) |
+| `MEILISEARCH_HOST` | No | MeiliSearch URL (defaults to `http://localhost:7700`) |
+| `MEILISEARCH_KEY` | No | MeiliSearch API key (defaults to `frankmax_search_key_2026`) |
+
+## Hardware Recommendations
+
+### Development
+
+- **CPU:** 2+ cores
+- **RAM:** 4 GB minimum (8 GB recommended)
+- **Disk:** 2 GB free space for dependencies and database
+
+### Production
+
+- **CPU:** 4+ cores
+- **RAM:** 8 GB minimum (16 GB recommended)
+- **Disk:** 20 GB+ SSD (depending on media volume)
+- **Network:** Stable connection with low latency to PostgreSQL and MeiliSearch instances
+
+## Next Steps
+
+Once all prerequisites are installed, proceed to [Local Development](/docs/operations/deployment/local-development) to set up your development environment.

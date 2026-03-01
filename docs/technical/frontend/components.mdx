@@ -1,0 +1,113 @@
+---
+title: Components
+sidebar_position: 4
+---
+
+# Components
+
+The Frankmax CMS includes shared layout components that wrap all frontend pages, providing consistent navigation, branding, and footer content.
+
+## Header
+
+**Source:** `src/components/Header.tsx`
+
+The Header component renders the site navigation bar with links to main sections and a country name badge.
+
+### Props
+
+| Prop | Type | Required | Description |
+|------|------|----------|-------------|
+| `locale` | string | Yes | Current locale string (e.g., `en-gb`) |
+| `countryName` | string | No | Display name of the current jurisdiction |
+
+### Navigation Links
+
+The header renders navigation links prefixed with the current locale:
+
+| Label | Path |
+|-------|------|
+| Services | `/{locale}/services` |
+| Software | `/{locale}/software` |
+| News | `/{locale}/news` |
+| Contact | `/{locale}/contact` |
+| Search | `/{locale}/search` |
+
+### Country Badge
+
+When `countryName` is provided, the header displays a badge showing the current jurisdiction name. This helps users identify which country-specific version of the site they are viewing.
+
+### Styling
+
+The header uses CSS custom properties from the sovereign theme:
+
+```css
+.header {
+  background-color: var(--primary);
+  color: var(--foreground);
+}
+```
+
+## Footer
+
+**Source:** `src/components/Footer.tsx`
+
+The Footer component renders a four-column grid layout with company information, navigation links, and sub-brand listings.
+
+### Props
+
+| Prop | Type | Required | Description |
+|------|------|----------|-------------|
+| `locale` | string | Yes | Current locale string (e.g., `en-gb`) |
+
+### Column Layout
+
+The footer is organized into a four-column grid:
+
+#### Column 1: Frankmax Digital
+
+Company description and branding. Displays the Frankmax Digital name and a brief description of the company.
+
+#### Column 2: Services
+
+Links to main service-related pages:
+
+| Label | Path |
+|-------|------|
+| All Services | `/{locale}/services` |
+| Software Directory | `/{locale}/software` |
+
+#### Column 3: Company
+
+Links to company pages:
+
+| Label | Path |
+|-------|------|
+| News | `/{locale}/news` |
+| Contact | `/{locale}/contact` |
+
+#### Column 4: Sub-Brands
+
+List of the five Frankmax sub-brands:
+
+| Code | Name |
+|------|------|
+| FDS001 | Digital Marketing Maven |
+| FDS002 | Design Studio |
+| FDS003 | IT Synergy |
+| FDS004 | DevOps Excellence |
+| FDS005 | AI Labs |
+
+### Copyright Line
+
+The footer includes a copyright line at the bottom spanning all columns.
+
+### Styling
+
+The footer uses CSS custom properties:
+
+```css
+.footer {
+  background-color: var(--sidebar-bg);
+  color: var(--sidebar-fg);
+}
+```

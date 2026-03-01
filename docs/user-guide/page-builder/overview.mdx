@@ -1,0 +1,108 @@
+---
+title: Page Builder Overview
+sidebar_position: 1
+---
+
+# Page Builder Overview
+
+The Frankmax CMS uses a block-based page builder that lets you assemble pages from modular, reusable content components. Each page's **layout** field contains an ordered array of blocks that render from top to bottom on the frontend.
+
+## How Block-Based Page Building Works
+
+Instead of a single rich text editor for an entire page, the CMS breaks content into discrete **blocks**. Each block has:
+
+- A **type** that determines its structure and rendering (e.g., HeroBanner, TwoColumn, RichText).
+- **Fields** specific to that block type (e.g., a HeroBanner has title, subtitle, background settings, and CTA buttons).
+- A **position** in the layout array that controls where it appears on the page.
+
+This approach gives you precise control over page structure while ensuring visual consistency across the 250+ jurisdiction sites.
+
+## The 20 Blocks
+
+The CMS provides 20 block types organised into five categories:
+
+### Layout Blocks
+
+Blocks that define the structural grid of a page section.
+
+| Block | Slug | Purpose |
+|-------|------|---------|
+| [HeroBanner](/docs/user-guide/page-builder/layout-blocks#herobanner) | `heroBanner` | Full-width hero section with title, subtitle, background, and CTA buttons |
+| [TwoColumn](/docs/user-guide/page-builder/layout-blocks#twocolumn) | `twoColumn` | Two-column layout with configurable width ratios |
+| [ThreeColumn](/docs/user-guide/page-builder/layout-blocks#threecolumn) | `threeColumn` | Three equal columns with content and images |
+| [FourColumn](/docs/user-guide/page-builder/layout-blocks#fourcolumn) | `fourColumn` | Four equal columns with heading, content, and images |
+| [BentoGrid](/docs/user-guide/page-builder/layout-blocks#bentogrid) | `bentoGrid` | Asymmetric grid with a featured card and supporting cards |
+
+### Content Blocks
+
+Blocks for presenting text, data, and structured information.
+
+| Block | Slug | Purpose |
+|-------|------|---------|
+| [RichText](/docs/user-guide/page-builder/content-blocks#richtext) | `richText` | Free-form rich text content with width control |
+| [Accordion](/docs/user-guide/page-builder/content-blocks#accordion) | `accordion` | Expandable/collapsible content sections (FAQ-style) |
+| [Tabs](/docs/user-guide/page-builder/content-blocks#tabs) | `tabs` | Tabbed content panels |
+| [Carousel](/docs/user-guide/page-builder/content-blocks#carousel) | `carousel` | Swipeable card carousel with optional autoplay |
+| [PeopleGrid](/docs/user-guide/page-builder/content-blocks#peoplegrid) | `peopleGrid` | Team or personnel grid with photos and bios |
+| [AZList](/docs/user-guide/page-builder/content-blocks#azlist) | `azList` | Alphabetical directory listing |
+| [Stats](/docs/user-guide/page-builder/content-blocks#stats) | `stats` | Numerical statistics display (1 to 8 metrics) |
+
+### Media Blocks
+
+Blocks for images, video, and embedded content.
+
+| Block | Slug | Purpose |
+|-------|------|---------|
+| [ImageGallery](/docs/user-guide/page-builder/media-blocks#imagegallery) | `imageGallery` | Multi-image display with grid, masonry, or slider layout |
+| [Video](/docs/user-guide/page-builder/media-blocks#video) | `video` | Video player supporting URL embeds and file uploads |
+| [Embed](/docs/user-guide/page-builder/media-blocks#embed) | `embed` | Raw HTML embed for third-party widgets |
+
+### Feed Blocks
+
+Blocks that pull in dynamic content or provide interactive elements.
+
+| Block | Slug | Purpose |
+|-------|------|---------|
+| [NewsFeed](/docs/user-guide/page-builder/feed-blocks#newsfeed) | `newsFeed` | Dynamic list of news articles with filtering |
+| [ServiceShowcase](/docs/user-guide/page-builder/feed-blocks#serviceshowcase) | `serviceShowcase` | Dynamic display of services filtered by brand |
+| [CallToAction](/docs/user-guide/page-builder/feed-blocks#calltoaction) | `callToAction` | Promotional banner with heading, description, and buttons |
+| [FormBlock](/docs/user-guide/page-builder/feed-blocks#formblock) | `formBlock` | Contact, newsletter, quote, or custom forms |
+| [Sidebar](/docs/user-guide/page-builder/feed-blocks#sidebar) | `sidebar` | Two-panel layout with main content and sidebar |
+
+## Adding Blocks
+
+1. Open a page in the editor.
+2. Scroll to the **Layout** section.
+3. Click the **Add Block** button.
+4. A dropdown appears listing all 20 block types. Select the one you need.
+5. The block is appended to the end of the layout. Fill in the block's fields.
+
+## Reordering Blocks
+
+Each block in the layout has a **drag handle** (the icon on the left side of the block header). Click and drag the handle to move the block up or down in the layout. The frontend renders blocks in the exact order they appear in the layout array.
+
+## Removing Blocks
+
+To remove a block:
+
+1. Locate the block in the layout.
+2. Click the **trash icon** in the block's header bar.
+3. Confirm the removal when prompted.
+
+:::caution
+Removing a block deletes all its content immediately. If you have unsaved changes, the removal is part of those changes and will only persist when you save. If you accidentally remove a block, you can navigate away without saving to discard the change, or restore from a previous version.
+:::
+
+## Block Rendering
+
+On the frontend, each block type maps to a React component. The page renderer iterates through the layout array and renders the corresponding component for each block. Blocks inherit the jurisdiction's sovereign theme (flag-derived colour palettes), so the same block content can appear with different colour schemes across different country sites.
+
+## Next Steps
+
+Explore the detailed documentation for each block category:
+
+- [Layout Blocks](/docs/user-guide/page-builder/layout-blocks) -- HeroBanner, TwoColumn, ThreeColumn, FourColumn, BentoGrid
+- [Content Blocks](/docs/user-guide/page-builder/content-blocks) -- RichText, Accordion, Tabs, Carousel, PeopleGrid, AZList, Stats
+- [Media Blocks](/docs/user-guide/page-builder/media-blocks) -- ImageGallery, Video, Embed
+- [Feed Blocks](/docs/user-guide/page-builder/feed-blocks) -- NewsFeed, ServiceShowcase, CallToAction, FormBlock, Sidebar
+- [Block Reference](/docs/user-guide/page-builder/block-reference) -- Quick-reference table of all 20 blocks

@@ -1,0 +1,134 @@
+---
+title: Creating Pages
+sidebar_position: 2
+---
+
+# Creating Pages
+
+Pages are the primary content type in the Frankmax CMS. Each page is built using a block-based layout system and can be targeted to specific jurisdictions and languages. This guide covers the complete process of creating, configuring, and saving a page.
+
+## Creating a New Page
+
+1. Navigate to **Pages** in the sidebar.
+2. Click **Create New** in the top-right corner.
+3. You will see the page editor with several field groups.
+
+## Core Fields
+
+The following fields define the page's identity and URL:
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| **name** | Text | Yes | The display name of the page, used in admin lists and navigation |
+| **slug** | Text | Yes | The URL-friendly identifier (auto-generated from name, but editable) |
+| **description** | Textarea | No | A short summary used for SEO meta descriptions and social sharing |
+| **pageUrl** | Text | Auto | The computed full URL path for this page |
+
+:::info Slug Rules
+Slugs are automatically generated from the page name. They are lowercased, spaces become hyphens, and special characters are removed. You can override the auto-generated slug, but ensure it remains URL-safe (lowercase letters, numbers, and hyphens only).
+:::
+
+## Adding Blocks to Layout
+
+The **layout** field is where you build the page content. It is an array of blocks that render in order from top to bottom.
+
+To add a block:
+
+1. Scroll to the **Layout** section of the page editor.
+2. Click **Add Block**.
+3. Select the block type from the dropdown (e.g., HeroBanner, TwoColumn, RichText).
+4. Configure the block's fields.
+5. Repeat to add more blocks.
+
+To **reorder** blocks, use the drag handles on the left side of each block. To **remove** a block, click the trash icon in the block header.
+
+There are 20 block types organised into five categories. See the [Page Builder Overview](/docs/user-guide/page-builder/overview) for a complete list.
+
+## Status Workflow
+
+Every page follows a content lifecycle with four statuses:
+
+| Status | Meaning |
+|--------|---------|
+| **Draft** | Work in progress, not visible on the live site |
+| **Review** | Submitted for editorial review |
+| **Ratified** | Approved and ready for publishing |
+| **Published** | Live on the website, visible to visitors |
+
+The status field is in the sidebar of the page editor. Valid transitions are enforced by governance hooks:
+
+- **Draft** can move to **Review**
+- **Review** can move back to **Draft** or forward to **Ratified**
+- **Ratified** can move to **Published** or back to **Review**
+- **Published** can move back to **Draft** (to start a new revision cycle)
+
+See [Content Lifecycle](/docs/user-guide/workflows/content-lifecycle) for full details.
+
+## Sidebar Fields
+
+The right sidebar of the page editor contains targeting and scheduling controls.
+
+### Target Jurisdictions
+
+The **targetJurisdictions** field is a relationship field that links the page to one or more jurisdictions.
+
+- **Leave empty** to make the page global (visible on all jurisdiction sites).
+- **Select specific jurisdictions** to restrict the page to only those sites.
+
+This field drives the content filtering logic. When a visitor accesses `en-gb`, the system uses `buildContentFilter()` to return only pages that either have no jurisdiction restrictions or explicitly include the visitor's jurisdiction.
+
+### Target Languages
+
+The **targetLanguages** field is a multi-select field with the 10 supported languages:
+
+`en`, `fr`, `es`, `de`, `pt`, `ar`, `zh`, `ja`, `hi`, `ru`
+
+- **Leave empty** to show the page in all languages.
+- **Select specific languages** to restrict visibility to those languages only.
+
+The system extracts the language code from the locale (e.g., `en-gb` yields `en`) and filters accordingly.
+
+### Scheduling
+
+Two date/time fields control when the page is visible:
+
+| Field | Purpose |
+|-------|---------|
+| **scheduledPublishAt** | Content becomes visible after this date and time |
+| **expiresAt** | Content is hidden after this date and time |
+
+Both fields use a day-and-time picker. Leave either field empty to skip that constraint (e.g., no `expiresAt` means the page never expires). See [Scheduling](/docs/user-guide/content-targeting/scheduling) for more details.
+
+## Saving Drafts and Versions
+
+### Saving as Draft
+
+Click **Save Draft** at any time to persist your work without changing the page status. Draft saves do not affect the live site.
+
+### Version History
+
+The CMS automatically tracks versions of each page. Every save creates a new version entry. You can:
+
+- View the version history in the **Versions** tab.
+- Compare changes between versions.
+- Restore a previous version if needed.
+
+:::tip
+Save frequently while building complex pages. The version history acts as a safety net, allowing you to roll back to any previous state.
+:::
+
+### Publishing
+
+When a page reaches the **Published** status, the system:
+
+1. Generates a **SHA-256 content hash** for integrity verification.
+2. Creates a **PublishToken** record.
+3. Makes the page available on the live site.
+
+Only pages with status `published` are served to visitors. All other statuses return a 404 response.
+
+## Next Steps
+
+- Learn about the [block types](/docs/user-guide/page-builder/overview) available for building page layouts.
+- Understand [jurisdiction targeting](/docs/user-guide/content-targeting/jurisdictions) for multi-site content delivery.
+- Review the [content lifecycle](/docs/user-guide/workflows/content-lifecycle) for governance and approval workflows.

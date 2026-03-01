@@ -1,0 +1,57 @@
+---
+title: Content Blocks
+sidebar_position: 13
+---
+
+# Content Blocks Collection
+
+The Content Blocks collection serves as a registry of available block types in the CMS. It provides a catalog of block definitions that can be referenced and managed through the admin panel.
+
+## Configuration
+
+| Property | Value |
+|----------|-------|
+| **Slug** | `content-blocks` |
+| **Admin Group** | Content |
+
+## Fields
+
+| Field | Type | Required | Default | Admin | Description |
+|-------|------|----------|---------|-------|-------------|
+| `name` | text | Yes | — | — | Human-readable block name |
+| `slug` | text | Yes | — | Unique, Indexed | Block type identifier |
+| `description` | textarea | No | — | — | Description of the block's purpose and usage |
+
+## Purpose
+
+The Content Blocks collection is a registry collection that catalogs the available block types. It does not directly define block behavior or fields. Instead, the actual block type definitions live in `src/blocks/` as Payload Block configurations, and the corresponding React components live in `src/components/blocks/`.
+
+This collection provides a centralized place to:
+
+- View all available block types
+- Document block purposes and usage guidelines
+- Reference blocks by slug in other parts of the system
+
+## Relationship to Block System
+
+The Content Blocks collection is separate from the block definition system:
+
+| Concern | Location |
+|---------|----------|
+| Block type definitions (fields, validation) | `src/blocks/*.ts` |
+| Block rendering components | `src/components/blocks/*.tsx` |
+| Block registry (allBlocks array) | `src/blocks/index.ts` |
+| Block catalog (this collection) | `content-blocks` collection |
+| Block rendering engine | `src/components/blocks/RenderBlocks.tsx` |
+
+See [Blocks Overview](../blocks/overview) for details on the block system architecture.
+
+## API Endpoints
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET | `/api/content-blocks` | List all registered block types |
+| POST | `/api/content-blocks` | Register a new block type |
+| GET | `/api/content-blocks/:id` | Get a specific block type |
+| PATCH | `/api/content-blocks/:id` | Update a block type's metadata |
+| DELETE | `/api/content-blocks/:id` | Remove a block type from the registry |

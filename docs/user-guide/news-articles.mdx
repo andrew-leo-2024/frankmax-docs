@@ -1,0 +1,98 @@
+---
+title: News Articles
+sidebar_position: 11
+---
+
+# News Articles
+
+The News Articles collection stores curated news content that is displayed across the Frankmax jurisdiction sites. Articles can be sourced from external feeds or created manually, and they support jurisdiction, language, and scheduling targeting.
+
+## News Article Fields
+
+### Core Fields
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| **title** | Text | Yes | The headline of the article |
+| **slug** | Text | Yes | The URL-friendly identifier, auto-generated from the title |
+| **source** | Text | No | The name of the original source (e.g., "TechCrunch", "Reuters") |
+| **sourceUrl** | URL | No | A link to the original article on the source website |
+| **summary** | Textarea | No | A short summary or excerpt of the article, used in list views and news feeds |
+| **content** | Rich Text | No | The full article content with rich text formatting |
+
+### Relationships
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| **jurisdiction** | Relationship (single) | No | A single jurisdiction that this article is primarily associated with. This is different from `targetJurisdictions` -- it represents the article's origin or primary relevance, not its visibility |
+| **services** | Relationship (hasMany) | No | Services related to this article. Used by the NewsFeed block's `filterByService` feature to show relevant articles on service pages |
+| **industry** | Text | No | The industry sector the article relates to (e.g., "Healthcare", "Finance", "Technology") |
+
+### Dates
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| **publishedAt** | Date | No | The original publication date of the article (from the source). This is used for sorting articles by date, with the most recent appearing first |
+
+### Integration
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| **minifluxId** | Text | No | An identifier linking the article to a Miniflux RSS feed entry. Used for deduplication when importing articles from RSS feeds |
+
+### Content Targeting
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| **targetJurisdictions** | Relationship (hasMany) | No | Jurisdictions where this article is visible. Leave empty for global visibility |
+| **targetLanguages** | Multi-select | No | Languages in which this article is displayed. Leave empty for all languages |
+| **scheduledPublishAt** | Day and Time | No | Date/time after which the article becomes visible |
+| **expiresAt** | Day and Time | No | Date/time after which the article is hidden |
+
+### Status
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| **status** | Select | Yes | The article's lifecycle status: Draft, Review, Ratified, or Published |
+
+## Creating a News Article
+
+1. Navigate to **News Articles** in the sidebar.
+2. Click **Create New**.
+3. Enter the **title** and let the slug auto-generate.
+4. If the article is sourced from an external site, fill in **source** and **sourceUrl**.
+5. Write a **summary** for use in news feed displays.
+6. Add the full **content** using the rich text editor.
+7. Set the **publishedAt** date (the original publication date).
+8. Link related **services** if applicable.
+9. Configure targeting (jurisdictions, languages, scheduling) in the sidebar.
+10. Save as Draft.
+
+## The jurisdiction vs targetJurisdictions Distinction
+
+News articles have two jurisdiction-related fields that serve different purposes:
+
+| Field | Purpose |
+|-------|---------|
+| **jurisdiction** (singular) | Identifies the article's origin or primary relevance. A single jurisdiction. Used for editorial organisation and context |
+| **targetJurisdictions** (plural) | Controls where the article is visible on the frontend. Multiple jurisdictions. Used by the content filter |
+
+For example, an article about UK regulation might have `jurisdiction: United Kingdom` (it is primarily about the UK) but `targetJurisdictions: [United Kingdom, Ireland, United States]` (it is visible on three jurisdiction sites).
+
+## Displaying News on Pages
+
+Use the [NewsFeed block](/docs/user-guide/page-builder/feed-blocks#newsfeed) to display news articles dynamically on any page. The NewsFeed block supports:
+
+- Setting the number of articles to display (1-24).
+- Filtering by related service.
+- Choosing between grid and list layouts.
+
+Articles in the feed are sorted by `publishedAt` date (most recent first) and filtered by the visitor's jurisdiction and language.
+
+## Tips
+
+- Always fill in the **source** and **sourceUrl** fields for externally sourced articles to maintain proper attribution.
+- Link articles to relevant **services** so they appear in service-specific news feeds.
+- Use the **summary** field for a compelling excerpt -- this is the text displayed in news feed cards and list views.
+- The **minifluxId** field is managed automatically by the RSS import system. Do not edit it manually.
+- News articles follow the same content lifecycle as pages. Only articles with `published` status appear on the frontend.

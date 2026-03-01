@@ -1,0 +1,99 @@
+---
+title: Live Preview
+sidebar_position: 3
+---
+
+# Live Preview
+
+The Frankmax CMS supports live preview through Payload's built-in preview system, allowing editors to see content changes in real time before publishing.
+
+## LivePreviewListener Component
+
+**Source:** `src/components/LivePreviewListener.tsx`
+
+The `LivePreviewListener` component wraps Payload's `useLivePreview` hook from `@payloadcms/live-preview-react` to provide real-time preview data to child components.
+
+```typescript
+interface LivePreviewListenerProps {
+  initialData: any;
+  serverURL: string;
+  children: (data: any) => React.ReactNode;
+}
+```
+
+### Props
+
+| Prop | Type | Required | Description |
+|------|------|----------|-------------|
+| `initialData` | any | Yes | The initial document data to display |
+| `serverURL` | string | Yes | The Payload server URL for WebSocket connection |
+| `children` | function | Yes | Render prop receiving the live-updating data |
+
+### How It Works
+
+1. `LivePreviewListener` receives `initialData` (the current draft document)
+2. It connects to Payload's live preview WebSocket using `useLivePreview`
+3. As the editor makes changes in the admin panel, the hook receives updated data
+4. The `children` render prop is called with the latest data
+5. The preview updates in real time without requiring a page refresh
+
+## Preview Route
+
+**Source:** `src/app/(frontend)/[locale]/preview/page.tsx`
+
+The preview route at `/[locale]/preview` renders a preview of a document based on search parameters.
+
+### URL Parameters
+
+| Parameter | Type | Values | Description |
+|-----------|------|--------|-------------|
+| `collection` | string | `pages`, `services` | Which collection to preview |
+| `id` | string | Document ID | The document to preview |
+
+### Example URLs
+
+```
+/en-gb/preview?collection=pages&id=abc123
+/en-us/preview?collection=services&id=def456
+```
+
+### Preview Mode Banner
+
+When in preview mode, a yellow banner is displayed at the top of the page indicating that the user is viewing draft content:
+
+```tsx
+<div style={{
+  backgroundColor: '#fef3cd',
+  color: '#856404',
+  padding: '0.5rem 1rem',
+  textAlign: 'center',
+  fontWeight: 'bold',
+}}>
+  Preview Mode
+</div>
+```
+
+### Draft Mode
+
+The preview route enables Next.js draft mode, which bypasses the built-in page cache and fetches the latest draft version of the document rather than the published version.
+
+## Payload Admin Configuration
+
+Live preview is configured in `payload.config.ts` through the admin configuration. The admin panel provides a "Preview" button on supported collections that opens the preview route in a new tab or iframe.
+
+### Supported Collections
+
+| Collection | Preview Route |
+|-----------|--------------|
+| Pages | `/[locale]/preview?collection=pages&id={id}` |
+| Services | `/[locale]/preview?collection=services&id={id}` |
+
+## Usage Flow
+
+1. Editor opens a page or service document in the admin panel
+2. Editor clicks the "Preview" button
+3. The preview route opens, loading the document's draft data
+4. `LivePreviewListener` establishes a WebSocket connection
+5. As the editor types in the admin panel, changes appear instantly in the preview
+6. The yellow "Preview Mode" banner reminds the editor they are viewing draft content
+7. When satisfied, the editor can proceed through the governance workflow to publish

@@ -1,0 +1,77 @@
+---
+title: Campaigns Dashboard
+sidebar_position: 4
+---
+
+# Campaigns Dashboard
+
+The Campaigns Dashboard provides a timeline visualization and management view for all marketing campaigns.
+
+**Source:** `src/admin/views/CampaignsDashboard.tsx`
+
+**URL:** `/admin/campaigns-dashboard`
+
+## Component Type
+
+Client component (`'use client'`).
+
+## Data Fetching
+
+```
+GET /api/campaigns?limit=100&sort=startDate&depth=1
+```
+
+The `depth=1` parameter resolves one level of relationships, providing the `targetJurisdictions` and `relatedContent` data inline.
+
+## Status Colors
+
+The dashboard uses a predefined color mapping for campaign statuses:
+
+```typescript
+const statusColors: Record<string, string> = {
+  draft: '#f3f4f6',       // Gray 100
+  scheduled: '#dbeafe',   // Blue 100
+  active: '#dcfce7',      // Green 100
+  paused: '#fef9c3',      // Yellow 100
+  completed: '#f3e8ff',   // Purple 100
+};
+```
+
+## Features
+
+### Timeline View
+
+The timeline visualization displays campaigns as horizontal bars positioned proportionally based on their start and end dates:
+
+**Calculation:**
+
+1. Determines the minimum `startDate` and maximum `endDate` across all campaigns
+2. For each campaign, calculates the `left` position as a percentage: `(startDate - min) / (max - min) * 100`
+3. Calculates the bar `width` as a percentage: `(endDate - startDate) / (max - min) * 100`
+4. Renders each bar with absolute positioning within the timeline container
+5. A vertical red line marks the current date ("now" marker) at its proportional position
+
+### Campaign Cards
+
+Each campaign is displayed with:
+
+| Element | Source | Description |
+|---------|--------|-------------|
+| Name | `name` | Campaign name |
+| Status | `status` | Color-coded status badge |
+| Start Date | `startDate` | Formatted start date |
+| End Date | `endDate` | Formatted end date |
+| Budget | `budget` | Budget in USD |
+| Content Count | `relatedContent.length` | Number of related content items |
+
+### Now Marker
+
+A red vertical line on the timeline indicates the current date and time, providing visual context for which campaigns are active, upcoming, or past.
+
+## Layout
+
+The dashboard displays:
+
+1. A full-width timeline section at the top
+2. A grid of campaign cards below the timeline
+3. Each card is colored according to its status

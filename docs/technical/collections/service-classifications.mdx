@@ -1,0 +1,47 @@
+---
+title: Service Classifications
+sidebar_position: 14
+---
+
+# Service Classifications Collection
+
+The Service Classifications collection provides categorization and feature tagging for services, enabling structured organization of the 48 service offerings across multiple classification dimensions.
+
+## Configuration
+
+| Property | Value |
+|----------|-------|
+| **Slug** | `service-classifications` |
+| **Admin Group** | Content |
+
+## Fields
+
+| Field | Type | Required | Default | Admin | Description |
+|-------|------|----------|---------|-------|-------------|
+| `title` | text | Yes | — | — | Classification title |
+| `slug` | text | Yes | — | Indexed | URL-friendly identifier |
+| `service` | relationship | No | — | — | Related service (to `services`) |
+| `description` | textarea | No | — | — | Classification description |
+| `features` | textarea | No | — | — | Feature list or tags for this classification |
+
+## Relationships
+
+| Collection | Field | Direction |
+|-----------|-------|-----------|
+| Services | `service` | Classification → Service |
+
+Multiple classifications can reference the same service, creating a many-to-one relationship where each service can have multiple classification entries.
+
+## Data Volume
+
+The Frankmax platform includes 91 service classifications across the 48 service offerings.
+
+## API Endpoints
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET | `/api/service-classifications` | List classifications |
+| POST | `/api/service-classifications` | Create a new classification |
+| GET | `/api/service-classifications/:id` | Get a specific classification |
+| PATCH | `/api/service-classifications/:id` | Update a classification |
+| DELETE | `/api/service-classifications/:id` | Delete a classification |

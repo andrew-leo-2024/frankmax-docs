@@ -1,0 +1,107 @@
+---
+title: Resolve Jurisdiction
+sidebar_position: 2
+---
+
+# Resolve Jurisdiction
+
+The resolve jurisdiction library provides utility functions for extracting country and language codes from locale strings and resolving them to jurisdiction documents.
+
+**Source:** `src/lib/resolve-jurisdiction.ts`
+
+## resolveJurisdiction(locale)
+
+Extracts the country code from a locale string and queries the Jurisdictions collection to find the matching jurisdiction.
+
+```typescript
+async function resolveJurisdiction(locale: string): Promise<Jurisdiction | null>
+```
+
+**Parameters:**
+
+| Parameter | Type | Description |
+|-----------|------|-------------|
+| `locale` | string | Locale string in `{lang}-{country}` format (e.g., `en-gb`) |
+
+**Returns:** The matching `Jurisdiction` document, or `null` if not found.
+
+**Process:**
+
+1. Extracts the country code from the locale string (e.g., `en-gb` yields `gb`)
+2. Queries the `jurisdictions` collection with `where: { countryCode: { equals: countryCode } }`
+3. Returns the first matching jurisdiction document
+
+### Example
+
+```typescript
+import { resolveJurisdiction } from '@/lib/resolve-jurisdiction';
+
+// In a server component or route handler
+const jurisdiction = await resolveJurisdiction('en-gb');
+// Returns the jurisdiction document for Great Britain
+
+const jurisdiction2 = await resolveJurisdiction('fr-fr');
+// Returns the jurisdiction document for France
+```
+
+## extractLanguage(locale)
+
+Extracts the language code from a locale string.
+
+```typescript
+function extractLanguage(locale: string): string
+```
+
+**Parameters:**
+
+| Parameter | Type | Description |
+|-----------|------|-------------|
+| `locale` | string | Locale string in `{lang}-{country}` format |
+
+**Returns:** The language code portion of the locale string.
+
+### Examples
+
+| Input | Output |
+|-------|--------|
+| `en-gb` | `en` |
+| `fr-fr` | `fr` |
+| `es-mx` | `es` |
+| `de-de` | `de` |
+| `ar-ae` | `ar` |
+
+## Usage in the Application
+
+### Locale Layout
+
+The primary consumer of these functions is the locale layout (`src/app/(frontend)/[locale]/layout.tsx`):
+
+```typescript
+const jurisdiction = await resolveJurisdiction(locale);
+const lang = extractLanguage(locale);
+```
+
+The resolved jurisdiction provides:
+
+- **Theme data** for sovereign theming (see [Sovereign Theming](../architecture/sovereign-theming))
+- **Jurisdiction ID** for content filtering (see [Content Filters](./content-filters))
+- **Country name** for display in the header
+
+The extracted language code is used for:
+
+- **Language filtering** in `buildContentFilter()`
+- **Locale-specific content selection**
+
+### Content Pages
+
+Individual page routes also use these functions to filter content appropriately:
+
+```typescript
+const jurisdiction = await resolveJurisdiction(params.locale);
+const lang = extractLanguage(params.locale);
+
+const filter = buildContentFilter({
+  jurisdictionId: jurisdiction?.id,
+  lang,
+});
+```

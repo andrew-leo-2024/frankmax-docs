@@ -1,0 +1,226 @@
+---
+title: Site Settings
+sidebar_position: 3
+---
+
+# Site Settings
+
+The `SiteSettings` global provides site-wide configuration for the Frankmax CMS. It is accessible from the admin panel under the **Settings** group and is used across both the frontend and admin views.
+
+## Accessing Site Settings
+
+In the admin panel, navigate to **Settings** in the sidebar, then select **Site Settings**. Changes are applied immediately after saving.
+
+Via the REST API:
+
+```bash
+GET /api/globals/site-settings
+```
+
+Via the Payload Local API:
+
+```typescript
+const settings = await payload.findGlobal({
+  slug: 'site-settings',
+})
+```
+
+## Fields Reference
+
+### siteName
+
+| Property | Value |
+|----------|-------|
+| **Type** | `text` |
+| **Default** | `Frankmax Digital` |
+| **Required** | No |
+| **Description** | The display name of the site. Used in the browser title bar, metadata, email templates, and throughout the frontend. |
+
+### siteDescription
+
+| Property | Value |
+|----------|-------|
+| **Type** | `textarea` |
+| **Default** | `Global Governance & Digital Consulting Corporation` |
+| **Required** | No |
+| **Description** | A brief description of the site. Used for default meta descriptions and Open Graph tags when page-specific descriptions are not provided. |
+
+### defaultLocale
+
+| Property | Value |
+|----------|-------|
+| **Type** | `text` |
+| **Default** | `en-gb` |
+| **Required** | No |
+| **Description** | The default locale code used for URL routing and content fallback. Determines which jurisdiction is shown when no locale is specified in the URL. Format follows the pattern `{language}-{country}` (e.g., `en-gb`, `en-us`, `fr-fr`). |
+
+### contactEmail
+
+| Property | Value |
+|----------|-------|
+| **Type** | `email` |
+| **Default** | `contact@frankmax.digital` |
+| **Required** | No |
+| **Description** | The primary contact email address for the site. Displayed in footer, contact pages, and used as the reply-to address for system-generated emails. |
+
+### socialLinks
+
+A field group containing social media profile URLs. All fields in this group are optional.
+
+| Field | Type | Default | Description |
+|-------|------|---------|-------------|
+| `linkedin` | `text` | None | LinkedIn company or profile URL |
+| `twitter` | `text` | None | Twitter/X profile URL |
+| `github` | `text` | None | GitHub organization or repository URL |
+
+## Admin Group
+
+The SiteSettings global is assigned to the **Settings** admin group:
+
+```typescript
+admin: {
+  group: 'Settings',
+},
+```
+
+This places it in its own sidebar section, separate from the collection groups (System, Content, Governance, Directory, News).
+
+## Global Configuration
+
+```typescript title="src/globals/SiteSettings.ts"
+import { GlobalConfig } from 'payload'
+
+export const SiteSettings: GlobalConfig = {
+  slug: 'site-settings',
+  label: 'Site Settings',
+  admin: {
+    group: 'Settings',
+  },
+  fields: [
+    {
+      name: 'siteName',
+      type: 'text',
+      defaultValue: 'Frankmax Digital',
+      label: 'Site Name',
+    },
+    {
+      name: 'siteDescription',
+      type: 'textarea',
+      defaultValue: 'Global Governance & Digital Consulting Corporation',
+      label: 'Site Description',
+    },
+    {
+      name: 'defaultLocale',
+      type: 'text',
+      defaultValue: 'en-gb',
+      label: 'Default Locale',
+    },
+    {
+      name: 'contactEmail',
+      type: 'email',
+      defaultValue: 'contact@frankmax.digital',
+      label: 'Contact Email',
+    },
+    {
+      name: 'socialLinks',
+      type: 'group',
+      label: 'Social Links',
+      fields: [
+        {
+          name: 'linkedin',
+          type: 'text',
+          label: 'LinkedIn',
+        },
+        {
+          name: 'twitter',
+          type: 'text',
+          label: 'Twitter',
+        },
+        {
+          name: 'github',
+          type: 'text',
+          label: 'GitHub',
+        },
+      ],
+    },
+  ],
+}
+```
+
+## Using Site Settings in the Frontend
+
+### Server Components
+
+Fetch site settings directly in Next.js Server Components:
+
+```typescript
+import { getPayload } from 'payload'
+import config from '@payload-config'
+
+export default async function Layout({ children }) {
+  const payload = await getPayload({ config })
+  const settings = await payload.findGlobal({
+    slug: 'site-settings',
+  })
+
+  return (
+    <html>
+      <head>
+        <title>{settings.siteName}</title>
+        <meta name="description" content={settings.siteDescription} />
+      </head>
+      <body>
+        <header>
+          <h1>{settings.siteName}</h1>
+        </header>
+        {children}
+        <footer>
+          <a href={`mailto:${settings.contactEmail}`}>{settings.contactEmail}</a>
+          {settings.socialLinks?.linkedin && (
+            <a href={settings.socialLinks.linkedin}>LinkedIn</a>
+          )}
+          {settings.socialLinks?.twitter && (
+            <a href={settings.socialLinks.twitter}>Twitter</a>
+          )}
+          {settings.socialLinks?.github && (
+            <a href={settings.socialLinks.github}>GitHub</a>
+          )}
+        </footer>
+      </body>
+    </html>
+  )
+}
+```
+
+### REST API
+
+Retrieve site settings via the REST API:
+
+```bash
+curl http://localhost:3000/api/globals/site-settings
+```
+
+Response:
+
+```json
+{
+  "siteName": "Frankmax Digital",
+  "siteDescription": "Global Governance & Digital Consulting Corporation",
+  "defaultLocale": "en-gb",
+  "contactEmail": "contact@frankmax.digital",
+  "socialLinks": {
+    "linkedin": "https://linkedin.com/company/frankmax-digital",
+    "twitter": "https://twitter.com/frankmaxdigital",
+    "github": "https://github.com/frankmax-digital"
+  },
+  "id": "site-settings",
+  "globalType": "site-settings",
+  "createdAt": "2026-03-01T05:13:34.000Z",
+  "updatedAt": "2026-03-01T05:13:34.000Z"
+}
+```
+
+## Next Steps
+
+- [Payload Config](/docs/operations/configuration/payload-config) — Full `payload.config.ts` reference
+- [Environment Variables](/docs/operations/configuration/environment-variables) — Variables that affect site behavior

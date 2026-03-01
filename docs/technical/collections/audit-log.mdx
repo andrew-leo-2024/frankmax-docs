@@ -1,0 +1,80 @@
+---
+title: Audit Log
+sidebar_position: 11
+---
+
+# Audit Log Collection
+
+The Audit Log collection provides an immutable record of all governance actions performed within the CMS. Entries are created automatically by governance hooks and cannot be modified or deleted after creation.
+
+## Configuration
+
+| Property | Value |
+|----------|-------|
+| **Slug** | `audit-log` |
+| **Admin Group** | Governance |
+
+### Access Control
+
+The Audit Log enforces immutability through its access control configuration:
+
+| Operation | Access |
+|-----------|--------|
+| `create` | `true` (system creates entries via hooks) |
+| `read` | `true` (all authenticated users can read) |
+| `update` | `false` (entries cannot be modified) |
+| `delete` | `false` (entries cannot be deleted) |
+
+## Fields
+
+| Field | Type | Required | Default | Description |
+|-------|------|----------|---------|-------------|
+| `action` | select | Yes | — | Type of governance action |
+| `collection` | text | Yes | — | Slug of the affected collection |
+| `documentId` | text | Yes | — | ID of the affected document |
+| `user` | relationship | No | — | User who performed the action (to `users`) |
+| `contentHash` | text | No | — | SHA-256 hash of the document at time of action |
+| `previousStatus` | text | No | — | Status before the action |
+| `newStatus` | text | No | — | Status after the action |
+| `metadata` | json | No | — | Additional contextual data |
+
+### Action Options
+
+| Value | Label | Description |
+|-------|-------|-------------|
+| `create` | Create | Document was created |
+| `update` | Update | Document was updated |
+| `delete` | Delete | Document was deleted |
+| `publish` | Publish | Document was published |
+| `ratify` | Ratify | Document was ratified |
+| `status_change` | Status Change | Document status was changed |
+
+## Automatic Entry Creation
+
+Audit log entries are created automatically by the governance hooks when:
+
+1. **Status changes** — Any transition in the governance state machine creates an entry with `previousStatus` and `newStatus`
+2. **Publishing** — Publishing a document creates an entry with the `publish` action and `contentHash`
+3. **Ratification** — Ratifying a doctrine document creates an entry with the `ratify` action
+
+See [Governance Hooks](../hooks/governance-hooks) for details on how entries are generated.
+
+## Querying the Audit Log
+
+The audit log can be queried via the REST API to reconstruct the history of any document:
+
+```
+GET /api/audit-log?where[collection][equals]=pages&where[documentId][equals]=abc123&sort=-createdAt
+```
+
+This returns all governance actions for a specific page, ordered by most recent first.
+
+## API Endpoints
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET | `/api/audit-log` | List audit log entries |
+| POST | `/api/audit-log` | Create an audit log entry (system use) |
+| GET | `/api/audit-log/:id` | Get a specific audit log entry |
+
+Update and delete operations are not available due to access control restrictions.

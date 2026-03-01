@@ -1,0 +1,144 @@
+---
+title: Creating Blocks
+sidebar_position: 2
+---
+
+# Creating Blocks
+
+This guide covers the process of adding a new block type to the Frankmax CMS. Each block requires four steps: definition, registration, component creation, and component registration.
+
+## Step 1: Create the Block Definition
+
+Create a new file in `src/blocks/` that exports a Payload `Block` type definition.
+
+```typescript
+// src/blocks/MyNewBlock.ts
+import { Block } from 'payload';
+
+export const MyNewBlock: Block = {
+  slug: 'myNewBlock',
+  labels: {
+    singular: 'My New Block',
+    plural: 'My New Blocks',
+  },
+  fields: [
+    {
+      name: 'heading',
+      type: 'text',
+      required: true,
+    },
+    {
+      name: 'content',
+      type: 'richText',
+    },
+    {
+      name: 'alignment',
+      type: 'select',
+      defaultValue: 'left',
+      options: [
+        { label: 'Left', value: 'left' },
+        { label: 'Center', value: 'center' },
+        { label: 'Right', value: 'right' },
+      ],
+    },
+  ],
+};
+```
+
+### Block Definition Requirements
+
+- **`slug`** — Must be camelCase, unique across all blocks
+- **`labels`** — Singular and plural labels shown in the admin UI
+- **`fields`** — Array of Payload field definitions
+
+## Step 2: Register in allBlocks
+
+Add the new block to the `allBlocks` array in `src/blocks/index.ts`:
+
+```typescript
+// src/blocks/index.ts
+import { MyNewBlock } from './MyNewBlock';
+// ... other imports
+
+export const allBlocks = [
+  // ... existing blocks
+  MyNewBlock,
+];
+```
+
+After this step, the block will appear in the admin panel's block picker when editing page layouts.
+
+## Step 3: Create the React Component
+
+Create a new component file in `src/components/blocks/`:
+
+```tsx
+// src/components/blocks/MyNewBlock.tsx
+import React from 'react';
+
+interface MyNewBlockProps {
+  heading: string;
+  content?: any; // Lexical rich text data
+  alignment?: 'left' | 'center' | 'right';
+  locale: string;
+}
+
+export const MyNewBlockComponent: React.FC<MyNewBlockProps> = ({
+  heading,
+  content,
+  alignment = 'left',
+  locale,
+}) => {
+  return (
+    <section style={{ textAlign: alignment }}>
+      <h2>{heading}</h2>
+      {content && (
+        <div>{/* Render rich text content */}</div>
+      )}
+    </section>
+  );
+};
+```
+
+### Component Props
+
+Block components receive all fields from the block definition as props, plus:
+
+- **`locale`** — The current locale string (e.g., `en-gb`), passed by `RenderBlocks`
+- **`id`** — The block instance ID
+- **`blockType`** — The block slug
+
+## Step 4: Register in blockComponents
+
+Add the component to the `blockComponents` map in `src/components/blocks/RenderBlocks.tsx`:
+
+```tsx
+// src/components/blocks/RenderBlocks.tsx
+import { MyNewBlockComponent } from './MyNewBlock';
+
+const blockComponents: Record<string, ComponentType<any>> = {
+  // ... existing components
+  myNewBlock: MyNewBlockComponent,
+};
+```
+
+The key in `blockComponents` must exactly match the `slug` from the block definition.
+
+## Verification
+
+After completing all four steps:
+
+1. Restart the development server
+2. Navigate to a page in the admin panel
+3. Edit the page's layout field
+4. The new block should appear in the block picker
+5. Add an instance and verify it renders correctly on the frontend
+
+## File Checklist
+
+| File | Action |
+|------|--------|
+| `src/blocks/MyNewBlock.ts` | Create block definition |
+| `src/blocks/index.ts` | Add to `allBlocks` array |
+| `src/components/blocks/MyNewBlock.tsx` | Create React component |
+| `src/components/blocks/RenderBlocks.tsx` | Add to `blockComponents` map |

@@ -1,0 +1,103 @@
+---
+title: Content Lifecycle
+sidebar_position: 1
+---
+
+# Content Lifecycle
+
+All content in the Frankmax CMS follows a structured lifecycle with four statuses. This ensures that content is reviewed and approved before it reaches the live site, maintaining quality and governance standards across the 250+ jurisdiction network.
+
+## The Four Statuses
+
+| Status | Description | Visible on Live Site? |
+|--------|-------------|-----------------------|
+| **Draft** | Content is being created or revised. Work in progress | No |
+| **Review** | Content has been submitted for editorial review | No |
+| **Ratified** | Content has been approved and is ready for publishing | No |
+| **Published** | Content is live and visible to website visitors | Yes |
+
+Only content with **Published** status appears on the live site. All other statuses are internal workflow states visible only in the admin panel.
+
+## Status Transitions
+
+The lifecycle enforces specific valid transitions. You cannot skip steps or make arbitrary status changes.
+
+```
+                    ┌──────────────────┐
+                    │                  │
+                    ▼                  │
+  ┌───────┐    ┌────────┐    ┌───────────┐    ┌───────────┐
+  │ Draft │───▶│ Review │───▶│ Ratified  │───▶│ Published │
+  └───────┘    └────────┘    └───────────┘    └───────────┘
+      ▲            │              │                 │
+      │            │              │                 │
+      │            ▼              │                 │
+      │         (back to          │                 │
+      │          Draft)           │                 │
+      │                     (back to                │
+      │                      Review)                │
+      │                                             │
+      └─────────────────────────────────────────────┘
+                    (back to Draft)
+```
+
+### Valid Transitions
+
+| From | To | Purpose |
+|------|----|---------|
+| **Draft** | **Review** | Submit content for editorial review |
+| **Review** | **Draft** | Return content to the author for revisions |
+| **Review** | **Ratified** | Approve content as ready for publishing |
+| **Ratified** | **Review** | Send approved content back for further review (e.g., last-minute changes requested) |
+| **Ratified** | **Published** | Make content live on the website |
+| **Published** | **Draft** | Take content offline and start a new revision cycle |
+
+### Invalid Transitions
+
+The following transitions are **not allowed** and will be blocked by governance hooks:
+
+- Draft directly to Ratified (must go through Review)
+- Draft directly to Published (must go through Review and Ratified)
+- Review directly to Published (must go through Ratified)
+
+## How Transitions Are Enforced
+
+Status transitions are enforced by **governance hooks** that run on every save operation. When you change a content item's status:
+
+1. The hook checks the **current status** (before the change).
+2. It checks the **requested new status**.
+3. It validates whether that transition is in the allowed transitions list.
+4. If the transition is **valid**, the save proceeds.
+5. If the transition is **invalid**, the save is rejected with an error message explaining the allowed transitions.
+
+This enforcement cannot be bypassed through the admin UI. It ensures every piece of content follows the same review and approval process regardless of the user's role.
+
+## Typical Workflow
+
+### Creating New Content
+
+1. **Author** creates a new page/article/service. It starts in **Draft** status.
+2. Author builds out the content, saves multiple drafts as they work.
+3. When ready, author changes status to **Review** and saves.
+4. **Editor/Reviewer** examines the content.
+   - If changes are needed: status returns to **Draft** with feedback.
+   - If approved: status moves to **Ratified**.
+5. **Publisher** reviews the ratified content.
+   - Status is changed to **Published**.
+   - The system generates a content hash and publish token.
+   - Content appears on the live site.
+
+### Revising Published Content
+
+1. Change the published content's status back to **Draft**.
+2. Make the required revisions.
+3. Follow the same Review, Ratified, Published cycle.
+
+:::caution
+When a published page is moved back to Draft, it is immediately removed from the live site. Visitors to that URL will see a 404 response until the page is re-published. If you need to make minor edits without taking content offline, consider using the versioning system to prepare a new version while the current version remains live.
+:::
+
+## Next Steps
+
+- Learn about [publishing and content hashing](/docs/user-guide/workflows/publishing).
+- Understand the [governance framework](/docs/user-guide/workflows/governance) that underpins the lifecycle.

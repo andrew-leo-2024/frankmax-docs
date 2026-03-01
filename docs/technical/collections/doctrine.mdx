@@ -1,0 +1,94 @@
+---
+title: Doctrine
+sidebar_position: 10
+---
+
+# Doctrine Collection
+
+The Doctrine collection stores governance documents with layered classification, immutability enforcement, and ratification tracking. It is the cornerstone of the Frankmax governance framework.
+
+## Configuration
+
+| Property | Value |
+|----------|-------|
+| **Slug** | `doctrine` |
+| **Admin Group** | Governance |
+| **Versions/Drafts** | `true` |
+| **Hooks** | `beforeChange: [createGovernanceHook('doctrine')]` |
+
+## Fields
+
+| Field | Type | Required | Default | Admin | Description |
+|-------|------|----------|---------|-------|-------------|
+| `title` | text | Yes | — | — | Doctrine document title |
+| `slug` | text | Yes | — | Indexed | URL-friendly identifier |
+| `layer` | select | No | — | — | Governance layer classification |
+| `category` | text | No | — | — | Document category |
+| `content` | richText | No | — | — | Document content (Lexical editor) |
+| `immutable` | checkbox | No | `false` | — | Whether this document is immutable once ratified |
+| `contentHash` | text | No | — | Read-only | SHA-256 hash of the document content |
+| `ratifiedBy` | relationship | No | — | — | User who ratified this document (to `users`) |
+| `ratifiedAt` | date | No | — | — | Date and time of ratification |
+| `status` | select | No | `draft` | — | Governance workflow status |
+
+### Layer Options
+
+| Value | Label | Description |
+|-------|-------|-------------|
+| `immutable` | Immutable | Foundational documents that cannot be changed once ratified |
+| `constitutional` | Constitutional | Core governance principles |
+| `peace_protocol` | Peace Protocol | Conflict resolution and operational harmony |
+| `operational` | Operational | Day-to-day operational guidelines |
+
+### Status Options
+
+| Value | Label |
+|-------|-------|
+| `draft` | Draft |
+| `review` | Review |
+| `ratified` | Ratified |
+| `published` | Published |
+
+## Immutability Enforcement
+
+When a doctrine document has `immutable: true` and its status is `ratified`, the governance hook prevents any modifications to the document's content. This provides a tamper-proof record for foundational governance documents.
+
+The immutability check occurs in the `createGovernanceHook('doctrine')` beforeChange hook:
+
+1. The hook checks if `immutable === true` and `status === 'ratified'`
+2. If both conditions are met, content modifications are rejected
+3. Status transitions (e.g., to `published`) may still be permitted
+
+## Ratification Process
+
+When a doctrine document transitions to the `ratified` status:
+
+1. The governance hook records `ratifiedBy` with the current user
+2. `ratifiedAt` is set to the current timestamp
+3. A `contentHash` (SHA-256) is generated from the document content
+4. An audit log entry is created
+5. A publish token is generated
+
+## Governance Workflow
+
+Doctrine follows the standard governance state machine:
+
+```
+draft → review → ratified → published
+  ↑        ↓        ↓
+  └── review ←── ratified
+  ↑
+  └──────── published
+```
+
+See [Governance Hooks](../hooks/governance-hooks) for the complete workflow.
+
+## API Endpoints
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET | `/api/doctrine` | List doctrine documents |
+| POST | `/api/doctrine` | Create a new doctrine document |
+| GET | `/api/doctrine/:id` | Get a specific doctrine document |
+| PATCH | `/api/doctrine/:id` | Update a doctrine document |
+| DELETE | `/api/doctrine/:id` | Delete a doctrine document |

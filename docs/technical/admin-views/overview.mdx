@@ -1,0 +1,70 @@
+---
+title: Admin Views Overview
+sidebar_position: 1
+---
+
+# Admin Views Overview
+
+The Frankmax CMS includes 5 custom admin views that extend the Payload admin panel with purpose-built dashboards for managing jurisdictions, campaigns, content, and analytics. These views are accessed through the "Command Center" navigation section.
+
+## Registration
+
+Custom views are registered in `payload.config.ts` under the `admin.components.views` configuration:
+
+```typescript
+admin: {
+  components: {
+    views: {
+      SitesDashboard: {
+        Component: 'src/admin/views/SitesDashboard',
+        path: '/sites',
+        exact: true,
+      },
+      SiteDetail: {
+        Component: 'src/admin/views/SiteDetail',
+        path: '/sites/:id',
+        exact: true,
+      },
+      CampaignsDashboard: {
+        Component: 'src/admin/views/CampaignsDashboard',
+        path: '/campaigns-dashboard',
+        exact: true,
+      },
+      ContentOrchestrator: {
+        Component: 'src/admin/views/ContentOrchestrator',
+        path: '/orchestrator',
+        exact: true,
+      },
+      AnalyticsOverview: {
+        Component: 'src/admin/views/AnalyticsOverview',
+        path: '/analytics',
+        exact: true,
+      },
+    },
+    afterNavLinks: 'src/admin/views/NavLinks',
+  },
+}
+```
+
+## View Summary
+
+| View | URL Path | Purpose |
+|------|----------|---------|
+| [Sites Dashboard](./sites-dashboard) | `/admin/sites` | Grid view of all jurisdictions |
+| [Site Detail](./site-detail) | `/admin/sites/:id` | Single jurisdiction detail |
+| [Campaigns Dashboard](./campaigns-dashboard) | `/admin/campaigns-dashboard` | Campaign timeline and management |
+| [Content Orchestrator](./content-orchestrator) | `/admin/orchestrator` | Bulk content operations |
+| [Analytics Overview](./analytics-overview) | `/admin/analytics` | Platform-wide statistics |
+
+## Navigation
+
+The [NavLinks](./nav-links) component is registered as `afterNavLinks`, which renders a "Command Center" heading followed by links to all custom views in the admin panel sidebar.
+
+## Architecture
+
+All custom admin views are **client components** (using `'use client'` directive). They fetch data from the Payload REST API using browser-side `fetch` calls to `/api/{collection}` endpoints. This approach:
+
+- Keeps views responsive with client-side state management
+- Uses standard Payload REST API endpoints (no custom server-side code required)
+- Supports filtering, searching, and pagination through URL query parameters
+- Enables real-time UI updates through React state
